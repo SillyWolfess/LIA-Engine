@@ -1,0 +1,8 @@
+<root>
+    <mainMenu>./data/default/gui/data/mainMenu.xml</mainMenu>
+    <ingameMenu>./data/default/gui/data/ingameMenu.xml</ingameMenu>
+    <endMenu>./data/default/gui/data/endMenu.xml</endMenu>
+    <topBar>./data/default/gui/data/topBar.xml</topBar>
+    <settings>./data/default/gui/data/settings.xml</settings>
+    <debugInfo>./data/default/gui/data/debugInfo.xml</debugInfo>
+</root>

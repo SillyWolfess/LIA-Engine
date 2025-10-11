@@ -1,0 +1,6 @@
+<root>
+    <name>textureTest</name>
+    <folder>./data/test/</folder>
+    <path>./data/test/textureTest.obj</path>
+    <shader>advanced</shader>
+</root>

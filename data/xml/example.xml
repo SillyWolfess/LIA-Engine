@@ -1,0 +1,7 @@
+<root>
+    <node atrStr="value1" atrNum="1" atrBool ="false" atrFloat="1.2"/>
+    <nodeValue>some text</nodeValue>
+    <anotherChild>
+        <childChild/>
+    </anotherChild>
+</root>

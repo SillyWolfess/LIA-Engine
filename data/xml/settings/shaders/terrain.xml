@@ -1,0 +1,5 @@
+<root>
+    <vertex>./build/graphic/shaders/terrain.vert</vertex>
+    <fragment>./build/graphic/shaders/terrain.frag</fragment>
+    <geom/>
+</root>

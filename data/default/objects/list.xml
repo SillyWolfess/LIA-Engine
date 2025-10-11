@@ -1,0 +1,8 @@
+<root>
+    <white_field>./data/default/objects/white_field.xml</white_field>
+    <black_field>./data/default/objects/black_field.xml</black_field>
+	<vixen>./data/default/objects/vixen.xml</vixen>
+    <test>./data/default/objects/test.xml</test>
+    <plane>./data/default/objects/plane.xml</plane>
+    <prefab_square>./data/default/objects/prefab_square.xml</prefab_square>
+</root>

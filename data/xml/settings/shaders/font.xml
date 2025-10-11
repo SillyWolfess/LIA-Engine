@@ -1,0 +1,5 @@
+<root>
+    <vertex>./build/graphic/shaders/font.vert</vertex>
+    <fragment>./build/graphic/shaders/font.frag</fragment>
+    <geom/>
+</root>

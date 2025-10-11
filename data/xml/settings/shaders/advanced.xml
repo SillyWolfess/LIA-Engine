@@ -1,0 +1,5 @@
+<root>
+    <vertex>./build/graphic/shaders/advanced.vert</vertex>
+    <fragment>./build/graphic/shaders/texture.frag</fragment>
+    <geom/>
+</root>

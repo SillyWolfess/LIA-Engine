@@ -1,0 +1,6 @@
+<root>
+    <name>prefab_square</name>
+    <folder>./data/default/prefabs/</folder>
+    <path>./data/default/prefabs/square.obj</path>
+    <shader>simple</shader>
+</root>
