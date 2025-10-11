@@ -4,7 +4,6 @@
 *.txt
 *.lib
 .vscode
-/build
 /data/cardGame
 /data/cityGame
 /data/Inspector
