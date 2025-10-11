@@ -1,0 +1,45 @@
+#ifndef LIA_COMPONENT_HPP
+#define LIA_COMPONENT_HPP
+
+#include "data/Event.hpp"
+#include "tools/macros.hpp"
+#include <string>
+namespace LIA {
+    class ObjectManager;
+    class EventManager;
+    class ComponentManager;
+    class TextureManager;
+    class Gui;
+    class Component {
+        public:
+            bool initCore();
+            void setIdentifier(int);
+            virtual bool afterInit();
+            bool tickEvenHandler(LIA::Event&);
+            bool loadEventHandler(LIA::Event&);
+            bool getDataGuiEventHandler(LIA::Event&);
+            bool buttonActionEventHandler(LIA::Event&);
+        protected:
+            int _identifier = -1;
+            virtual bool registerHandlers();
+            virtual bool init();
+            virtual bool onTick(LIA::Event&);
+            virtual bool onLoad(LIA::Event&);
+            virtual bool onGetGuiData(LIA::Event&);
+            virtual bool onButtonAction(LIA::Event&);
+            EventManager* getEventManager() { return _eventManager; }
+            ObjectManager* getObjectManager() { return _objectManager; }
+            ComponentManager* getComponentManager() { return _componentManager; }
+            Gui* getGuiManager() { return _guiManager; }
+            TextureManager* getTextureManager() { return _textureManager; }
+            bool subscribe(std::string);
+        private:
+            EventManager* _eventManager;
+            ObjectManager* _objectManager;
+            ComponentManager* _componentManager;
+            Gui* _guiManager;
+            TextureManager* _textureManager;
+            bool _registerHandlers();
+    };
+}
+#endif
