@@ -545,7 +545,7 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
             for (GuiObject& lchild: lChildren) {
                 passChild(lchild, scene, font);
             }
-        } else if (child._type = GuiObjectType::GRID) { 
+        } else if (child._type == GuiObjectType::GRID) { 
             scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.hoverButtonBgColor : child._bgColor);   
         } else {
            passChild(child, scene, font);
