@@ -296,7 +296,7 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
         if (window != nullptr) {
             if (event.useList) {
                 LIA_trace_f("Updating {}.{} = [list.size={}]", event.window, event.target, event.argl.size());
-                window->updateList(event.target, event.argl);
+                window->updateList(event.target, event.argl, event.argi);
             } else {
                 LIA_trace_f("Updating {}.{} = {}", event.window, event.target, event.arg0);
                 window->updateField(event.target, event.arg0);

@@ -112,8 +112,18 @@ void LIA::Window::addButton(std::string id, std::string text, Position& position
     
     button._isHovered = false;
     button._enabled = true;
+    logGuiObject(button);
     _children.push_back(button);
     _needToResize = true;
+}
+
+void LIA::Window::logGuiObject(GuiObject& object) {
+    LIA_debug_f(
+        "type = {}, value = {}, enabled = {}",
+        objectTypeToString(object._type),
+        object._value,
+        object._enabled
+    );
 }
 
 void LIA::Window::addButton(std::string id, std::string text, float x, float y) {
@@ -162,6 +172,7 @@ bool LIA::Window::hasButton(std::string id) {
 
 void LIA::Window::addCheckBox(std::string id, std::string label, bool isChecked, std::string eventAction) {
     GuiObject checkbox;
+    setDefaults(checkbox);
     
     checkbox._id = id;
     checkbox._type = GuiObjectType::CHECKBOX;
@@ -171,23 +182,36 @@ void LIA::Window::addCheckBox(std::string id, std::string label, bool isChecked,
     checkbox._action = eventAction;
 
     checkbox._scale = _style.checkBoxScale;
+/*
     checkbox._fontSize = defaultFontSize();
     checkbox._fontColor = defaultFontColor();
     checkbox._bgColor = defaultBgColor();
 
     checkbox._isHovered = false;
     checkbox._enabled = true;
+*/
     _children.push_back(checkbox);
+}
+
+void LIA::Window::setDefaults(GuiObject& object) {
+    object._scale = defaultScale();
+    object._fontSize = defaultFontSize();
+    object._fontColor = defaultFontColor();
+    object._bgColor = defaultBgColor();
+
+    object._isHovered = false;
+    object._enabled = true;
 }
 
 void LIA::Window::addLabel(std::string id, std::string value) {
     GuiObject label;
+    setDefaults(label);
 
     label._id = id;
     label._type = GuiObjectType::LABEL;
     label._labelAlignment = GUI_LABEL_POSITION::PREFIX;
     label._value = value;
-
+/*
     label._scale = defaultScale();
     label._fontSize = defaultFontSize();
     label._fontColor = defaultFontColor();
@@ -195,6 +219,7 @@ void LIA::Window::addLabel(std::string id, std::string value) {
 
     label._isHovered = false;
     label._enabled = true;
+*/
     _children.push_back(label);
 }
 
@@ -208,6 +233,8 @@ void LIA::Window::addGrid(std::string id, std::string name, int minRows, int max
             grid._labelAlignment = GUI_LABEL_POSITION::PREFIX;
             grid._value = "";
 
+            setDefaults(grid);
+            /*
             grid._scale = defaultScale();
             grid._fontSize = defaultFontSize();
             grid._fontColor = defaultFontColor();
@@ -215,6 +242,7 @@ void LIA::Window::addGrid(std::string id, std::string name, int minRows, int max
 
             grid._isHovered = false;
             grid._enabled = true;
+            */
             _children.push_back(grid);
         }
     }
@@ -222,11 +250,15 @@ void LIA::Window::addGrid(std::string id, std::string name, int minRows, int max
 
 void LIA::Window::addList(std::string id, std::string name) {
     GuiObject data;
+    setDefaults(data);
     data._id = id;
-    data._name = name;
+    data._label = name;
     data._type = GuiObjectType::LIST;
+    /*
+    data._scale = defaultScale();
     data._isHovered = false;
     data._enabled = true;
+    */
     _children.push_back(data);
     std::vector<GuiObject> tmp;
     _childrenMap.emplace(std::pair<std::string, std::vector<GuiObject>>(id, tmp));
@@ -234,6 +266,8 @@ void LIA::Window::addList(std::string id, std::string name) {
 
 void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, Position& position) {
     GuiObject field;
+    setDefaults(field);
+
     field._id = id;
     field._type = GuiObjectType::FIELD;
     field._labelAlignment = GUI_LABEL_POSITION::PREFIX;
@@ -241,7 +275,7 @@ void LIA::Window::addField(std::string id, std::string label, std::string value,
     field._value = value;
     field._position = position;
     field._placeholder = placeholder;
-
+/*
     field._scale = defaultScale();
     field._fontSize = defaultFontSize();
     field._fontColor = defaultFontColor();
@@ -249,6 +283,7 @@ void LIA::Window::addField(std::string id, std::string label, std::string value,
 
     field._isHovered = false;
     field._enabled = true;
+*/
     _children.push_back(field);
 }
 
@@ -280,23 +315,34 @@ void LIA::Window::updateField(std::string id, std::string value) {
     }
 }
 
-void LIA::Window::updateList(std::string id, std::vector<std::string> value) {
+void LIA::Window::updateList(std::string id, std::vector<std::string> value, int subtype) {
     for (GuiObject& child: _children) {
         if (child._id.compare(id) == 0) {
             if (child._type == GuiObjectType::LIST) {
                 std::vector<GuiObject>& data = _childrenMap[child._id];
                 data.clear();
                 data.reserve(value.size());
+                int indx = 0;
                 for (std::string &v : value) {
                     GuiObject& lgu = data.emplace_back();
+                    setDefaults(lgu);
+                    /*
                     lgu._fontColor = defaultFontColor();
                     lgu._fontSize = defaultFontSize();
-                    lgu._type = GuiObjectType::LABEL;
-                    lgu._id = id;
+                    lgu._scale = defaultScale();
                     lgu._isHovered = false;
                     lgu._enabled = true;
+                    */
+                    if (subtype == GuiObjectType::BUTTON) {
+                        lgu._type = GuiObjectType::BUTTON;
+                    } else {
+                        lgu._type = GuiObjectType::FIELD;
+                    }
+                    lgu._id = std::vformat("{}[{}]", std::make_format_args(child._id, indx));
                     lgu._value = v;
+                    indx++;
                 }
+                _needToResize = true;
             }
             return;
         }
@@ -367,6 +413,10 @@ void LIA::Window::computeScale() {
         }
         if (button._type == GuiObjectType::GRID) {
         //    yShift = yShift + button._scale.y + _style.padding.bottom;
+        } else if (button._type == GuiObjectType::LIST) {
+            for (GuiObject& ch: _childrenMap[button._id]) {
+                yShift = yShift + ch._scale.y + _style.padding.bottom;
+            }
         } else {
             yShift = yShift + button._scale.y + _style.padding.bottom;
         }
@@ -420,15 +470,26 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
         button._position.z = _position.z + zOffset;
         if (button._type == GuiObjectType::GRID) {
         //    yShift = yShift + button._scale.y + _style.padding.bottom;
+        } else if (button._type == GuiObjectType::LIST) {
+            button._position.y = _position.y;
+            for (GuiObject& ch: _childrenMap[button._id]) {
+                ch._position.x = button._position.x;
+                ch._position.y = button._position.y + yShift;
+                ch._position.z = button._position.z;
+                LIA_trace_f("yShift = {:.2f} + {:.2f} + {:.2f} = {:.2f}", yShift, ch._scale.y, _style.padding.bottom, (yShift + ch._scale.y + _style.padding.bottom));
+                yShift = yShift + ch._scale.y + _style.padding.bottom;
+                LIA_trace_f("button[{}].position = {:.2f} x {:.2f} x {:.2f}", ch._id, ch._position.x, ch._position.y, ch._position.z);
+            }
         } else {
             yShift = yShift + button._scale.y + _style.padding.bottom;
         }
+
         /*
         if (_style.padding.left + button._scale.x + _style.padding.right > xMax) {
             xMax = _style.padding.left + button._scale.x + _style.padding.right;
         }
         */
-        LIA_trace_f("button[{}].position = {} x {} x {}", button._id, button._position.x, button._position.y, button._position.z);
+        LIA_trace_f("button[{}].position = {:.2f} x {:.2f} x {:.2f}", button._id, button._position.x, button._position.y, button._position.z);
     }
     /*
     if (_scale.y < yShift) {
@@ -439,6 +500,33 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     }
     */
     _lastAppScale = appScale;
+}
+
+void LIA::Window::passChild(GuiObject& child, Scene* scene, Font* font) {
+    Rotation rotation = emptyRotation();
+    if (child._type == GuiObjectType::FIELD) {
+        std::string fieldText = (child._label.compare("") != 0 ? child._label + ": " : "") + (child._value.compare("") == 0 ? child._placeholder : child._value);
+        font->addText(fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
+    } else if (child._type == GuiObjectType::BUTTON) {
+        font->addText(child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
+        Color bgColor = child._isHovered ? _style.hoverButtonBgColor : child._bgColor;
+        if (!child._enabled) {
+            copyColor(bgColor, _style.disbaledButtonColor);
+        }
+        scene->addSquare(child._id, child._position, rotation, child._scale, bgColor);
+    } else if (child._type == GuiObjectType::CHECKBOX) {
+        Color fontColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
+        font->addText(child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
+        Color bgColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
+        if (!child._enabled) {
+            copyColor(bgColor, _style.disbaledButtonColor);
+        }
+        scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.checkBoxHoverColor : bgColor);
+    } else if (child._type == GuiObjectType::LABEL) {
+        font->addText(child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
+    } else {
+        LIA_error(std::vformat("unknown gui object type of {}", std::make_format_args(static_cast<int>(child._type))));
+    }
 }
 
 void LIA::Window::passObjects(Scene* scene, Font* font) {
@@ -455,37 +543,15 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
         if (child._type == GuiObjectType::LIST) {
             std::vector<GuiObject>& lChildren = _childrenMap[child._id];
             for (GuiObject& lchild: lChildren) {
-                if (lchild._type == GuiObjectType::FIELD) {
-                    std::string fieldText = (lchild._label.compare("") != 0 ? lchild._label + ": " : "") + (lchild._value.compare("") == 0 ? lchild._placeholder : lchild._value);
-                    font->addText(fieldText, computeFontPosition(lchild, fieldText), lchild._fontColor, lchild._fontSize);
-                }
+                passChild(lchild, scene, font);
             }
-        } else if (child._type == GuiObjectType::BUTTON) {
-            font->addText(child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
-            Color bgColor = child._isHovered ? _style.hoverButtonBgColor : child._bgColor;
-            if (!child._enabled) {
-                copyColor(bgColor, _style.disbaledButtonColor);
-            }
-            scene->addSquare(child._id, child._position, rotation, child._scale, bgColor);
-        } else if (child._type == GuiObjectType::FIELD) {
-            std::string fieldText = (child._label.compare("") != 0 ? child._label + ": " : "") + (child._value.compare("") == 0 ? child._placeholder : child._value);
-            font->addText(fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
-        } else if (child._type == GuiObjectType::CHECKBOX) {
-            Color fontColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
-            font->addText(child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
-            Color bgColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
-            if (!child._enabled) {
-                copyColor(bgColor, _style.disbaledButtonColor);
-            }
-            scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.checkBoxHoverColor : bgColor);
-        } else if (child._type == GuiObjectType::LABEL) {
-            font->addText(child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
         } else if (child._type = GuiObjectType::GRID) { 
             scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.hoverButtonBgColor : child._bgColor);   
         } else {
-            LIA_error(std::vformat("unknown gui object type of {}", std::make_format_args(static_cast<int>(child._type))));
+           passChild(child, scene, font);
         }
     }
+
     if (_hasHeader) {
         GuiObject oHeader;
         oHeader._position.x = _position.x;

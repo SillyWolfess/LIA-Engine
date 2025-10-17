@@ -47,7 +47,7 @@ namespace LIA {
             this->type = EventType::SIMULATION;
             this->name = "gameLost";
             this->arg0 = windowToOpen;
-        }
+        };
     };
     struct TickEvent : Event {
         TickEvent() = delete;
@@ -128,8 +128,18 @@ namespace LIA {
             this->target = target;
             this->useList = true;
             argl = value;
-        }
-    }
+            argi = -1;
+        };
+        UpdateGuiListEvent(std::string window, std::string target, std::vector<std::string> &value, int subtype) {
+            name = "update_gui";
+            type = EventType::GUI;
+            this->window = window;
+            this->target = target;
+            this->useList = true;
+            argl = value;
+            argi = subtype;
+        };
+    };
     struct SetGuiEnabledEvent: Event {
         SetGuiEnabledEvent() = delete;
         SetGuiEnabledEvent(std::string window, std::string target, bool value) {
@@ -147,7 +157,7 @@ namespace LIA {
             type = EventType::GUI;
             this->window = window;
             this->source = window;
-        }
+        };
     };
 }
 #endif
