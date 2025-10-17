@@ -61,6 +61,7 @@ namespace LIA {
             bool _visible;
             bool _hasHeader;
             bool _needToResize;
+            void setDefaults(GuiObject& object);
                         
             Position combinePositions(Position&, Position&);
             Position combinePositions(Position&, Position&, Padding&);
@@ -72,6 +73,8 @@ namespace LIA {
             void computeScale();
             Position computeFontPosition(GuiObject&, std::string);
             Position computeFontPosition(GuiObject&, std::string, bool);
+            void passChild(GuiObject&, Scene*, Font*);
+            void logGuiObject(GuiObject&);
         public:
             Window();
             ~Window();
@@ -202,8 +205,9 @@ namespace LIA {
             /**
              * @param {string} id
              * @param {list<string>} list of values
+             * @param {int} type of children
              */
-            void updateList(std::string, std::vector<std::string>);
+            void updateList(std::string, std::vector<std::string>, int);
             /**
              * @param {string} id
              * @param {string} value

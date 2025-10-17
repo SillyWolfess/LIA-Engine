@@ -44,5 +44,26 @@ namespace LIA {
         bool _isHovered;
         bool _enabled;
     };
+    inline std::string objectTypeToString(GuiObjectType& object) {
+        if (object == GuiObjectType::BUTTON) {
+            return "button";
+        }
+        if (object == GuiObjectType::FIELD) {
+            return "field";
+        }
+        if (object == GuiObjectType::CHECKBOX) {
+            return "checkbox";
+        }
+        if (object == GuiObjectType::LABEL) {
+            return "label";
+        }
+        if (object == GuiObjectType::LIST) {
+            return "list";
+        }
+        if (object == GuiObjectType::GRID) {
+            return "grid";
+        }
+        return "--";
+    }
 }
 #endif
