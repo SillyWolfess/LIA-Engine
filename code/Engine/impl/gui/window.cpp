@@ -223,7 +223,7 @@ void LIA::Window::addGrid(std::string id, std::string name, int minRows, int max
 void LIA::Window::addList(std::string id, std::string name) {
     GuiObject data;
     data._id = id;
-    data._name = name;
+    data._label = name;
     data._type = GuiObjectType::LIST;
     data._isHovered = false;
     data._enabled = true;

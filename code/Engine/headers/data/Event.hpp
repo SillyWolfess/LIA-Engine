@@ -26,7 +26,7 @@ namespace LIA {
             argi = fps;
             arg0 = "";
             type = EventType::GUI;
-        };
+        }
     };
     struct LoadEvent : Event {
         LoadEvent() = delete;
@@ -35,14 +35,14 @@ namespace LIA {
             this->argi = id;
             this->name = "load";
             this->source = source;
-        };
+        }
     };
     struct GameLostEvent : Event {
         GameLostEvent() {
             this->type = EventType::SIMULATION;
             this->name = "gameLost";
             this->arg0 = "end_menu";
-        };
+        }
         GameLostEvent(std::string windowToOpen) {
             this->type = EventType::SIMULATION;
             this->name = "gameLost";
@@ -55,7 +55,7 @@ namespace LIA {
             this->type = EventType::SIMULATION;
             this->name = "tick";
             this->source = source;
-        };
+        }
     };
     struct ButtonEvent: Event {
         ButtonEvent() = delete;
@@ -65,7 +65,7 @@ namespace LIA {
             this->source = source;
             this->action = action;
             this->arg0 = arg0;
-        };
+        }
         ButtonEvent(std::string source, std::string action, std::string arg0, std::string window) {
             this->name = "button_action";
             this->type = EventType::GUI;
@@ -73,7 +73,7 @@ namespace LIA {
             this->action = action;
             this->arg0 = arg0;
             this->window = window;
-        };
+        }
     };
     struct CheckBoxEvent: Event {
         CheckBoxEvent() = delete;
@@ -82,7 +82,7 @@ namespace LIA {
             this->type = EventType::GUI;
             this->source = source;
             this->action = action;
-        };
+        }
     };
     //UpdateGuiEvent updateGuiEvent("settings", "fullscreen", _glfwSettings.maximize);
     struct UpdateGuiEvent: Event {
@@ -93,21 +93,21 @@ namespace LIA {
             this->window = window;
             this->target = target;
             arg0 = value ? "true" : "false";
-        };
+        }
         UpdateGuiEvent(std::string window, std::string target, int value) {
             name = "update_gui";
             type = EventType::GUI;
             this->window = window;
             this->target = target;
             arg0 = std::to_string(value);
-        };
+        }
         UpdateGuiEvent(std::string window, std::string target, std::string value) {
             name = "update_gui";
             type = EventType::GUI;
             this->window = window;
             this->target = target;
             arg0 = value;
-        };
+        }
     };
     struct UpdateGuiStringEvent: Event {
         UpdateGuiStringEvent() = delete;
@@ -117,7 +117,7 @@ namespace LIA {
             this->window = window;
             this->target = target;
             arg0 = value;
-        };
+        }
     };
     struct UpdateGuiListEvent: Event {
         UpdateGuiListEvent() = delete;
@@ -129,7 +129,7 @@ namespace LIA {
             this->useList = true;
             argl = value;
         }
-    }
+    };
     struct SetGuiEnabledEvent: Event {
         SetGuiEnabledEvent() = delete;
         SetGuiEnabledEvent(std::string window, std::string target, bool value) {
@@ -138,7 +138,7 @@ namespace LIA {
             this->window = window;
             this->target = target;
             argb = value;
-        };
+        }
     };
     struct GuiGetDataEvent: Event {
         GuiGetDataEvent() = delete;
