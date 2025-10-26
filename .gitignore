@@ -8,5 +8,6 @@
 /compiler
 /code
 /network
+/Inspector
 /Engine/code/*.obj
 /Engine/code/test
