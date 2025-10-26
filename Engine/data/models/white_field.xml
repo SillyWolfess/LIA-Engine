@@ -1,0 +1,6 @@
+<root>
+    <name>white_field</name>
+    <folder>./data/</folder>
+    <path>./data/field_white.obj</path>
+    <shader>simple</shader>
+</root>
