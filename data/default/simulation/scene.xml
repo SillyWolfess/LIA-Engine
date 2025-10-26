@@ -1,9 +1,0 @@
-<root>
-    <!-- light -->
-    <light type="light">./data/default/light/light.xml</light>
-    <!--
-    <pointl type="light">./data/default/light/point.xml</pointl>
-    <f
-    lashlight type="light">./data/default/light/flashlight.xml</flashlight>
-    -->
-</root>

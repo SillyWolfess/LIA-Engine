@@ -1,7 +1,0 @@
-<root>
-    <font>./data/xml/settings/shaders/font.xml</font>
-    <simple>./data/xml/settings/shaders/simple.xml</simple>
-    <gui>./data/xml/settings/shaders/gui.xml</gui>
-    <advanced>./data/xml/settings/shaders/advanced.xml</advanced>
-    <terrain>./data/xml/settings/shaders/terrain.xml</terrain>
-</root>

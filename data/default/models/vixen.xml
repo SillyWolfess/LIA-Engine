@@ -1,6 +1,0 @@
-<root>
-    <name>vixen</name>
-    <folder>./data/vixen/</folder>
-    <path>./data/vixen/vixen.obj</path>
-    <shader>advanced</shader>
-</root>
