@@ -6,6 +6,10 @@ bool LIA::Math::isColliding(Object* target, Object* source) {
     return isColliding(target, source->_position, source->_scale);
 }
 
+float LIA::Math::toRadians(float euql) {
+    return euql * PiOver180;
+}
+
 bool LIA::Math::isColliding(Object* target, Position newPosition, Scale scale) {
     const Position targetPos = target->_position;
     const Scale targetScale = target->_scale;
