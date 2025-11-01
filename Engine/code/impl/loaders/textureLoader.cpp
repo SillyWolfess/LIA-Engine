@@ -9,90 +9,90 @@
 #include "3d-party/stb_image.h"
 
 bool LIA::TextureLoader::loadBMP(GLuint &textureID_out, std::string imagepath) {
-	const bool debug_texture = false;
-	if (debug_texture) {
-        LIA_debug_f("Reading bmp image {}", imagepath);
-	}
-	// Data read from the header of the BMP file
-	unsigned char header[54];
-	unsigned int dataPos;
-	unsigned int imageSize;
-	unsigned int width, height;
-	// Actual RGB data
-	unsigned char * data;
+	LIA_TRY
+		const bool debug_texture = false;
+		LIA_debug_f("Reading bmp image {}", imagepath);
+		// Data read from the header of the BMP file
+		unsigned char header[54];
+		unsigned int dataPos;
+		unsigned int imageSize;
+		unsigned int width, height;
+		// Actual RGB data
+		unsigned char * data;
 
-	// Open the file
-	FILE * file = fopen(imagepath.c_str(), "rb");
-	if (!file)							    
-	{
-        LIA_fatal_f("{} not found", imagepath);
-		return false;
-	}
+		// Open the file
+		FILE * file = fopen(imagepath.c_str(), "rb");
+		if (!file)							    
+		{
+			LIA_fatal_f("{} not found", imagepath);
+			return false;
+		}
 
-	// If less than 54 bytes are read, problem
-	if ( fread(header, 1, 54, file)!=54 ){ 
-		LIA_fatal("Not a correct BMP file: less than 54 bytes");
+		// If less than 54 bytes are read, problem
+		if ( fread(header, 1, 54, file)!=54 ){ 
+			LIA_fatal("Not a correct BMP file: less than 54 bytes");
+			fclose(file);
+			return false;
+		}
+		// A BMP files always begins with "BM"
+		if ( header[0]!='B' || header[1]!='M' ){
+			LIA_fatal("Not a correct BMP file: missing BM");
+			fclose(file);
+			return false;
+		}
+		// Make sure this is a 24bpp file
+		if ( *(int*)&(header[0x1E])!=0  ) { 
+			LIA_fatal("Not a correct BMP file: not 24bpp file"); 
+			fclose(file);
+			return false;
+		}
+		if ( *(int*)&(header[0x1C])!=24 ) {
+			LIA_fatal("Not a correct BMP file: not 24bpp file"); 
+			fclose(file); 
+			return false;
+		}
+
+		// Read the information about the image
+		dataPos    = *(int*)&(header[0x0A]);
+		imageSize  = *(int*)&(header[0x22]);
+		width      = *(int*)&(header[0x12]);
+		height     = *(int*)&(header[0x16]);
+
+		// Some BMP files are misformatted, guess missing information
+		if (imageSize==0)    imageSize=width*height*3; // 3 : one byte for each Red, Green and Blue component
+		if (dataPos==0)      dataPos=54; // The BMP header is done that way
+
+		// Create a buffer
+		data = new unsigned char [imageSize];
+
+		// Read the actual data from the file into the buffer
+		fread(data,1,imageSize,file);
+
+		// Everything is in memory now, the file wan be closed
+		fclose (file);
+		GLuint textureID;
+		// Create one OpenGL texture
+		glGenTextures(1, &textureID);
+		
+		// "Bind" the newly created texture : all future texture functions will modify this texture
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+		// Give the image to OpenGL
+		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+
+		// OpenGL has now copied the data. Free our own version
+		delete [] data;
 		fclose(file);
-		return false;
-	}
-	// A BMP files always begins with "BM"
-	if ( header[0]!='B' || header[1]!='M' ){
-		LIA_fatal("Not a correct BMP file: missing BM");
-		fclose(file);
-		return false;
-	}
-	// Make sure this is a 24bpp file
-	if ( *(int*)&(header[0x1E])!=0  ) { 
-		LIA_fatal("Not a correct BMP file: not 24bpp file"); 
-		fclose(file);
-		return false;
-	}
-	if ( *(int*)&(header[0x1C])!=24 ) {
-		LIA_fatal("Not a correct BMP file: not 24bpp file"); 
-		fclose(file); 
-		return false;
-	}
 
-	// Read the information about the image
-	dataPos    = *(int*)&(header[0x0A]);
-	imageSize  = *(int*)&(header[0x22]);
-	width      = *(int*)&(header[0x12]);
-	height     = *(int*)&(header[0x16]);
+		// Poor filtering, or ...
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 
-	// Some BMP files are misformatted, guess missing information
-	if (imageSize==0)    imageSize=width*height*3; // 3 : one byte for each Red, Green and Blue component
-	if (dataPos==0)      dataPos=54; // The BMP header is done that way
-
-	// Create a buffer
-	data = new unsigned char [imageSize];
-
-	// Read the actual data from the file into the buffer
-	fread(data,1,imageSize,file);
-
-	// Everything is in memory now, the file wan be closed
-	fclose (file);
-	GLuint textureID;
-	// Create one OpenGL texture
-	glGenTextures(1, &textureID);
-	
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	// Give the image to OpenGL
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
-
-	// OpenGL has now copied the data. Free our own version
-	delete [] data;
-	fclose(file);
-
-	// Poor filtering, or ...
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-
-	// Return the ID of the texture we just created
-	textureID_out = textureID;
-    LIA_debug_f("new texture id: {}", textureID);
-	return true;
+		// Return the ID of the texture we just created
+		textureID_out = textureID;
+		LIA_debug_f("new texture id: {}", textureID);
+		return true;
+	LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::TextureLoader::_loadTexture(GLuint &textureID_out, std::string imagepath, GLenum format) {

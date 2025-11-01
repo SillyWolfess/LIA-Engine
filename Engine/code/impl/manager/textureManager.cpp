@@ -33,38 +33,50 @@ bool LIA::TextureManager::load() {
 }
 
 LIA::Texture& LIA::TextureManager::get(std::string name) {
+    LIA_trace_f("retrieving texture '{}'", name);
     return _textures[name];
 }
 
 bool LIA::TextureManager::load(std::string name) {
-    Texture& texture = get(name);
-    if (texture.isValid()) {
-        LIA_trace_f("[FOUND_VALID] {} = {}", texture._name, texture._id);
-        return true;
-    }
-    LIA_trace_f("Loading texture {}", texture._name);
-    std::string path = std::vformat("{}{}", std::make_format_args(texture._folder, texture._path)); 
-    if (texture._type == TextureType::ANY) {
-        if (!TextureLoader::loadTexture(texture._id, path)) {
-            LIA_error_f("Failed to load texture {}", texture._name);
-            return false;
+    LIA_TRY
+        Texture& texture = get(name);
+        if (texture.isValid()) {
+            LIA_trace_f("[FOUND_VALID] {} = {}", texture._name, texture._id);
+            return true;
         }
-    } else if (texture._type == TextureType::HDR) {
-        if (!TextureLoader::loadTextureHDR(texture._id, path)) {
-            LIA_error_f("Failed to load texture {}", texture._name);
-            return false;
-        }    
-    } else if (texture._type == TextureType::RGBA) {
-        if (!TextureLoader::loadTextureRGBA(texture._id, path)) {
-            LIA_error_f("Failed to load texture {}", texture._name);
-            return false;
-        }    
-    } else {
-        LIA_fatal_f("Unknown texture type for {}", texture._name);
-        return false;
-    }
-    LIA_trace_f("New texture {} loaded with id {}", texture._name, texture._id);
-    return true;
+        LIA_trace_f("Loading texture {}", texture._name);
+        std::string path = std::vformat("{}{}", std::make_format_args(texture._folder, texture._path)); 
+        if (texture._path.ends_with(std::string_view(".bmp"))) {
+            LIA_debug_f("{} with path {} is bmp", texture._name, texture._path);
+            if (!TextureLoader::loadBMP(texture._id, path)) {
+                LIA_error_f("Failed to load bmp texture {}", texture._name);
+                return false;
+            }
+        } else {
+            LIA_debug_f("{} with path {} is not bmp", texture._name, texture._path);
+            if (texture._type == TextureType::ANY) {
+                if (!TextureLoader::loadTexture(texture._id, path)) {
+                    LIA_error_f("Failed to load texture {}", texture._name);
+                    return false;
+                }
+            } else if (texture._type == TextureType::HDR) {
+                if (!TextureLoader::loadTextureHDR(texture._id, path)) {
+                    LIA_error_f("Failed to load hdr texture {}", texture._name);
+                    return false;
+                }    
+            } else if (texture._type == TextureType::RGBA) {
+                if (!TextureLoader::loadTextureRGBA(texture._id, path)) {
+                    LIA_error_f("Failed to load rgba texture {}", texture._name);
+                    return false;
+                }    
+            } else {
+                LIA_fatal_f("Unknown texture type for {}", texture._name);
+                return false;
+            }
+        }
+        LIA_trace_f("New texture {} loaded with id {}", texture._name, texture._id);
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::TextureManager::registerTexture(std::string name, std::string folder, std::string path, TextureType type) {

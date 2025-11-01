@@ -150,6 +150,9 @@ void LIA::ObjLoader::load(ModelData& object, const char * dir, const char * path
 					LIA_trace("make new material");
 					object.materials.emplace_back();
 					gMaterial& smt = object.materials[object.materials.size() - 1];
+					smt.hasBump = false;
+					smt.hasEm = false;
+					smt.hasTexture = false;
 					smt.Kd[0] = 0; smt.Kd[1] = 0; smt.Kd[2] = 0;
 					smt.Ka[0] = 0; smt.Ka[1] = 0; smt.Ka[2] = 0;
 					smt.Ks[0] = 0; smt.Ks[1] = 0; smt.Ks[2] = 0;

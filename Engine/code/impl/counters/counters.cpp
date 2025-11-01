@@ -79,10 +79,10 @@ void LIA_DEBUG::Counters::log() {
             LIA_fatal(std::vformat("{} = {} copy constructors", std::make_format_args(name, _constructorCopyCalls[name])));
             LIA_fatal(std::vformat("{} = {} destructors", std::make_format_args(name, _destructorCalls[name])));
             */
-            LIA_fatal("{} has difference in constructor / destructor by {}", name, count);
-            LIA_fatal("{} = {} constructors total", name, _constructorCalls[name]);
-            LIA_fatal("{} = {} copy constructors", name, _constructorCopyCalls[name]);
-            LIA_fatal("{} = {} destructors", name, _destructorCalls[name]);
+            LIA_fatal_f("{} has difference in constructor / destructor by {}", name, count);
+            LIA_fatal_f("{} = {} constructors total", name, _constructorCalls[name]);
+            LIA_fatal_f("{} = {} copy constructors", name, _constructorCopyCalls[name]);
+            LIA_fatal_f("{} = {} destructors", name, _destructorCalls[name]);
         }
     }
 }

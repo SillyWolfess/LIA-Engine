@@ -222,7 +222,7 @@ void LIA::ObjectManager::setScale(Object* object, Scale& scale) {
 bool LIA::ObjectManager::createObject(std::string id, std::string name) {
     std::string path = getPath(id);
     if (path.compare("") == 0) {
-        LIA_error("Failed to get path for '{}'", id);
+        LIA_error_f("Failed to get path for '{}'", id);
         return false;
     }
     return loadObject(path, name);

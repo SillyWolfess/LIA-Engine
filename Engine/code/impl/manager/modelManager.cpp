@@ -324,7 +324,7 @@ bool LIA::ModelManager::load(Model& model, int programId) {
                     return false;
                 }
             }
-            Texture& mTexture = textureManager.get(material.hasTexture ? material.texture_bump : "emptyBump");
+            Texture& mTexture = textureManager.get(material.hasBump ? material.texture_bump : "emptyBump");
             if (!textureManager.load(mTexture._name)) {
                 LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
                 return false;
@@ -355,13 +355,13 @@ bool LIA::ModelManager::load(Model& model, int programId) {
         LIA_TRY
             if (material.hasEm) {
                 if (!textureManager.registerTexture(material.texture_em, model.folder, material.texture_em, TextureType::HDR)) {
-                    LIA_error_f("Failed to register texture {} for material {}", material.texture_em, material.name);
+                    LIA_error_f("Failed to register em texture {} for material {}", material.texture_em, material.name);
                     return false;
                 }
             }
-            Texture& mTexture = textureManager.get(material.hasTexture ? material.texture_em : "emptyEm");
+            Texture& mTexture = textureManager.get(material.hasEm ? material.texture_em : "emptyEm");
             if (!textureManager.load(mTexture._name)) {
-                LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
+                LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
                 return false;
             }
             Texture& textureEm = model._em.emplace_back();
