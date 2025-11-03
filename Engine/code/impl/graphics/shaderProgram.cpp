@@ -27,10 +27,12 @@ LIA::ShaderProgram::ShaderProgram(const ShaderProgram& shaderProgram) {
     _name = shaderProgram._name;
     for (auto [shader_type, path] : shaderProgram._shaderPaths) {
         _shaderPaths.emplace(std::pair<LIA_SHADER, std::string>(shader_type, path));
+        _watcher.subscribe(path);
     }
 }
 void LIA::ShaderProgram::add(LIA_SHADER type, std::string path) {
     _shaderPaths.emplace(std::pair<LIA_SHADER, std::string>(type, path));
+    _watcher.subscribe(path);
 }
 
 LIA::ShaderProgram::sShaderReturn LIA::ShaderProgram::createShader(std::string path, GLenum type) {
@@ -396,4 +398,34 @@ bool LIA::ShaderProgram::unbindTexture(std::string uniformName, int uniformId) {
        return false;
     }
     return true;
+}
+
+void LIA::ShaderProgram::update() {
+    std::string vertexPath = getShaderPath(LIA_SHADER::VERTEX);
+    bool needUpdateVertex = vertexPath.compare("") != 0 && _watcher.needsReload(vertexPath);
+
+    std::string fragmentPath = getShaderPath(LIA_SHADER::FRAGMENT);
+    bool needUpdateFragment = fragmentPath.compare("") != 0 && _watcher.needsReload(fragmentPath);
+
+    std::string geomPath = getShaderPath(LIA_SHADER::GEOMETRY);
+    bool needUpdateGeom = geomPath.compare("") != 0 && _watcher.needsReload(geomPath);
+
+    if (needUpdateFragment || needUpdateVertex || needUpdateGeom) {
+        GLuint pId = _program;
+        bool loaded = _loaded;
+        if (!buildProgram()) {
+            LIA_error("Failed to reload shaders");
+            _program = pId;
+            loaded = _loaded;
+            return;
+        }
+        _uniforms.clear();
+        if (!loadUniforms()) {
+            LIA_error("Failed to reload uniforms");
+            _program = pId;
+            loaded = _loaded;
+            return;
+        }
+        glDeleteProgram(pId);
+    }
 }

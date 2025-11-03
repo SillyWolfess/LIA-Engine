@@ -182,14 +182,6 @@ void LIA::Window::addCheckBox(std::string id, std::string label, bool isChecked,
     checkbox._action = eventAction;
 
     checkbox._scale = _style.checkBoxScale;
-/*
-    checkbox._fontSize = defaultFontSize();
-    checkbox._fontColor = defaultFontColor();
-    checkbox._bgColor = defaultBgColor();
-
-    checkbox._isHovered = false;
-    checkbox._enabled = true;
-*/
     _children.push_back(checkbox);
 }
 
@@ -211,15 +203,6 @@ void LIA::Window::addLabel(std::string id, std::string value) {
     label._type = GuiObjectType::LABEL;
     label._labelAlignment = GUI_LABEL_POSITION::PREFIX;
     label._value = value;
-/*
-    label._scale = defaultScale();
-    label._fontSize = defaultFontSize();
-    label._fontColor = defaultFontColor();
-    label._bgColor = defaultBgColor();
-
-    label._isHovered = false;
-    label._enabled = true;
-*/
     _children.push_back(label);
 }
 
@@ -234,15 +217,6 @@ void LIA::Window::addGrid(std::string id, std::string name, int minRows, int max
             grid._value = "";
 
             setDefaults(grid);
-            /*
-            grid._scale = defaultScale();
-            grid._fontSize = defaultFontSize();
-            grid._fontColor = defaultFontColor();
-            grid._bgColor = defaultBgColor();
-
-            grid._isHovered = false;
-            grid._enabled = true;
-            */
             _children.push_back(grid);
         }
     }
@@ -254,11 +228,6 @@ void LIA::Window::addList(std::string id, std::string name) {
     data._id = id;
     data._label = name;
     data._type = GuiObjectType::LIST;
-    /*
-    data._scale = defaultScale();
-    data._isHovered = false;
-    data._enabled = true;
-    */
     _children.push_back(data);
     std::vector<GuiObject> tmp;
     _childrenMap.emplace(std::pair<std::string, std::vector<GuiObject>>(id, tmp));
@@ -275,15 +244,7 @@ void LIA::Window::addField(std::string id, std::string label, std::string value,
     field._value = value;
     field._position = position;
     field._placeholder = placeholder;
-/*
-    field._scale = defaultScale();
-    field._fontSize = defaultFontSize();
-    field._fontColor = defaultFontColor();
-    field._bgColor = defaultBgColor();
 
-    field._isHovered = false;
-    field._enabled = true;
-*/
     _children.push_back(field);
 }
 
@@ -326,13 +287,7 @@ void LIA::Window::updateList(std::string id, std::vector<std::string> value, int
                 for (std::string &v : value) {
                     GuiObject& lgu = data.emplace_back();
                     setDefaults(lgu);
-                    /*
-                    lgu._fontColor = defaultFontColor();
-                    lgu._fontSize = defaultFontSize();
-                    lgu._scale = defaultScale();
-                    lgu._isHovered = false;
-                    lgu._enabled = true;
-                    */
+
                     if (subtype == GuiObjectType::BUTTON) {
                         lgu._type = GuiObjectType::BUTTON;
                     } else {

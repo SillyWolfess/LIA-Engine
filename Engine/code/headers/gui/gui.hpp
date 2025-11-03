@@ -10,10 +10,13 @@
 #include "appWindow.hpp"
 #include "manager/eventManager.hpp"
 
+#include "watcher/Watcher.hpp"
+
 namespace LIA
 {
     class Gui {
         private:
+            Watcher _watcher;
             struct Data {
                 std::string text;
                 Position position;

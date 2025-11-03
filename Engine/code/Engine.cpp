@@ -213,6 +213,9 @@ bool LIA::Engine::update() {
         _lastTime = currentTime;
     }
 
+    _watcher.watch();
+    _shaderManager.update();
+
     _window.update();
     if (!_simulation.update(&_window, _deltaTime)) {
         LIA_fatal("Simulation update failed");

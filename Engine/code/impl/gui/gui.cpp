@@ -75,6 +75,7 @@ bool LIA::Gui::init() {
         return false;
     }
     _lastAppScale = _appWindow->getWindowScale();
+    _watcher.subscribe("./data/gui/style.xml");
     return true;
 }
 
@@ -354,6 +355,17 @@ int LIA::Gui::add(std::string text) {
 } 
 
 void LIA::Gui::update() {
+    if (_watcher.needsReload("./data/gui/style.xml")) {
+        if (!loadStyle()) {
+            LIA_error("Failed to reload style");
+        } else {
+            LIA_trace("Style reloaded");
+            for (Window& window: _windows) {
+                window.setStyle(style);
+            }
+        }
+    }
+
     AppWindow* appWindow = _appWindow;
     EventManager* eventManager = _eventManager;
     int lastKey = appWindow->lastKeyPressed();

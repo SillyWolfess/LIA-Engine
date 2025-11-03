@@ -12,10 +12,13 @@
 #include "manager/textureManager.hpp"
 #include "component/BaseGame.hpp"
 
+#include "watcher/Watcher.hpp"
+
 namespace LIA
 {
     class Engine {
         private:
+            Watcher _watcher;
             AppWindow _window;
             Simulation _simulation;
             Gui _gui;

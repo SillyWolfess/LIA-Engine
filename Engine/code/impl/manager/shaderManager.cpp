@@ -51,6 +51,12 @@ bool LIA::ShaderManager::init() {
     return true;
 }
 
+void LIA::ShaderManager::update() {
+    for (ShaderProgram& shader : _shaders) {
+        shader.update();
+    }
+}
+
 GLuint LIA::ShaderManager::getProgramId(std::string shaderName) {
     std::map<std::string, int>::iterator it = _shaderMap.find(shaderName);
     if (it == _shaderMap.end()) {

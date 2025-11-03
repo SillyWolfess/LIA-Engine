@@ -20,6 +20,7 @@ namespace LIA {
             GLuint getProgramId(std::string);
             ShaderProgram& getShader(std::string);
             bool init();
+            void update();
             ~ShaderManager();
     };
 }

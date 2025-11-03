@@ -6,10 +6,12 @@
 #include "data/Light.hpp"
 #include <map>
 #include <unordered_map>
+#include "watcher/Watcher.hpp"
 
 namespace LIA {
     class ShaderProgram {
         private:
+            Watcher _watcher;
             struct sShaderReturn {
                 GLuint id;
                 bool success;
@@ -43,7 +45,7 @@ namespace LIA {
              * @param {std::string} path to shader
              */
             void add(LIA_SHADER, std::string);
-
+            void update();
             /***
              * Builds shader in GPU
              */
