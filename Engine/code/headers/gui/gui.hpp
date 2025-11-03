@@ -62,6 +62,7 @@ namespace LIA
             void closeWindow(Window*);
             void toggleWindow(std::string);
             bool loadWindow(std::string name, std::string path);
+            bool loadWindow(Window& window, std::string path, bool);
             /**
              * @param {string} target window
              * @param {string} id

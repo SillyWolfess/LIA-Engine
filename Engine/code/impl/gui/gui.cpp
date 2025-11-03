@@ -79,14 +79,14 @@ bool LIA::Gui::init() {
     return true;
 }
 
-bool LIA::Gui::loadWindow(std::string name, std::string path) {
-    LIA_TRY
+bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
+    std::string name = window.getName();
         XmlLoader xmlLoader;
         XmlLoader::XmlData xmlWindow = xmlLoader.load(path);
         std::map<std::string, std::string> xmlWindowData = xmlWindow.values;
-        Window window;
         window.setName(xmlWindowData.at("name"));
         window.setId(xmlWindowData.at("id"));
+        window.setPath(path);
         LIA_trace("Setting style");
         window.setStyle(style);
 
@@ -178,14 +178,27 @@ bool LIA::Gui::loadWindow(std::string name, std::string path) {
                 LIA_error(std::vformat("Unknown child type {} in {}", std::make_format_args(childType, name)));
             }
         }
-        if (isVisible) {
-            window.show(_appWindow);
-        } else {
-            window.hide();
+        if (initShow) {
+            if (isVisible) {
+                window.show(_appWindow);
+            } else {
+                window.hide();
+            }
+        }
+        return true;
+}
+
+bool LIA::Gui::loadWindow(std::string name, std::string path) {
+    LIA_TRY
+        Window window;
+        if (!loadWindow(window, path, true)) {
+            return false;
         }
         _windows.emplace_back(window);
         int indx = _windows.size() - 1;
         _windowMap.emplace(std::pair<std::string, int>(window.getId(), indx));
+        _watcher.subscribe(path);
+        LIA_debug_f("New window {} with id", window.getId(), indx);
         return true;
     LIA_CATCH_RETURN_FALSE
 }
@@ -364,6 +377,27 @@ void LIA::Gui::update() {
                 window.setStyle(style);
             }
         }
+    }
+
+    for (Window& window: _windows) {
+        LIA_TRY
+        if (_watcher.needsReload(window.getPath())) {
+            Window tmpWindow;
+            tmpWindow.setPath(window.getPath());
+            if (loadWindow(tmpWindow, tmpWindow.getPath(), false)) {
+                window.clear();
+                if (loadWindow(window, window.getPath(), false)) {
+                    window.resize(_appWindow);
+                    if (window.isVisible()) {
+                        GuiGetDataEvent guiGetDataEvent(window.getId());
+                        _eventManager->handleEvent(guiGetDataEvent);
+                    }
+                }
+            } else {
+                LIA_error_f("Failed to reload window {}", window.getName());
+            }
+        }
+        LIA_CATCH_EMPTY
     }
 
     AppWindow* appWindow = _appWindow;

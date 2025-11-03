@@ -48,6 +48,7 @@ namespace LIA {
             
             Style _style;
 
+            std::string _path;
             std::string _name;
             std::string _id;
             std::string _alignment;
@@ -78,6 +79,10 @@ namespace LIA {
         public:
             Window();
             ~Window();
+
+            void setPath(std::string path) { _path = path; };
+            std::string getPath() { return _path; };
+
             void setStyle(struct Style style) { _style = style; };
             void setAlignment(std::string value) { _alignment = value; };
 
@@ -229,6 +234,7 @@ namespace LIA {
             bool grab(Position&);
             bool isGrabbed() { return _isGrabbed; }
             void resize(AppWindow*);
+            void clear();
     };
 }
 #endif

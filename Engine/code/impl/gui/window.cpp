@@ -351,6 +351,11 @@ void LIA::Window::resize(AppWindow* appWindow) {
     compute(appWindow);
 }
 
+void LIA::Window::clear() {
+    _children.clear();
+    _childrenMap.clear();
+}
+
 void LIA::Window::compute(AppWindow* appWindow) {
     compute(appWindow, false);
 }
