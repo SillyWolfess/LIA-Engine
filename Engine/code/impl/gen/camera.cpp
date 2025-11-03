@@ -1,6 +1,11 @@
 #include "camera.hpp"
 #include "precompiled.hpp"
 
+#include "data/Event.hpp"
+//TODO remove
+#include "appWindow.hpp"
+#include "manager/eventManager.hpp"
+
 bool LIA::Camera::init() {
     LIA_info("Camera init");
     _perspSettings.fov = 45.0f;
@@ -29,6 +34,55 @@ bool LIA::Camera::init() {
     _lookAt.y = 0;// + y;
     _lookAt.z = 0;
     return true;
+}
+
+void LIA::Camera::update(EventManager *eventManager) {
+    if (isLocked()) {
+        return;
+    }
+    
+    if (AppWindow::isKeyPressed("camera", _cameraControl.up)) {
+        Position pos = emptyPosition();
+        pos.y = _settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    } else if (AppWindow::isKeyPressed("camera", _cameraControl.down)) {
+        Position pos = emptyPosition();
+        pos.y = -_settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    } else  if (AppWindow::isKeyPressed("camera", _cameraControl.right)) {
+        Position pos = emptyPosition();
+        pos.x = -_settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    } else if (AppWindow::isKeyPressed("camera", _cameraControl.left)) {
+        Position pos = emptyPosition();
+        pos.x = _settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    } else  if (AppWindow::isKeyPressed("camera", _cameraControl.forward)) {
+        Position pos = emptyPosition();
+        pos.z = _settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    } else if (AppWindow::isKeyPressed("camera", _cameraControl.backward)) {
+        Position pos = emptyPosition();
+        pos.z = -_settings.step;
+        move(pos);
+        onPositionChanged(eventManager);
+    }
+}
+
+void LIA::Camera::onPositionChanged(EventManager *eventManager) {
+        Position& pos = getPosition();
+        std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
+        UpdateGuiEvent updateGuiEvent("debug", "camera_position", cPos);
+        eventManager->handleEvent(updateGuiEvent);
+        Position& lookAt = getLookAt();
+        std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
+        UpdateGuiEvent updateLookAtEvent("debug", "camera_lookAt", cLookAt);
+        eventManager->handleEvent(updateLookAtEvent);
 }
 
 void LIA::Camera::update(float w, float h) {
@@ -82,4 +136,44 @@ void LIA::Camera::switchOrtho() {
 
 void LIA::Camera::swtichPersp() {
     _ortho = false;
+}
+
+bool LIA::Camera::loadControls(std::string path) {
+    if (path == "") {
+        return true;
+    }
+    LIA_TRY
+        XmlLoader xmlLoader;
+        XmlLoader::XmlData xmlCamera = xmlLoader.load(path);
+        _cameraControl.left = xmlLoader.getChar(xmlCamera, "left", '\0');
+        _cameraControl.right = xmlLoader.getChar(xmlCamera, "right", '\0');
+        _cameraControl.up = xmlLoader.getChar(xmlCamera, "up", '\0');
+        _cameraControl.down = xmlLoader.getChar(xmlCamera, "down", '\0');
+        _cameraControl.forward = xmlLoader.getChar(xmlCamera, "forward", '\0');
+        _cameraControl.backward = xmlLoader.getChar(xmlCamera, "backward", '\0');
+        return true;
+    LIA_CATCH_RETURN_FALSE
+}
+
+bool LIA::Camera::loadFromSettings(std::string path) {
+    LIA_TRY
+        XmlLoader xmlLoader;
+        XmlLoader::XmlData xmlData = xmlLoader.load(path);
+        _settings.locked = xmlLoader.getBoolean(xmlData, "locked", false);
+        _settings.ortho = xmlLoader.getBoolean(xmlData, "ortho", false);
+        _settings.position = xmlLoader.getPosition(xmlData, "position");
+        _settings.step = xmlLoader.getFloat(xmlData, "step", 0.1);
+
+        if (_settings.ortho) {
+            switchOrtho();
+        }
+        setLocked(_settings.locked);
+        setPosition(_settings.position);
+
+        if (!loadControls(xmlLoader.getString(xmlData, "controls", ""))) {
+            LIA_error("Failed to load camera controls");
+            return false;
+        }
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }

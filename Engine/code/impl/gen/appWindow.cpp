@@ -128,7 +128,7 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
     }
     return false;
 }
-
+/*
 void LIA::AppWindow::onCameraPositionChanged() {
         Position& pos = _mainCamera.getPosition();
         std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
@@ -139,6 +139,7 @@ void LIA::AppWindow::onCameraPositionChanged() {
         UpdateGuiEvent updateLookAtEvent("debug", "camera_lookAt", cLookAt);
         _eventManager->handleEvent(updateLookAtEvent);
 }
+*/
 
 bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
     eventManager->subscribe("checkbox_action", EventType::GUI, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
@@ -177,12 +178,13 @@ void LIA::AppWindow::loadSettings() {
     _background.g = bgColor.g;
     _background.b = bgColor.b;
     _background.a = bgColor.a;
-
+/*
     _cameraSettings.locked = xmlLoader.getBoolean(xmlData, "lockedCamera", false);
     _cameraSettings.ortho = xmlLoader.getBoolean(xmlData, "orthoCamera", false);
     _cameraSettings.position = xmlLoader.getPosition(xmlData, "cameraPosition");
     _cameraSettings.step = xmlLoader.getFloat(xmlData, "cameraStep", 0.1);
-
+*/
+/*
     XmlLoader::XmlData xmlCamera = xmlLoader.load("./data/settings/controls/camera.xml");
     _cameraControl.left = xmlLoader.getChar(xmlCamera, "left", '\0');
     _cameraControl.right = xmlLoader.getChar(xmlCamera, "right", '\0');
@@ -190,6 +192,7 @@ void LIA::AppWindow::loadSettings() {
     _cameraControl.down = xmlLoader.getChar(xmlCamera, "down", '\0');
     _cameraControl.forward = xmlLoader.getChar(xmlCamera, "forward", '\0');
     _cameraControl.backward = xmlLoader.getChar(xmlCamera, "backward", '\0');
+*/
 }
 
 bool LIA::AppWindow::init(std::string windowName) {
@@ -283,11 +286,17 @@ bool LIA::AppWindow::init(std::string windowName) {
         LIA_fatal("Failed to init main camera");
         return false;
     }
+    if (!_mainCamera.loadFromSettings("./data/settings/camera.xml")) {
+        LIA_fatal("Failed to load main camera settings");
+        return false;
+    }
+    /*
     if (_cameraSettings.ortho) {
         _mainCamera.switchOrtho();
     }
     _mainCamera.setLocked(_cameraSettings.locked);
     _mainCamera.setPosition(_cameraSettings.position);
+    */
     if (!_guiCamera.init()) {
         LIA_fatal("Failed to init gui camera");
         return false;
@@ -336,39 +345,7 @@ void LIA::AppWindow::update() {
     glfwPollEvents();
     handleMouseInput();
 
-    if (!_mainCamera.isLocked()) {
-        if (isKeyPressed("camera", _cameraControl.up)) {
-            Position pos = emptyPosition();
-            pos.y = _cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        } else if (isKeyPressed("camera", _cameraControl.down)) {
-            Position pos = emptyPosition();
-            pos.y = -_cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        } else  if (isKeyPressed("camera", _cameraControl.right)) {
-            Position pos = emptyPosition();
-            pos.x = -_cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        } else if (isKeyPressed("camera", _cameraControl.left)) {
-            Position pos = emptyPosition();
-            pos.x = _cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        } else  if (isKeyPressed("camera", _cameraControl.forward)) {
-            Position pos = emptyPosition();
-            pos.z = _cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        } else if (isKeyPressed("camera", _cameraControl.backward)) {
-            Position pos = emptyPosition();
-            pos.z = -_cameraSettings.step;
-            _mainCamera.move(pos);
-            onCameraPositionChanged();
-        }
-    }
+    _mainCamera.update(_eventManager);
 }
 
 void LIA::AppWindow::draw() {

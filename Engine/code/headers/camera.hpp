@@ -4,6 +4,7 @@
 #include "data/position.hpp"
 
 namespace LIA {
+    class EventManager;
     class Camera {
         private:
             struct s_persp_settings {
@@ -26,11 +27,29 @@ namespace LIA {
             Position _position;
             Position _worldDirection;
             Position _lookAt;
+
+            struct s_settings {
+                bool locked;
+                bool ortho;
+                Position position;
+                float step;
+            } _settings;
+            struct s_cameraControl {
+                char left;
+                char right;
+                char up;
+                char down;
+                char forward;
+                char backward;
+            } _cameraControl;
         public: 
            bool init();
+           bool loadFromSettings(std::string);
+           bool loadControls(std::string);
            void setLocked(bool locked) { _locked = locked; };
            bool isLocked() { return _locked; };
            void update(float, float);
+           void update(EventManager*);
 //           void destroy();
            void switchOrtho();
            void swtichPersp();
@@ -42,6 +61,7 @@ namespace LIA {
            Position& getPosition() { return _position; };
            Position& getLookAt() { return _lookAt; };
            void setPosition(Position& position) { copy(_position, position); };
+           void onPositionChanged(EventManager*);
            ~Camera();
     };
 }

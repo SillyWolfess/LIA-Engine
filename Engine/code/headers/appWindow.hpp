@@ -83,23 +83,7 @@ namespace LIA
                 int width;
                 int height;
             } _glfwSettings;
-
-            struct s_cameraSettings {
-                bool locked;
-                bool ortho;
-                Position position;
-                float step;
-            } _cameraSettings;
             
-            struct s_cameraControl {
-                char left;
-                char right;
-                char up;
-                char down;
-                char forward;
-                char backward;
-            } _cameraControl;
-
             struct s_background {
                 float r, g, b, a;
             } _background;
