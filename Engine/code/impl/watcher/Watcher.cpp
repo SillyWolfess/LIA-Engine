@@ -45,7 +45,7 @@ bool LIA::Watcher::registerFile(std::string fileName) {
         return false;
     }
     _paths[fileName] =  std::filesystem::last_write_time(std::filesystem::path(fileName));
-    LIA_debug_f("'{}' added to watchers");
+    LIA_debug_f("'{}' added to watchers", fileName);
     return true;
 }
 

@@ -19,6 +19,7 @@ namespace LIA {
             bool loadEventHandler(LIA::Event&);
             bool getDataGuiEventHandler(LIA::Event&);
             bool buttonActionEventHandler(LIA::Event&);
+            bool guiWindowInitHandler(LIA::Event&);
         protected:
             int _identifier = -1;
             virtual bool registerHandlers();
@@ -27,6 +28,7 @@ namespace LIA {
             virtual bool onLoad(LIA::Event&);
             virtual bool onGetGuiData(LIA::Event&);
             virtual bool onButtonAction(LIA::Event&);
+            virtual bool onGuiWindowInit(LIA::Event&);
             EventManager* getEventManager() { return _eventManager; }
             ObjectManager* getObjectManager() { return _objectManager; }
             ComponentManager* getComponentManager() { return _componentManager; }

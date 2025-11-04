@@ -42,6 +42,10 @@ bool LIA::Component::subscribe(std::string name) {
         getEventManager()->subscribe("button_action", LIA::EventType::GUI, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
         return true;
     }
+    else if (name.compare("init_gui_window") == 0) {
+        getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
+        return true;
+    }
     else {
         LIA_error_f("Subscription name '{}' is not known to engine", name);
         return false;
@@ -80,6 +84,13 @@ bool LIA::Component::buttonActionEventHandler(LIA::Event& event) {
     return onButtonAction(event);
 }
 
+bool LIA::Component::guiWindowInitHandler(LIA::Event& event) {
+    if (event.name.compare("init_gui_window") != 0) {
+        return false;
+    }
+    return onGuiWindowInit(event);
+}
+
 bool LIA::Component::onTick(LIA::Event& event) {
     return false;
 }
@@ -93,6 +104,10 @@ bool LIA::Component::onGetGuiData(LIA::Event& event) {
 }
 
 bool LIA::Component::onButtonAction(LIA::Event& event) {
+    return false;
+}
+
+bool LIA::Component::onGuiWindowInit(LIA::Event& event) {
     return false;
 }
 

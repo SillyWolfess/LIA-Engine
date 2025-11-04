@@ -76,6 +76,7 @@ bool LIA::Gui::init() {
     }
     _lastAppScale = _appWindow->getWindowScale();
     _watcher.subscribe("./data/gui/style.xml");
+    _watcher.subscribe("./data/gui/gui.xml");
     return true;
 }
 
@@ -197,6 +198,7 @@ bool LIA::Gui::loadWindow(std::string name, std::string path) {
         _windows.emplace_back(window);
         int indx = _windows.size() - 1;
         _windowMap.emplace(std::pair<std::string, int>(window.getId(), indx));
+        _pathMap.emplace(std::pair<std::string, std::string>(name, path));
         _watcher.subscribe(path);
         LIA_debug_f("New window {} with id", window.getId(), indx);
         return true;
@@ -368,6 +370,20 @@ int LIA::Gui::add(std::string text) {
 } 
 
 void LIA::Gui::update() {
+    if (_watcher.needsReload("./data/gui/gui.xml")) {
+        LIA_TRY
+            XmlLoader xmlLoader;
+            XmlLoader::XmlData xmlData = xmlLoader.load("./data/gui/gui.xml");
+
+            for (auto [name, path] : xmlData.values) {
+                if (_pathMap.find(name) == _pathMap.end()) {
+                    if (!loadWindow(name, path)) {
+                        LIA_error_f("Failed to load {} from '{}'", name, path);
+                    }
+                }
+            }
+        LIA_CATCH_EMPTY
+    }
     if (_watcher.needsReload("./data/gui/style.xml")) {
         if (!loadStyle()) {
             LIA_error("Failed to reload style");
@@ -392,6 +408,8 @@ void LIA::Gui::update() {
                         GuiGetDataEvent guiGetDataEvent(window.getId());
                         _eventManager->handleEvent(guiGetDataEvent);
                     }
+                    GuiInitEvent guiInitEvent(window.getId());
+                    _eventManager->handleEvent(guiInitEvent);
                 }
             } else {
                 LIA_error_f("Failed to reload window {}", window.getName());

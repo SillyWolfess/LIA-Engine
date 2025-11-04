@@ -159,5 +159,14 @@ namespace LIA {
             this->source = window;
         };
     };
+    struct GuiInitEvent: Event {
+        GuiInitEvent() = delete;
+        GuiInitEvent(std::string window) {
+            name = "init_gui_window";
+            type = EventType::GUI;
+            this->window = window;
+            this->source = window;
+        };
+    };
 }
 #endif

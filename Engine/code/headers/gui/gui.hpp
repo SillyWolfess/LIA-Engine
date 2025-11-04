@@ -37,6 +37,7 @@ namespace LIA
 
             std::vector<Window> _windows;
             std::map<std::string, int> _windowMap;
+            std::map<std::string, std::string> _pathMap;
 
             int _lastGrabbedWindow;
 
