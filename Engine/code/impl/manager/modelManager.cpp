@@ -299,22 +299,6 @@ bool LIA::ModelManager::load(Model& model, int programId) {
             texture._name = mTexture._name;
             texture._path = mTexture._path;
             texture._id = mTexture._id;
-            /*
-            if (material.hasTexture) {
-                texture._folder = model.folder;
-                texture._name = material.texture;
-                texture._path = material.texture;
-            } else {
-                texture._folder = "./data/emptyTextures/";
-                texture._name = "empty";
-                texture._path = "Shader_NoneWhite.png";
-            }
-            std::string path = std::vformat("{}{}", std::make_format_args(texture._folder, texture._path));
-            if (!TextureLoader::loadTextureRGBA(texture._id, path)) {
-                LIA_error_f("Failed to laod texture {} for material {}", texture._name, material.name);
-                return false;
-            }
-            */
         LIA_CATCH_RETURN_FALSE
 
         LIA_TRY
@@ -334,22 +318,6 @@ bool LIA::ModelManager::load(Model& model, int programId) {
             textureBump._name = mTexture._name;
             textureBump._path = mTexture._path;
             textureBump._id = mTexture._id;
-            /*
-            if (material.hasBump) {
-                textureBump._folder = model.folder;
-                textureBump._name = material.texture_bump;
-                textureBump._path = material.texture_bump;
-            } else {
-                textureBump._folder = "./data/emptyTextures/";
-                textureBump._name = "emptyBump";
-                textureBump._path = "Shader_NoneNormal.png";
-            }
-            std::string pathBump = std::vformat("{}{}", std::make_format_args(textureBump._folder, textureBump._path));
-            if (!TextureLoader::loadTexture(textureBump._id, pathBump)) {
-                LIA_error_f("Failed to laod texture {} for material {}", textureBump._name, material.name);
-                return false;
-            }
-            */
         LIA_CATCH_RETURN_FALSE
         
         LIA_TRY
@@ -369,23 +337,6 @@ bool LIA::ModelManager::load(Model& model, int programId) {
             textureEm._name = mTexture._name;
             textureEm._path = mTexture._path;
             textureEm._id = mTexture._id;
-            /*
-            if (material.hasEm) {
-                textureEm._folder = model.folder;
-                textureEm._name = material.texture_em;
-                textureEm._path = material.texture_em;
-            } else {
-                textureEm._folder = "./data/emptyTextures/";
-                textureEm._name = "emptyEm";
-                textureEm._path = "Shader_NoneBlack.png";
-            }
-            
-            std::string pathEm = std::vformat("{}{}", std::make_format_args(textureEm._folder, textureEm._path));
-            if (!TextureLoader::loadTextureHDR(textureEm._id, pathEm)) {
-                LIA_error_f("Failed to laod texture {} for material {}", textureEm._name, material.name);
-                return false;
-            }
-            */
         LIA_CATCH_RETURN_FALSE
     }
 
