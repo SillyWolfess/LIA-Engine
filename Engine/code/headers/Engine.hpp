@@ -13,6 +13,7 @@
 #include "component/BaseGame.hpp"
 
 #include "watcher/Watcher.hpp"
+#include "counters/FpsCounter.hpp"
 
 namespace LIA
 {
@@ -28,13 +29,8 @@ namespace LIA
             ObjectManager _objectManager;
             TextureManager _textureManager;
             Terrain _terrain;
+            FpsCounter _fpsCounter;
             BaseGame* _game = nullptr;
-
-            int _nFrames;
-            int _fps;
-            double _lastTime;
-            double _deltaTime;
-            double _lastFrameTime;
 
             bool registerEventHandlers();
             bool handleGui(Event& event);

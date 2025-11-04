@@ -134,7 +134,7 @@ bool LIA::Engine::handleGuiGetData(Event& event) {
         return false;
     }
     if (event.source.compare("debug") == 0) {
-        UpdateGuiEvent updateGuiEvent(event.window, "fps", _fps);
+        UpdateGuiEvent updateGuiEvent(event.window, "fps", _fpsCounter.getFps());
         _eventManager.handleEvent(updateGuiEvent);
         return true;
     }
@@ -200,24 +200,14 @@ bool LIA::Engine::load() {
 
 bool LIA::Engine::update() {
     double currentTime = glfwGetTime();
-    _deltaTime = currentTime - _lastTime;
-    _nFrames++;
-    if (_deltaTime >= 1.0) {
-        double value = 1000.0 / double(_nFrames);
-        if (_fps != _nFrames) {
-            _fps = _nFrames;
-            FpsEvent event(_fps);
-            _eventManager.handleEvent(event);
-        }
-        _nFrames = 0;
-        _lastTime = currentTime;
-    }
+    _fpsCounter.update(currentTime, _eventManager);
+    double deltaTime = _fpsCounter.getDelta();
 
     _watcher.watch();
     _shaderManager.update();
 
     _window.update();
-    if (!_simulation.update(&_window, _deltaTime)) {
+    if (!_simulation.update(&_window, deltaTime)) {
         LIA_fatal("Simulation update failed");
         return false;
     }
