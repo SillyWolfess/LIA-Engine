@@ -40,6 +40,11 @@ void LIA::Camera::update(EventManager *eventManager) {
     if (isLocked()) {
         return;
     }
+    if (_settings.controls != "" && _watcher.needsReload(_settings.controls)) {
+        if (!loadControls(_settings.controls)) {
+            LIA_error("Failed to reload camera controls");
+        }
+    }
     
     if (AppWindow::isKeyPressed("camera", _cameraControl.up)) {
         Position pos = emptyPosition();
@@ -163,6 +168,7 @@ bool LIA::Camera::loadFromSettings(std::string path) {
         _settings.ortho = xmlLoader.getBoolean(xmlData, "ortho", false);
         _settings.position = xmlLoader.getPosition(xmlData, "position");
         _settings.step = xmlLoader.getFloat(xmlData, "step", 0.1);
+        _settings.controls = xmlLoader.getString(xmlData, "controls", "");
 
         if (_settings.ortho) {
             switchOrtho();
@@ -170,7 +176,10 @@ bool LIA::Camera::loadFromSettings(std::string path) {
         setLocked(_settings.locked);
         setPosition(_settings.position);
 
-        if (!loadControls(xmlLoader.getString(xmlData, "controls", ""))) {
+        if (_settings.controls != "") {
+            _watcher.subscribe(_settings.controls);
+        }
+        if (!loadControls(_settings.controls)) {
             LIA_error("Failed to load camera controls");
             return false;
         }

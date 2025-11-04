@@ -2,6 +2,7 @@
 #define LIA_CAMERA
 #include "precompiled.hpp"
 #include "data/position.hpp"
+#include "watcher/Watcher.hpp"
 
 namespace LIA {
     class EventManager;
@@ -33,6 +34,7 @@ namespace LIA {
                 bool ortho;
                 Position position;
                 float step;
+                std::string controls;
             } _settings;
             struct s_cameraControl {
                 char left;
@@ -42,6 +44,7 @@ namespace LIA {
                 char forward;
                 char backward;
             } _cameraControl;
+            Watcher _watcher;
         public: 
            bool init();
            bool loadFromSettings(std::string);
