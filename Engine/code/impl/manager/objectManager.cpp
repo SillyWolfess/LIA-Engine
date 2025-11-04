@@ -90,16 +90,18 @@ bool LIA::ObjectManager::load(ShaderManager* shaderManager) {
     for (Object &object: _objects) {
         Model* model = _modelManager.get(object._modelInfo.id);
         ModelInfo* info = &object._modelInfo;
-        info->hasIndices = model->hasIndices;
-        info->loaded = model->isInGpu;
-        info->size = model->size;
-        info->vao = model->vao;
-        info->shader = model->shader;
+    //    info->hasIndices = model->hasIndices;
+    //    info->loaded = model->isInGpu;
+    //    info->size = model->size;
+    //    info->vao = model->vao;
+    //    info->shader = model->shader;
 
-        if (object._modelInfo.size == 0) {
+    //    if (object._modelInfo.size == 0) {
+        if (model->size == 0) {
             LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
             return false;
-        } else if (!object._modelInfo.loaded) {
+    //    } else if (!object._modelInfo.loaded) {
+        } else if (!model->isInGpu) {
             LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
             return false;
         } else {
@@ -117,19 +119,23 @@ void LIA::ObjectManager::pass(Scene *scene) {
         if (object._hide) {
             continue;
         }
-        if (object._modelInfo.loaded) {            
-            Model* model = _modelManager.get(object._modelInfo.id);
+        Model* model = _modelManager.get(object._modelInfo.id);
+ //       if (object._modelInfo.loaded) {            
+        if (model->isInGpu) {
             std::vector<int> offsets = model->data.offsets;
             for (int i = 0; i < offsets.size(); i++) {
-                int oSize = object._modelInfo.size - offsets[i];
+            //    int oSize = object._modelInfo.size - offsets[i];
+                int oSize = model->size - offsets[i];
                 if (i + 1 < offsets.size()) {
                     oSize = offsets[i + 1] - offsets[i];
                 }
                 scene->add(
                     object._name,
                     object._position, object._rotation, object._scale,
-                    object._modelInfo.vao, object._modelInfo.shader,
-                    object._modelInfo.hasIndices, oSize,
+                    model->vao, model->shader,
+                    model->hasIndices, oSize,
+//                    object._modelInfo.vao, object._modelInfo.shader,
+//                    object._modelInfo.hasIndices, oSize,
                     model->data.materials, model->data.materialIds,
                     model->_textures, model->_bump, model->_em,
                     offsets[i]
@@ -166,7 +172,7 @@ void LIA::ObjectManager::setModel(Object* object, std::string modelName) {
         Model* model = _modelManager.create(modelName);
         object->_modelInfo.name = modelName;
         object->_modelInfo.id = model->indx;
-        object->_modelInfo.infoLoaded = model->infoLoaded;
+//        object->_modelInfo.infoLoaded = model->infoLoaded;
         LIA_debug("Done");
     LIA_CATCH_EMPTY
 }
@@ -245,7 +251,8 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
         if (customName.compare("") != 0) {
             object->_name = customName;
         }
-        if (!object->_modelInfo.infoLoaded) {
+//        if (!object->_modelInfo.infoLoaded) {
+        if (object->_modelInfo.id < 0) {
             LIA_fatal_f("Failed to get info for the model of object {}", name);
             return false;
         }
@@ -286,16 +293,19 @@ bool LIA::ObjectManager::loadModel(Object& object) {
         model = _modelManager.get(object._modelInfo.id);
     }
     ModelInfo* info = &object._modelInfo;
+    /*
     info->hasIndices = model->hasIndices;
     info->loaded = model->isInGpu;
     info->size = model->size;
     info->vao = model->vao;
     info->shader = model->shader;
-
-    if (object._modelInfo.size == 0) {
+    */
+ //   if (object._modelInfo.size == 0) {
+    if (model->size == 0) {
         LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
         return false;
-    } else if (!object._modelInfo.loaded) {
+//    } else if (!object._modelInfo.loaded) {
+    } else if (!model->isInGpu) {
         LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
         return false;
     } else {

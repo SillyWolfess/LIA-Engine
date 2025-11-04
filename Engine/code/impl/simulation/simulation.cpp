@@ -127,7 +127,8 @@ bool LIA::Simulation::loadObject(std::string path) {
             return false;
         }
         Object* object = _objManager->get(indx);
-        if (!object->_modelInfo.infoLoaded) {
+        Model* model = _objManager->getModelManager()->get(object->_modelInfo.id);
+        if (!model->infoLoaded) {
             LIA_fatal_f("Failed to get info for the model of object {}", name);
             return false;
         }

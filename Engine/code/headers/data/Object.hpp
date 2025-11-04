@@ -7,14 +7,16 @@
 
 namespace LIA {
     struct ModelInfo {
-        std::string shader;
         std::string name;
+        int id;
+        /*
+        std::string shader;
         GLuint vao;
         int size;
-        int id;
         bool hasIndices;
         bool loaded = false;
         bool infoLoaded = false;
+        */
         #if LIA_DEBUG_ON
         ModelInfo();
         ModelInfo(const ModelInfo&);
