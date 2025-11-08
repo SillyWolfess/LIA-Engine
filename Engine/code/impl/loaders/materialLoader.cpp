@@ -1,0 +1,102 @@
+#include "loaders/materialLoader.hpp"
+#include "tools/macros.hpp"
+#include "logs.hpp"
+
+#include <sstream>
+#include <glm/glm.hpp>
+
+bool LIA::MaterialLoader::load(Material& material) {
+    LIA_TRY
+        std::string folder = material.folder;
+        std::string path = material.path;
+        std::string name = material.name;
+
+        FILE *file = fopen(path.c_str(), "r");
+        if (file == nullptr) {
+            LIA_error_f("Failed to find material file {} on the path {}", name, path);
+            return false;
+        }
+        
+        char lineHeader[128];
+        bool loading = false;
+        while (!feof(file)) {
+            fscanf(file, "%s", lineHeader);
+            if (strcmp(lineHeader, "newtml") == 0) {
+                char text[255];
+                fscanf(file, "%s\n", &text);
+                loading = strcmp(text, name.c_str()) == 0;
+            }
+            else if (!loading) {
+                char stupidBuffer[1000];
+				fgets(stupidBuffer, 1000, file);
+            }
+            else if (strcmp(lineHeader,"Ns") == 0) {
+				float read = 0;
+				fscanf(file, " %f\n", &read);
+				material.Ns = read;
+			}
+			else if (strcmp(lineHeader,"Ka") == 0) {
+				glm::vec3 read;
+				fscanf(file, " %f %f %f\n", &read.x, &read.y, &read.z);
+				material.Ka[0] = read.x;
+				material.Ka[1] = read.y;
+				material.Ka[2] = read.z;
+			}
+			else if (strcmp(lineHeader,"Kd") == 0) {
+				glm::vec3 read;
+				fscanf(file, " %f %f %f\n", &read.x, &read.y, &read.z);
+				material.Kd[0] = read.x;
+				material.Kd[1] = read.y;
+				material.Kd[2] = read.z;
+			}
+			else if(strcmp(lineHeader,"Ks") == 0) {
+				float x,y,z;
+				fscanf(file, " %f %f %f\n", &x, &y, &z);
+				material.Ks[0] = x;
+				material.Ks[1] = y;
+				material.Ks[2] = z;
+			}
+            else if(strcmp(lineHeader,"Ke") == 0) {
+				float x,y,z;
+				fscanf(file, " %f %f %f\n", &x, &y, &z);
+				material.Ke[0] = x;
+				material.Ke[1] = y;
+				material.Ke[2] = z;
+			}
+			else if(strcmp(lineHeader,"Ni") == 0) {
+				float read=0;
+				fscanf(file, " %f\n", &read);
+				material.Ni = read;
+			}
+			else if(strcmp(lineHeader,"illum") == 0) {
+				int read=0;
+				fscanf(file, " %d\n", &read);
+				material.illum = read;
+			}
+			else if(strcmp(lineHeader,"map_Kd") == 0) {
+				char text[255];
+				fscanf(file, "%s\n", &text);
+				strcpy(material.texture, text);
+				material.hasTexture = true;
+			}
+			else if(strcmp(lineHeader,"map_Ke") == 0) {
+				char text[255];
+				fscanf(file, "%s\n", &text);
+				strcpy(material.texture_em, text);
+				material.hasEm = true;
+			}
+			else if (strcmp(lineHeader,"map_Bump") == 0) {
+				char text[255];
+				fscanf(file," -bm 1.000000 %s\n", &text);
+				strcpy(material.texture_bump, text);
+				material.hasBump = true;
+			}
+			else
+			{
+				char stupidBuffer[1000];
+				fgets(stupidBuffer, 1000, file);
+			}
+        }; 
+        return true;
+    LIA_CATCH_RETURN_FALSE
+}

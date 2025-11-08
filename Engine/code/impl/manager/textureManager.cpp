@@ -33,7 +33,6 @@ bool LIA::TextureManager::load() {
 }
 
 LIA::Texture& LIA::TextureManager::get(std::string name) {
-    LIA_trace_f("retrieving texture '{}'", name);
     return _textures[name];
 }
 
