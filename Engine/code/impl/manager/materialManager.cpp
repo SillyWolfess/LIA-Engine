@@ -44,6 +44,7 @@ bool LIA::MaterialManager::registerMaterial(std::string name, std::string folder
     material.name = name;
     material.folder = folder;
     material.path = path;
+    material.isLoaded = false;
     LIA_trace_f("Registered material '{}' with path '{}' in folder '{}'", name, path, folder);
     return true;
 }
