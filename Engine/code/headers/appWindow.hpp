@@ -114,7 +114,7 @@ namespace LIA
             ~AppWindow();
             bool init(std::string);
             bool initPrefab();
-            bool initFont(GLuint);
+            bool initFont(/*GLuint*/);
             void update();
             void draw();
             void close();

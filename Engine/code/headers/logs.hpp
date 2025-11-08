@@ -8,7 +8,7 @@
 
 #ifdef LIA_VERSION_RUN
     #if LIA_VERSION_RUN == 1
-        #define LIA_LOG_LEVEL 1
+        #define LIA_LOG_LEVEL 3
     #endif
 #endif
 
@@ -17,6 +17,7 @@
 #endif
 
 #define LIA_log(x, y) LIA::Logger::log(x, y, __FILE__, __LINE__, __FUNCTIONW__)
+#define LIA_log_f(x, ...) LIA::Logger::log_f(x, __FILE__, __LINE__, __FUNCTIONW__, __VA_ARGS__)
 #if LIA_LOG_LEVEL >= 0
     #define LIA_fatal(x) LIA::Logger::log(LIA::Logger::Level::FATAL, x, __FILE__, __LINE__, __FUNCTIONW__)
     #define LIA_fatal_f(...) LIA::Logger::log_f(LIA::Logger::Level::FATAL, __FILE__, __LINE__, __FUNCTIONW__, __VA_ARGS__)

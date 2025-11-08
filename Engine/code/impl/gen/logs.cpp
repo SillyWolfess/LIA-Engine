@@ -34,11 +34,10 @@ void LIA::Logger::log(Level level, std::string msg, std::string file, int line, 
     std::cout << CmdColor::white() << std::endl;
 
     if (!_file.is_open()) {
-        _file = std::ofstream("./logs.txt");//, std::ios_base::app);
+        _file = std::ofstream("./logs.txt");
     }
     if (_file.is_open()) {
         _file << prefix << __TIMESTAMP__ << " [" << file << ", " << line << "] " <<  LIA::ws2s(function) << " : " << msg << "\n";
         _file.flush();
     }
-//    _file.close();
 }

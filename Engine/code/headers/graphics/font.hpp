@@ -9,11 +9,11 @@
 #include "data/Color.hpp"
 #include "camera.hpp"
 
-#include "manager/shaderManager.hpp"
-
 namespace LIA {
+    class ShaderManager;
     class Font {
         private:
+            ShaderManager* _shaderManager;
             static const int maxFonts = 256;
             const float PiOver180 = 0.0174532925f;
             
@@ -93,7 +93,7 @@ namespace LIA {
             Font();
             ~Font();
 
-            bool initialise(GLuint);
+            bool initialise(ShaderManager*);
             /** resize drawing area
             *	@param {int} width
             *	@param {int} height

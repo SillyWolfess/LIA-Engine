@@ -8,6 +8,7 @@
 #include "loaders/objLoader.hpp"
 
 #include "graphics/glwrapper.hpp"
+#include "manager/shaderManager.hpp"
 
 
 /*
@@ -113,6 +114,7 @@ void LIA::Font::drawFont(glm::mat4& VP, int fontId, Position position, Rotation 
 
 }
 void LIA::Font::draw(Camera &camera, ShaderManager* shaderManager) {
+	programID_ = _shaderManager->getProgramId("font");
     prepareForDraw();
     glm::mat4 Projection = camera.getProjection();
     glm::mat4 View = camera.getView();
@@ -229,12 +231,13 @@ LIA::Font::Font()
 	nFonts_ = 0;
 	counter_= 0;
 }
-bool LIA::Font::initialise(GLuint programId)
+bool LIA::Font::initialise(ShaderManager* shanderManager)
 {	
+	_shaderManager = shanderManager;
 	resolution_.x_ = 1920.0f;
 	resolution_.y_ = 1080.0f;
-	 	
-	programID_ = programId;
+	 
+	programID_ = shanderManager->getProgramId("font");
 	glUseProgram(programID_);
 	
     glGenVertexArrays(1, &VertexArrayID_);

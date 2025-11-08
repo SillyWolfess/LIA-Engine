@@ -36,9 +36,7 @@ bool LIA::Engine::init() {
     }
     LIA_trace("Window prefabs initialised");
 
-    GLuint fontId = _shaderManager.getProgramId("font");
-
-    if (!_window.initFont(fontId)) {
+    if (!_window.initFont()) {
         LIA_fatal("font init failed");
         return false;
     }
@@ -256,6 +254,8 @@ void LIA::Engine::run() {
      LIA_TRY
         LIA_trace("Engine.run");
         #if LOG_TEST
+            LIA_log(LIA::Logger::Level::INFO, "normal log info");
+            LIA_log_f(LIA::Logger::Level::INFO, "paramter log {} {}", "works", "okay");
             LIA_info("info");            
             LIA_info_f("info {} - {} = {}", 3 , 4, 3 - 4);
             LIA_warn("warn");

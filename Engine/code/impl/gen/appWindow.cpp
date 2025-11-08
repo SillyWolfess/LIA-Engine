@@ -321,8 +321,9 @@ bool LIA::AppWindow::initPrefab() {
     }
 }
 
-bool LIA::AppWindow::initFont(GLuint programId) {
-    if (!_font.initialise(programId)) {
+bool LIA::AppWindow::initFont(/*GLuint programId*/) {
+    ShaderManager* shaderManager = &(LIA::Engine::getInstance().getShaderManager());
+    if (!_font.initialise(/*programId*/shaderManager)) {
         LIA_fatal("Failed to init font");
         return false;
     }
