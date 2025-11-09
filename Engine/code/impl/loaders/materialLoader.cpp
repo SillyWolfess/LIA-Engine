@@ -5,7 +5,28 @@
 
 #include <sstream>
 #include <glm/glm.hpp>
-
+/***
+ * Kd - color [done]
+ * map_Kd - color texture [done]
+ * 
+ * Ka - ambient reflectivity [done]
+ * 
+ * Ni - optical density - index of refraction (glass)
+ * 
+ * map_Bump - bump texture [done]
+ * 
+ * Ns - shininess exponent [done]
+ * map_Ns - shininess texture
+ * 
+ * Ks - Specular Color [done]
+ * map_Ks - specular texture 
+ * 
+ * Pr - Roughness
+ * map_Pr - roughness texture
+ * 
+ * Ke - emissive color
+ * map_Ke - emissive texture [done]
+ */
 bool LIA::MaterialLoader::loadLib(MaterialLib& materialLib) {
 	LIA_TRY
 		LIA_trace_f("Loading lib {}", materialLib._name);
