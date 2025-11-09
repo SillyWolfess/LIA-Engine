@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <format>
 
-#define LIA_VERSION_RUN 1
+#define LIA_VERSION_RUN 0
 
 #ifdef LIA_VERSION_RUN
     #if LIA_VERSION_RUN == 1

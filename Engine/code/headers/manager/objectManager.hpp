@@ -8,7 +8,6 @@
 namespace LIA {
     class ShaderManager;
     class Scene;
-    class ModelManager;
     class ObjectManager {
         private:
             ModelManager _modelManager;

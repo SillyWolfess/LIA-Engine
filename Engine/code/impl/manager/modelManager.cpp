@@ -137,6 +137,7 @@ int LIA::ModelManager::size() {
 #include "graphics/VertexBuffer.hpp"
 #include "graphics/VertexArrayObject.hpp"
 #include "manager/textureManager.hpp"
+#include "manager/materialManager.hpp"
 bool LIA::ModelManager::load(Model& model, int programId) {
     model.isInGpu = false;
     ObjLoader::load(
@@ -161,6 +162,98 @@ bool LIA::ModelManager::load(Model& model, int programId) {
         mData.tangents,
         mData.bitangents
     );
+
+    // Load materials
+    LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
+    if (!materialManager.registerMaterialLib(model.data.materialLib, model.folder)) {
+        LIA_fatal_f("Cannot register material lib {}", model.data.materialLib);
+        return false;
+    }
+    if (!materialManager.loadLib(model.data.materialLib)) {
+        LIA_fatal_f("Cannot load material lib {}", model.data.materialLib);
+        return false;
+    }
+    // Load textures
+    LIA::TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
+    //   for (gMaterial& material: model.data.materials) {
+    for (std::string materialName: model.data.materialName) {
+        LIA::Material &material = materialManager.getByLib(model.data.materialLib, materialName);
+        LIA_TRY
+            if (material.hasTexture) {
+                if (!textureManager.registerTexture(material.texture, material.folder, material.texture, TextureType::RGBA)) {
+                    LIA_error_f("Failed to register texture {} for material {}", material.texture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasTexture ? material.texture : "empty");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasTexture) {
+                material.texture = "empty";
+                material.hasTexture = true;
+            }
+            /*
+            Texture& texture = model._textures.emplace_back();
+            material.textureIndex = model._textures.size() - 1;
+            texture._folder = mTexture._folder;
+            texture._name = mTexture._name;
+            texture._path = mTexture._path;
+            texture._id = mTexture._id;
+            */
+        LIA_CATCH_RETURN_FALSE
+
+        LIA_TRY
+            if (material.hasBump) {
+                if (!textureManager.registerTexture(material.bumpTexture, material.folder, material.bumpTexture, TextureType::ANY)) {
+                    LIA_error_f("Failed to register bump texture {} for material {}", material.bumpTexture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasBump ? material.bumpTexture : "emptyBump");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasBump) {
+                material.bumpTexture = "emptyBump";
+                material.hasBump = true;
+            }
+            /*
+            Texture& textureBump = model._bump.emplace_back();
+            textureBump._folder = mTexture._folder;
+            textureBump._name = mTexture._name;
+            textureBump._path = mTexture._path;
+            textureBump._id = mTexture._id;
+            */
+        LIA_CATCH_RETURN_FALSE
+        
+        LIA_TRY
+            if (material.hasEm) {
+                if (!textureManager.registerTexture(material.emTexture, material.folder, material.emTexture, TextureType::HDR)) {
+                    LIA_error_f("Failed to register em texture {} for material {}", material.emTexture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasEm ? material.emTexture : "emptyEm");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasEm) {
+                material.emTexture = "emptyEm";
+                material.hasEm = true;
+            }
+            /*
+            Texture& textureEm = model._em.emplace_back();
+            textureEm._folder = mTexture._folder;
+            textureEm._name = mTexture._name;
+            textureEm._path = mTexture._path;
+            textureEm._id = mTexture._id;
+            */
+        LIA_CATCH_RETURN_FALSE
+    }
 
     glUseProgram(model.program);
     VertexArrayObject vertexArrayObject;
@@ -277,68 +370,6 @@ bool LIA::ModelManager::load(Model& model, int programId) {
     model.data.bitangents.clear();
     model.data.tangents.clear();
     model.data.normals.clear();
-
-    // Load textures
-    TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
-    for (gMaterial& material: model.data.materials) {
-        LIA_TRY
-            if (material.hasTexture) {
-                if (!textureManager.registerTexture(material.texture, model.folder, material.texture, TextureType::RGBA)) {
-                    LIA_error_f("Failed to register texture {} for material {}", material.texture, material.name);
-                    return false;
-                }
-            }
-            Texture& mTexture = textureManager.get(material.hasTexture ? material.texture : "empty");
-            if (!textureManager.load(mTexture._name)) {
-                LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
-                return false;
-            }
-            Texture& texture = model._textures.emplace_back();
-            material.textureIndex = model._textures.size() - 1;
-            texture._folder = mTexture._folder;
-            texture._name = mTexture._name;
-            texture._path = mTexture._path;
-            texture._id = mTexture._id;
-        LIA_CATCH_RETURN_FALSE
-
-        LIA_TRY
-            if (material.hasBump) {
-                if (!textureManager.registerTexture(material.texture_bump, model.folder, material.texture_bump, TextureType::ANY)) {
-                    LIA_error_f("Failed to register bump texture {} for material {}", material.texture_bump, material.name);
-                    return false;
-                }
-            }
-            Texture& mTexture = textureManager.get(material.hasBump ? material.texture_bump : "emptyBump");
-            if (!textureManager.load(mTexture._name)) {
-                LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
-                return false;
-            }
-            Texture& textureBump = model._bump.emplace_back();
-            textureBump._folder = mTexture._folder;
-            textureBump._name = mTexture._name;
-            textureBump._path = mTexture._path;
-            textureBump._id = mTexture._id;
-        LIA_CATCH_RETURN_FALSE
-        
-        LIA_TRY
-            if (material.hasEm) {
-                if (!textureManager.registerTexture(material.texture_em, model.folder, material.texture_em, TextureType::HDR)) {
-                    LIA_error_f("Failed to register em texture {} for material {}", material.texture_em, material.name);
-                    return false;
-                }
-            }
-            Texture& mTexture = textureManager.get(material.hasEm ? material.texture_em : "emptyEm");
-            if (!textureManager.load(mTexture._name)) {
-                LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
-                return false;
-            }
-            Texture& textureEm = model._em.emplace_back();
-            textureEm._folder = mTexture._folder;
-            textureEm._name = mTexture._name;
-            textureEm._path = mTexture._path;
-            textureEm._id = mTexture._id;
-        LIA_CATCH_RETURN_FALSE
-    }
 
     model.isInGpu = true;
     LIA_debug(std::vformat("Vao {} and Vbo {} created with size {}", std::make_format_args(model.vao,  model.vbo, model.size)));

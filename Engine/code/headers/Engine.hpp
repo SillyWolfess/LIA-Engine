@@ -10,6 +10,7 @@
 #include "manager/componentManager.hpp"
 #include "manager/objectManager.hpp"
 #include "manager/textureManager.hpp"
+#include "manager/materialManager.hpp"
 #include "component/BaseGame.hpp"
 
 #include "watcher/Watcher.hpp"
@@ -28,6 +29,7 @@ namespace LIA
             ComponentManager _componentManager;
             ObjectManager _objectManager;
             TextureManager _textureManager;
+            MaterialManager _materialManager;
             Terrain _terrain;
             FpsCounter _fpsCounter;
             BaseGame* _game = nullptr;
@@ -54,6 +56,7 @@ namespace LIA
             ComponentManager& getComponentManager() { return _componentManager; }
             ObjectManager& getObjectManager() { return _objectManager; }
             TextureManager& getTextureManager() { return _textureManager; }
+            MaterialManager& getMaterialManager() { return _materialManager; }
             Gui& getGuiManager() { return _gui; }
             AppWindow& getAppWindow() { return _window; }
             Camera& getMainCamera() { return _window.getCamera(); }

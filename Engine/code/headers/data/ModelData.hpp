@@ -51,8 +51,12 @@ namespace LIA {
         std::vector<glm::vec3> tangents;
         std::vector<glm::vec3> bitangents;
 
+        /*
         std::vector<gMaterial> materials;
         std::vector<int> materialIds;
+        */
+        std::string materialLib;
+        std::vector<std::string> materialName;
         std::vector<int> offsets;
 
         float min_x;

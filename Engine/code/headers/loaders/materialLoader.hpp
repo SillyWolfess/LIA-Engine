@@ -1,6 +1,7 @@
 #ifndef LIA_MATERIAL_LOADER
 #define LIA_MATERIAL_LOADER
 #include "data/Material.hpp"
+#include "data/MaterialLib.hpp"
 
 namespace LIA {
     class MaterialLoader {
@@ -8,7 +9,8 @@ namespace LIA {
             /***
              * @param {Material} material
              */
-            static bool load(Material&);
+            static bool loadFromLib(Material&);
+            static bool loadLib(MaterialLib&);
     };
 }
 #endif

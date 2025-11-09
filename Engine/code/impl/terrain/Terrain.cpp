@@ -330,11 +330,13 @@ bool LIA::Terrain::pass(Scene* scene) {
         _shader,
         _model.hasIndices,
         _model.size,
-        _model.data.materials,
-        _model.data.materialIds,
+        _model.data.materialLib,
+        _model.data.materialName.size() < 1 ? "" : _model.data.materialName[0],
+        /*
         _model._textures,
         _model._bump,
         _model._em,
+        */
         0,
         _drawAsPoints
     )) {

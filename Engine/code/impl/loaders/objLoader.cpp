@@ -91,11 +91,17 @@ void LIA::ObjLoader::load(ModelData& object, const char * dir, const char * path
 			break;
 		}
 	}
-	
-	int mtlSize=0;
+	if (mtlUsed) {
+		object.materialLib = {usemtlLib};
+//		strcpy(object.materialLib, usemtlLib);
+	} else {
+		object.materialLib = "";
+	}
+//	int mtlSize=0;
 	int last_vertex=0;
 	int last_vertices_out=0;
 	
+	/*
 	FILE *mtlFile= NULL;
 	if(mtlUsed)
 	{
@@ -130,11 +136,9 @@ void LIA::ObjLoader::load(ModelData& object, const char * dir, const char * path
 	object.materials.clear();
 	object.materials.reserve(20);
 	object.materialIds.clear();
-
-	int LastMtl=-1;
 	if(mtlUsed)
 	{
- 	
+
 		while(!feof(mtlFile))
 		{
 			fscanf(mtlFile, "%s", lineHeader);
@@ -264,62 +268,60 @@ void LIA::ObjLoader::load(ModelData& object, const char * dir, const char * path
 	}
     
     LIA_trace("mtl loaded");
+	*/
 	LIA_trace("loading obj");
 
+	int LastMtl=-1;
 	int numberMtL=-1;
 	bool texture_loaded=false;
 	bool vector_loaded=false;
 	while(!feof(file) )
 	{
 		res = fscanf(file, "%s", lineHeader);
-		if (res == EOF)
-		{
+		if (res == EOF) {
 			break; // EOF = End Of File. Quit the loop.
 		}
-		if ( strcmp( lineHeader, "o" ) == 0 )
-		{
+		if ( strcmp( lineHeader, "o" ) == 0 ) {
 			char text[255];
 			fscanf(file, "%s\n",text);
 			texture_loaded=false;
 			vector_loaded=false;
-		}
-		else
-		if ( strcmp( lineHeader, "usemtl" ) == 0 )
-		{
-			if(!mtlUsed)
-			{
+		} else if ( strcmp( lineHeader, "usemtl" ) == 0 ) {
+			if(!mtlUsed) {
 				LIA_error("ERROR : using material with missing material file header !!");
 			    return;
 			}
 			
 			char usemtlString[255];
-			fscanf(file, "%s \n",usemtlString);
+			fscanf(file, "%s \n", usemtlString);
 			numberMtL=-1;
-			for(int m=0;m<LastMtl+1;m++)
-			{
-				if(strcmp(usemtlString, object.materials[m].name)==0)
-				{
-					numberMtL=m;
+			for (int m=0; m < LastMtl + 1; m++) {
+				if (strcmp(usemtlString, object.materialName[m].c_str()) == 0) {
+					numberMtL = m;
 					break;
 				}
 			}
-			if(numberMtL!=-1)
-			{
-				sprintf(info, "using mtl :  %s = %s since %d",usemtlString, object.materials[numberMtL].texture, object.vertices.size());
+
+			if(numberMtL!=-1) {
+				sprintf(info, "using mtl : '%s' since %d", usemtlString, object.vertices.size());
+				LIA_debug(info);
+			} else {
+				sprintf(info, "New mtl : '%s' since %d", usemtlString, object.vertices.size());
 				LIA_debug(info);
 			}
-			else
-			{
-				sprintf(info, "WARNING: using mtl :  %s FALSE since %d",usemtlString, object.vertices.size());
-				LIA_warn(info);
-				return;
-			}
 			object.offsets.push_back(object.vertices.size());
+			std::string mtlName = {usemtlString};
+		//	strcpy(mtlName, usemtlString);
+			object.materialName.push_back(mtlName);
+			LastMtl++;
+			numberMtL = LastMtl;
+			if (temp_colours.size() < LastMtl + 1) {
+				temp_colours.push_back(glm::vec3(1,0,0));
+			}
 			LIA_debug_f("Offset {}", object.vertices.size());
 		}
 		else
-		if ( strcmp( lineHeader, "v" ) == 0 )
-		{
+		if ( strcmp( lineHeader, "v" ) == 0 ) {
 			glm::vec3 read;
 			fscanf(file, "%f %f %f\n", &read.x, &read.y, &read.z );
 
@@ -419,9 +421,11 @@ void LIA::ObjLoader::load(ModelData& object, const char * dir, const char * path
 			object.colours.push_back(vertex);
 
 			if (texture_loaded) {
+				/*
 				object.materialIds.push_back(numberMtL);
 				object.materialIds.push_back(numberMtL);
 				object.materialIds.push_back(numberMtL);
+				*/
 				object.uvs.push_back(temp_uvs[read_texture[0]-1]);
 				object.uvs.push_back(temp_uvs[read_texture[1]-1]);
 				object.uvs.push_back(temp_uvs[read_texture[2]-1]);

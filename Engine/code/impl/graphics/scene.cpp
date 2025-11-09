@@ -154,79 +154,49 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
     }
 
     if (object._hasMaterial) {
+        MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
+        if (!useMaterial(materialManager, shader, object._materialLib, object._materialName)) {
+            LIA_error_f("Failed to use material {} from {}", object._materialName, object._materialLib);
+            return false;
+        }
+        /*
         gMaterial& material = object._material;
         if (!shader.sendMaterial(material)) {
             LIA_error_f("Failed to send material {} to gpu", material.name);
             return false;
 
         }
+        */
+    } else {
+        shader.unbindTexture("textureDiff", 0);
+        shader.unbindTexture("textureBump", 1);
+        shader.unbindTexture("textureEm", 2);
     }
+    /*
     if (object._hasTexture) {
         if (!shader.bindTexture("textureDiff", 0, object._texture._id, object._texture._name)) {
             return false;
         }
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureDiff"), 0);
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glBindTexture(GL_TEXTURE_2D, object._texture._id);
-         if (catchGlError()) {
-            LIA_error_f("Failed to bind texture {}", object._texture._name);
-            return false;
-        }
-        */
     } else {
         shader.unbindTexture("textureDiff", 0);
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureDiff"), 0);
-        glActiveTexture(GL_TEXTURE0 + 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        */
     }
 
     if (object._hasBumpTexture) {
         if (!shader.bindTexture("textureBump", 1, object._bumpTexture._id, object._bumpTexture._name)) {
             return false;
         }
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureBump"), 1);
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, object._bumpTexture._id);
-        if (catchGlError()) {
-            LIA_error_f("Failed to bind texture {}", object._bumpTexture._name);
-            return false;
-        }
-        */
     } else {
         shader.unbindTexture("textureBump", 1);
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureBump"), 1);
-        glActiveTexture(GL_TEXTURE0 + 1);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        */
     }
 
     if (object._hasEmTexture) {
         if (!shader.bindTexture("textureEm", 2, object._emTexture._id, object._emTexture._name)) {
             return false;
         }
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureEm"), 2);
-        glActiveTexture(GL_TEXTURE0 + 2);
-        glBindTexture(GL_TEXTURE_2D, object._emTexture._id);
-        if (catchGlError()) {
-            LIA_error_f("Failed to bind texture {}", object._emTexture._name);
-            return false;
-        }
-        */
     } else {
         shader.unbindTexture("textureEm", 2);
-        /*
-        glUniform1i(glGetUniformLocation(shader.getProgram(), "textureEm"), 2);
-        glActiveTexture(GL_TEXTURE0 + 2);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        */
     }
-
+    */
     glBindVertexArray( object._vao );
     if (catchGlError()) {
         LIA_error("Failed to bind vao");
@@ -260,6 +230,60 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
     return true;
 }
 
+#define SCENE_TRACE 0
+
+bool LIA::Scene::useMaterial(MaterialManager &materialManager, ShaderProgram &shader, std::string materialLib, std::string materialName) {
+    #if SCENE_TRACE == 1
+        LIA_trace_f("Using material {} from {}", materialName, materialLib);
+    #endif
+    LIA_TRY
+        Material& material = materialManager.getByLib(materialLib, materialName);
+        TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
+
+        if (!shader.sendMaterial(material)) {
+            LIA_error_f("Failed to send material {} to gpu", material.name);
+            return false;
+        }
+
+        if (material.hasTexture) {
+            Texture &texture = textureManager.get(material.texture);
+            #if SCENE_TRACE == 1
+                LIA_trace_f("Using texture {} from material identifier {}", texture._name, material.texture);
+            #endif
+            if (!shader.bindTexture("textureDiff", 0, texture._id, texture._name)) {
+                return false;
+            }
+        } else {
+            shader.unbindTexture("textureDiff", 0);
+        }
+
+        if (material.hasBump) {
+            Texture &texture = textureManager.get(material.bumpTexture);
+            #if SCENE_TRACE == 1
+                LIA_trace_f("Using bump texture {} from material identifier {}", texture._name, material.bumpTexture);
+            #endif
+            if (!shader.bindTexture("textureBump", 1, texture._id, texture._name)) {
+                return false;
+            }
+        } else {
+            shader.unbindTexture("textureBump", 1);
+        }
+
+        if (material.hasEm) {
+            Texture &texture = textureManager.get(material.emTexture);
+            #if SCENE_TRACE == 1
+                LIA_trace_f("Using em texture {} from material identifier {}", texture._name, material.emTexture);
+            #endif
+            if (!shader.bindTexture("textureEm", 2, texture._id, texture._name)) {
+                return false;
+            }
+        } else {
+            shader.unbindTexture("textureEm", 2);
+        }
+        return true;
+    LIA_CATCH_RETURN_FALSE
+}
+
 LIA::Scene::~Scene() {
     LIA_DEBUG_DESTRUCTOR("Scene");
     LIA_trace("Scene destroyed");
@@ -271,21 +295,9 @@ LIA::Scene::Scene() {
 }
 
 void LIA::Scene::clear() {
-    /*
-    int size = _objects.size();
-    LIA_DEBUG_MAX_COUNT("Scene::_objects.maxSize", size);
-    _objects.clear();
-    _objects.reserve(size > 0 ? size : 10);
-    */
     _shaderObjectMap.clear();
 }
-/*
-bool LIA::Scene::add(SceneObject& object) {
-//    _objects.emplace_back(object);
-    addToShaderMap(object);
-    return true;
-}
-*/
+
 LIA::SceneObject& LIA::Scene::addToShaderMap(std::string shader) {
     if (_shaderObjectMap.find(shader) == _shaderObjectMap.end()) {
         std::vector<SceneObject> emptyVec;
@@ -318,7 +330,6 @@ LIA::SceneObject* LIA::Scene::get(int indx, std::string shader) {
 }
 
 bool LIA::Scene::add(Position position, Rotation rotation, Scale scale, GLuint vao, std::string shader, bool indices, int size) {
-//    SceneObject &object = _objects.emplace_back();
     SceneObject &object = addToShaderMap(shader);    
 
     object._position = position;
@@ -327,11 +338,11 @@ bool LIA::Scene::add(Position position, Rotation rotation, Scale scale, GLuint v
 
     object._passColor = false;
     object._hasMaterial = false;
-    
+    /*
     object._hasTexture = false;
     object._hasBumpTexture = false;
     object._hasEmTexture = false;
-
+    */
     object._vao = vao;
     object._shader = shader;
     object._size = size;
@@ -345,12 +356,15 @@ bool LIA::Scene::add(
     Position position, Rotation rotation, Scale scale,
     GLuint vao, std::string shader,
     bool indices, int size,
-    std::vector<LIA::gMaterial>& materials, std::vector<int>& mIds,
-    std::vector<Texture>& textures, std::vector<Texture>& bump, std::vector<Texture>& em,
+    std::string materialLib,
+    std::string materialName,
+//    std::vector<LIA::gMaterial>& materials, std::vector<int>& mIds,
+//    std::vector<Texture>& textures, std::vector<Texture>& bump, std::vector<Texture>& em,
     int offset
 )
 {
-    return add(identifier, position, rotation, scale, vao, shader, indices, size, materials, mIds, textures, bump, em, offset, false);
+//    return add(identifier, position, rotation, scale, vao, shader, indices, size, materials, mIds, textures, bump, em, offset, false);
+    return add(identifier, position, rotation, scale, vao, shader, indices, size, materialLib, materialName, offset, false);
 }
 
 bool LIA::Scene::add(
@@ -358,21 +372,29 @@ bool LIA::Scene::add(
     Position position, Rotation rotation, Scale scale,
     GLuint vao, std::string shader,
     bool indices, int size,
+    std::string materialLib,
+    std::string materialName,
+    /*
     std::vector<LIA::gMaterial>& materials, std::vector<int>& mIds,
     std::vector<Texture>& textures, std::vector<Texture>& bump, std::vector<Texture>& em,
-    int offset, bool asPoints
+    */
+    int offset,
+    bool asPoints
 ) {
     if (!add(position, rotation, scale, vao, shader, indices, size)) {
         return false;
     }
-//    int indx = _objects.size() - 1;
-//    SceneObject& object = _objects[indx];
     int indx = _shaderObjectMap[shader].size() - 1;
     SceneObject& object = _shaderObjectMap[shader][indx];
     object._identifier = identifier;
     object._offset = offset;
     object._drawAsPoints = asPoints;
+    object._materialLib = materialLib;
+    object._materialName = materialName;
 
+    object._hasMaterial = object._materialName != "";
+
+    /*
     TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
     if (materials.size() > 0 && mIds.size() > offset) {
         int mId = mIds[offset];
@@ -385,40 +407,29 @@ bool LIA::Scene::add(
         if (tIndex < 0) {
             return true;
         }
-        if (textures.size() > tIndex /* && textures[tIndex].isValid()*/) {
+        if (textures.size() > tIndex) {
             Texture& mTexture = textureManager.get(textures[tIndex]._name);
             if (mTexture.isValid()) {
                 object._texture = mTexture;
                 object._hasTexture = true;    
             }
-            /*
-            object._texture = textures[tIndex];
-            object._hasTexture = true;
-            */
         }
-        if (bump.size() > tIndex/* && bump[tIndex].isValid()*/) {
+        if (bump.size() > tIndex) {
             Texture& mTexture = textureManager.get(bump[tIndex]._name);
             if (mTexture.isValid()) {
                 object._bumpTexture = mTexture;
                 object._hasBumpTexture = true;    
             }
-            /*
-            object._bumpTexture = bump[tIndex];
-            object._hasBumpTexture = true;
-            */
         }
-        if (em.size() > tIndex/* && em[tIndex].isValid()*/) {
+        if (em.size() > tIndex) {
             Texture& mTexture = textureManager.get(em[tIndex]._name);
             if (mTexture.isValid()) {
                 object._emTexture = mTexture;
                 object._hasEmTexture = true;    
             }
-            /*
-            object._emTexture = em[tIndex];
-            object._hasEmTexture = true;
-            */
         }
     }
+    */
     return true;
 }
 

@@ -3,6 +3,7 @@
 #include "precompiled.hpp"
 #include "data/tShader.hpp"
 #include "data/ModelData.hpp"
+#include "data/Material.hpp"
 #include "data/Light.hpp"
 #include <map>
 #include <unordered_map>
@@ -62,7 +63,7 @@ namespace LIA {
             bool sendM(GLfloat *value);
             bool sendVP(GLfloat *value);
             bool sendColor(Color&);
-            bool sendMaterial(gMaterial&);
+            bool sendMaterial(Material&);
             bool sendLight(Light& light);
             /***
              * string - uniform name

@@ -9,6 +9,7 @@
 #include "data/Texture.hpp"
 #include "data/Light.hpp"
 #include "data/ModelData.hpp"
+#include "manager/materialManager.hpp"
 
 #include <vector>
 
@@ -67,6 +68,7 @@ namespace LIA {
             SceneObject& addToShaderMap(std::string);
             bool prepareShader(ShaderProgram& shader, glm::mat4& VP);
             bool sendLightSource(ShaderProgram&);
+            bool useMaterial(MaterialManager& materialManager,ShaderProgram& shader,std::string materialLib, std::string materialName);
         public:
             bool init();
             SceneObject* get(int, std::string);
@@ -93,16 +95,28 @@ namespace LIA {
              * std::string - shader
              * bool - hasIndices
              * int - number of verteces/indices
-             * materials
-             * material ids
-             * textures
-             * bump textures
-             * em textures
+             * material lib
+             * material name
              * int - offset
              */
-            bool add(std::string, Position, Rotation, Scale, GLuint, std::string, bool, int,
-                std::vector<LIA::gMaterial>&, std::vector<int>&,
-                std::vector<Texture>&, std::vector<Texture>&, std::vector<Texture>&,
+            bool add(
+                std::string,
+                Position,
+                Rotation,
+                Scale,
+                GLuint,
+                std::string,
+                bool,
+                int,
+                std::string,
+                std::string,
+                /*
+                std::vector<LIA::gMaterial>&,
+                std::vector<int>&,
+                std::vector<Texture>&,
+                std::vector<Texture>&,
+                std::vector<Texture>&,
+                */
                 int
             );
             /**
@@ -114,18 +128,31 @@ namespace LIA {
              * std::string - shader
              * bool - hasIndices
              * int - number of verteces/indices
-             * materials
-             * material ids
-             * textures
-             * bump textures
-             * em textures
+             * material lib
+             * material name
              * int - offset
              * bool - draw as points
              */
-            bool add(std::string, Position, Rotation, Scale, GLuint, std::string, bool, int,
-                std::vector<LIA::gMaterial>&, std::vector<int>&,
-                std::vector<Texture>&, std::vector<Texture>&, std::vector<Texture>&,
-                int, bool
+            bool add(
+                std::string,
+                Position,
+                Rotation,
+                Scale,
+                GLuint,
+                std::string,
+                bool,
+                int,
+                std::string,
+                std::string,
+                /*
+                std::vector<LIA::gMaterial>&,
+                std::vector<int>&,
+                std::vector<Texture>&,
+                std::vector<Texture>&,
+                std::vector<Texture>&,
+                */
+                int,
+                bool
             );
             /**
              * Position - position

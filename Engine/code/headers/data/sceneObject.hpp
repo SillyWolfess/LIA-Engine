@@ -18,19 +18,26 @@ namespace LIA {
         Color _color;
         std::string _shader;
 
+        std::string _materialLib;
+        std::string _materialName;
+        /*
         Texture _texture;
         Texture _bumpTexture;
         Texture _emTexture;
-
+        */
+        /*
         gMaterial _material;
+        */
 
         GLuint _vao;
         int _size;
         int _offset;
 
+        /*
         bool _hasTexture;
         bool _hasBumpTexture;
         bool _hasEmTexture;
+        */
         
         bool _hasMaterial;
         

@@ -136,8 +136,10 @@ void LIA::ObjectManager::pass(Scene *scene) {
                     model->hasIndices, oSize,
 //                    object._modelInfo.vao, object._modelInfo.shader,
 //                    object._modelInfo.hasIndices, oSize,
-                    model->data.materials, model->data.materialIds,
-                    model->_textures, model->_bump, model->_em,
+//                    model->data.materials, model->data.materialIds,
+//                    model->_textures, model->_bump, model->_em,
+                    model->data.materialLib,
+                    model->data.materialName.size() <= i ? "" : model->data.materialName[i],
                     offsets[i]
                 );
             }

@@ -327,7 +327,7 @@ bool LIA::ShaderProgram::sendVP(GLfloat *value) {
     return sendMatrix(_vpId, value);
 }
 
-bool LIA::ShaderProgram::sendMaterial(gMaterial& material) {
+bool LIA::ShaderProgram::sendMaterial(Material& material) {
     setVec3(_program, "material.ambient", material.Ka[0], material.Ka[1], material.Ka[2]);
     setVec3(_program, "material.diffuse", material.Kd[0], material.Kd[1], material.Kd[2]);
     setVec3(_program, "material.specular", material.Ks[0], material.Ks[1], material.Ks[2]);

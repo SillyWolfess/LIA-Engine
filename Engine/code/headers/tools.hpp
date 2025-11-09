@@ -2,6 +2,7 @@
 #define LIA_TOOLS
 #include <string>
 #include <codecvt>
+#include <ranges>
 
 namespace LIA {
     std::wstring s2ws(const std::string& str);
@@ -9,6 +10,10 @@ namespace LIA {
     std::string trim(std::string s);
     inline void ltrim(std::string &s);
     inline void rtrim(std::string &s);
+    std::string sanitizePath(std::string s);
+    std::string sanitizeFolderPath(std::string s);
+    std::string sanitizeFileName(std::string name, std::string extension);
+    std::string replaceAll(const std::string& str,const std::string& from, const std::string& to);
     
     static class CmdColor {
         public:
