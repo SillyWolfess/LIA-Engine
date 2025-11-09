@@ -1,8 +1,0 @@
-<root>
-    <position x="0" y="0"/>
-    <scale x="10" y="1" z="10"/>
-    <rotation x="0" y="0" z="0"/>
-    <object>plane</object>
-    <type>object</type>
-    <physics mass="0.1"/>
-</root>

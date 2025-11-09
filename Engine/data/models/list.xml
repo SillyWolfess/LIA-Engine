@@ -1,8 +1,3 @@
 <root>
-    <white_field>./data/models/white_field.xml</white_field>
-    <black_field>./data/models/black_field.xml</black_field>
-	<vixen>./data/models/vixen.xml</vixen>
-    <test>./data/models/test.xml</test>
-    <plane>./data/models/plane.xml</plane>
     <prefab_square>./data/models/prefab_square.xml</prefab_square>
 </root>

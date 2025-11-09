@@ -1,6 +1,0 @@
-<root>
-    <name>plane</name>
-    <folder>./data/</folder>
-    <path>./data/plane.obj</path>
-    <shader>advanced</shader>
-</root>

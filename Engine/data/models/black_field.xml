@@ -1,6 +1,0 @@
-<root>
-    <name>black_field</name>
-    <folder>./data/</folder>
-    <path>./data/field_black.obj</path>
-    <shader>simple</shader>
-</root>
