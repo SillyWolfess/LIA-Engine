@@ -38,6 +38,7 @@ namespace LIA {
     struct Object {
         bool _hide = false;
         std::string _name;
+        std::string _materialLib;
         ModelInfo _modelInfo;
         Position _position;
         Rotation _rotation;
