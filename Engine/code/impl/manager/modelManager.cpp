@@ -55,6 +55,7 @@ LIA::Model* LIA::ModelManager::create(std::string modelName) {
         model->folder =  xmlLoader.getString(xmlModelData, "folder");
         model->path = xmlLoader.getString(xmlModelData, "path");
         model->shader = xmlLoader.getString(xmlModelData, "shader");
+        model->materialLib = xmlLoader.getString(xmlModelData, "materialLib", "");
         model->infoLoaded = true;
     LIA_CATCH_EMPTY
     return model;
@@ -152,6 +153,9 @@ bool LIA::ModelManager::load(Model& model, int programId) {
     model.program = programId;
     model.hasIndices = false;
     model.size = model.data.vertices.size();
+    if (model.materialLib == "") {
+        model.materialLib = model.data.materialLib;
+    }
     
     ModelData& mData = model.data;
     computeTangentBasis(
@@ -165,19 +169,19 @@ bool LIA::ModelManager::load(Model& model, int programId) {
 
     // Load materials
     LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
-    if (!materialManager.registerMaterialLib(model.data.materialLib, model.folder)) {
-        LIA_fatal_f("Cannot register material lib {}", model.data.materialLib);
+    if (!materialManager.registerMaterialLib(model.materialLib, model.folder)) {
+        LIA_fatal_f("Cannot register material lib {}", model.materialLib);
         return false;
     }
-    if (!materialManager.loadLib(model.data.materialLib)) {
-        LIA_fatal_f("Cannot load material lib {}", model.data.materialLib);
+    if (!materialManager.loadLib(model.materialLib)) {
+        LIA_fatal_f("Cannot load material lib {}", model.materialLib);
         return false;
     }
     // Load textures
     LIA::TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
     //   for (gMaterial& material: model.data.materials) {
     for (std::string materialName: model.data.materialName) {
-        LIA::Material &material = materialManager.getByLib(model.data.materialLib, materialName);
+        LIA::Material &material = materialManager.getByLib(model.materialLib, materialName);
         LIA_TRY
             if (material.hasTexture) {
                 if (!textureManager.registerTexture(material.texture, material.folder, material.texture, TextureType::RGBA)) {

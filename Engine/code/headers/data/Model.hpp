@@ -16,11 +16,12 @@ namespace LIA {
         std::string path;
         std::string name;
         std::string shader;
-        
+        std::string materialLib;
+        /*
         std::vector<Texture> _textures;
         std::vector<Texture> _bump;
         std::vector<Texture> _em;
-        
+        */
         std::vector<unsigned int> _indices;
 
         GLuint vao;
