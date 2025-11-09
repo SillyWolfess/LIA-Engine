@@ -106,74 +106,9 @@ bool LIA::ObjectManager::load(ShaderManager* shaderManager) {
             LIA_trace(std::vformat("Object {} loaded", std::make_format_args(object._name)));
         }
         if (object._materialLib != "" && object._materialLib.compare(model->materialLib) != 0) {
-            LIA_trace("Loading material lib {} for object {}", object._materialLib, object._name);
-            // Load materials
-            LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
-            if (!materialManager.registerMaterialLib(object._materialLib, model->folder)) {
-                LIA_fatal_f("Cannot register material lib {}", object._materialLib);
+            if(!loadMaterials(object, model)) {
+                LIA_error_f("Failed to load all materials for {}", object._name);
                 return false;
-            }
-            if (!materialManager.loadLib(object._materialLib)) {
-                LIA_fatal_f("Cannot load material lib {}", object._materialLib);
-                return false;
-            }
-            // Load textures
-            LIA::TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
-            for (std::string materialName: model->data.materialName) {
-                LIA::Material &material = materialManager.getByLib(object._materialLib, materialName);
-                LIA_TRY
-                    if (material.hasTexture) {
-                        if (!textureManager.registerTexture(material.texture, material.folder, material.texture, TextureType::RGBA)) {
-                            LIA_error_f("Failed to register texture {} for material {}", material.texture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasTexture ? material.texture : "empty");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasTexture) {
-                        material.texture = "empty";
-                        material.hasTexture = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
-
-                LIA_TRY
-                    if (material.hasBump) {
-                        if (!textureManager.registerTexture(material.bumpTexture, material.folder, material.bumpTexture, TextureType::ANY)) {
-                            LIA_error_f("Failed to register bump texture {} for material {}", material.bumpTexture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasBump ? material.bumpTexture : "emptyBump");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasBump) {
-                        material.bumpTexture = "emptyBump";
-                        material.hasBump = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
-                
-                LIA_TRY
-                    if (material.hasEm) {
-                        if (!textureManager.registerTexture(material.emTexture, material.folder, material.emTexture, TextureType::HDR)) {
-                            LIA_error_f("Failed to register em texture {} for material {}", material.emTexture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasEm ? material.emTexture : "emptyEm");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasEm) {
-                        material.emTexture = "emptyEm";
-                        material.hasEm = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
             }
         }
     }
@@ -183,17 +118,88 @@ bool LIA::ObjectManager::load(ShaderManager* shaderManager) {
     return true;
 }
 
+bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
+    LIA_trace("Loading material lib {} for object {}", object._materialLib, object._name);
+    // Load materials
+    LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
+    if (!materialManager.registerMaterialLib(object._materialLib, model->folder)) {
+        LIA_fatal_f("Cannot register material lib {}", object._materialLib);
+        return false;
+    }
+    if (!materialManager.loadLib(object._materialLib)) {
+        LIA_fatal_f("Cannot load material lib {}", object._materialLib);
+        return false;
+    }
+    // Load textures
+    LIA::TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
+    for (std::string materialName: model->data.materialName) {
+        LIA::Material &material = materialManager.getByLib(object._materialLib, materialName);
+        LIA_TRY
+            if (material.hasTexture) {
+                if (!textureManager.registerTexture(material.texture, material.folder, material.texture, TextureType::RGBA)) {
+                    LIA_error_f("Failed to register texture {} for material {}", material.texture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasTexture ? material.texture : "empty");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasTexture) {
+                material.texture = "empty";
+                material.hasTexture = true;
+            }
+        LIA_CATCH_RETURN_FALSE
+
+        LIA_TRY
+            if (material.hasBump) {
+                if (!textureManager.registerTexture(material.bumpTexture, material.folder, material.bumpTexture, TextureType::ANY)) {
+                    LIA_error_f("Failed to register bump texture {} for material {}", material.bumpTexture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasBump ? material.bumpTexture : "emptyBump");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasBump) {
+                material.bumpTexture = "emptyBump";
+                material.hasBump = true;
+            }
+        LIA_CATCH_RETURN_FALSE
+                
+        LIA_TRY
+            if (material.hasEm) {
+                if (!textureManager.registerTexture(material.emTexture, material.folder, material.emTexture, TextureType::HDR)) {
+                    LIA_error_f("Failed to register em texture {} for material {}", material.emTexture, material.name);
+                    return false;
+                }
+            }
+            Texture& mTexture = textureManager.get(material.hasEm ? material.emTexture : "emptyEm");
+            if (!textureManager.load(mTexture._name)) {
+                LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
+                return false;
+            }
+            if (!material.hasEm) {
+                material.emTexture = "emptyEm";
+                material.hasEm = true;
+            }
+        LIA_CATCH_RETURN_FALSE
+    }
+    return true;
+}
+
 void LIA::ObjectManager::pass(Scene *scene) {
     for (Object &object: _objects) {
         if (object._hide) {
             continue;
         }
         Model* model = _modelManager.get(object._modelInfo.id);
- //       if (object._modelInfo.loaded) {            
         if (model->isInGpu) {
             std::vector<int> offsets = model->data.offsets;
             for (int i = 0; i < offsets.size(); i++) {
-            //    int oSize = object._modelInfo.size - offsets[i];
                 int oSize = model->size - offsets[i];
                 if (i + 1 < offsets.size()) {
                     oSize = offsets[i + 1] - offsets[i];
@@ -203,10 +209,6 @@ void LIA::ObjectManager::pass(Scene *scene) {
                     object._position, object._rotation, object._scale,
                     model->vao, model->shader,
                     model->hasIndices, oSize,
-//                    object._modelInfo.vao, object._modelInfo.shader,
-//                    object._modelInfo.hasIndices, oSize,
-//                    model->data.materials, model->data.materialIds,
-//                    model->_textures, model->_bump, model->_em,
                     object._materialLib != "" ? object._materialLib : model->materialLib,
                     model->data.materialName.size() <= i ? "" : model->data.materialName[i],
                     offsets[i]
@@ -229,21 +231,13 @@ void LIA::ObjectManager::print() {
         print(&object);
     }
 }
-/*
-void LIA::ObjectManager::setModel(Object* object, std::string folder, std::string path) {
-    LIA_debug(std::vformat("Setting model {} to object {}", std::make_format_args(path, object->_name)));
-    Model* model = _modelManager.create(folder, path);
-    object->_modelInfo.id = model->indx;
-    LIA_debug("Done");
-}
-*/
+
 void LIA::ObjectManager::setModel(Object* object, std::string modelName) {
     LIA_TRY
         LIA_debug(std::vformat("Setting model {} to object {}", std::make_format_args(modelName, object->_name)));
         Model* model = _modelManager.create(modelName);
         object->_modelInfo.name = modelName;
         object->_modelInfo.id = model->indx;
-//        object->_modelInfo.infoLoaded = model->infoLoaded;
         LIA_debug("Done");
     LIA_CATCH_EMPTY
 }
@@ -353,7 +347,6 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
     return true;
 }
 
-
 bool LIA::ObjectManager::loadModel(Object& object) {
     LIA_info("Loading objects");
     Model* model = _modelManager.get(object._modelInfo.id);
@@ -375,76 +368,11 @@ bool LIA::ObjectManager::loadModel(Object& object) {
         LIA_trace(std::vformat("Object {} loaded", std::make_format_args(object._name)));
     }
     if (object._materialLib != "" && object._materialLib.compare(model->materialLib) != 0) {
-            LIA_trace("Loading material lib {} for object {}", object._materialLib, object._name);
-            // Load materials
-            LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
-            if (!materialManager.registerMaterialLib(object._materialLib, model->folder)) {
-                LIA_fatal_f("Cannot register material lib {}", object._materialLib);
-                return false;
-            }
-            if (!materialManager.loadLib(object._materialLib)) {
-                LIA_fatal_f("Cannot load material lib {}", object._materialLib);
-                return false;
-            }
-            // Load textures
-            LIA::TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
-            for (std::string materialName: model->data.materialName) {
-                LIA::Material &material = materialManager.getByLib(object._materialLib, materialName);
-                LIA_TRY
-                    if (material.hasTexture) {
-                        if (!textureManager.registerTexture(material.texture, material.folder, material.texture, TextureType::RGBA)) {
-                            LIA_error_f("Failed to register texture {} for material {}", material.texture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasTexture ? material.texture : "empty");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasTexture) {
-                        material.texture = "empty";
-                        material.hasTexture = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
-
-                LIA_TRY
-                    if (material.hasBump) {
-                        if (!textureManager.registerTexture(material.bumpTexture, material.folder, material.bumpTexture, TextureType::ANY)) {
-                            LIA_error_f("Failed to register bump texture {} for material {}", material.bumpTexture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasBump ? material.bumpTexture : "emptyBump");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load bump texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasBump) {
-                        material.bumpTexture = "emptyBump";
-                        material.hasBump = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
-                
-                LIA_TRY
-                    if (material.hasEm) {
-                        if (!textureManager.registerTexture(material.emTexture, material.folder, material.emTexture, TextureType::HDR)) {
-                            LIA_error_f("Failed to register em texture {} for material {}", material.emTexture, material.name);
-                            return false;
-                        }
-                    }
-                    Texture& mTexture = textureManager.get(material.hasEm ? material.emTexture : "emptyEm");
-                    if (!textureManager.load(mTexture._name)) {
-                        LIA_error_f("Failed to load em texture {} for material {}", mTexture._name, material.name);
-                        return false;
-                    }
-                    if (!material.hasEm) {
-                        material.emTexture = "emptyEm";
-                        material.hasEm = true;
-                    }
-                LIA_CATCH_RETURN_FALSE
-            }
+        if(!loadMaterials(object, model)) {
+            LIA_error_f("Failed to load all materials for {}", object._name);
+            return false;
         }
+    }
     _modelManager.logNameToModelMap();
     _modelManager.logModels();
     LIA_debug(std::vformat("Objects.size: {}, Models.size: {}", std::make_format_args(_objects.size(), _modelManager.size())));

@@ -17,6 +17,7 @@ namespace LIA {
             int create();
             std::string getPath(std::string);
             std::string getTemplatePath(std::string);
+            bool loadMaterials(Object& object, Model* model);
         public:
             void reset();
             /***
