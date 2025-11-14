@@ -22,5 +22,6 @@ int LIA::ComponentManager::addAndInit(Component* component) {
 LIA::Component* LIA::ComponentManager::getComponent(int id) {
     LIA_trace_f("Get component of id {}", id);
     LIA_ASSERT(id > -1 , "Id is wrong");
+    LIA_ASSERT(id < _data.size(), "Id is out of range");
     return _data[id];
 }
