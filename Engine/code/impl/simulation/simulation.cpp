@@ -23,51 +23,57 @@ void LIA::Simulation::reset() {
 }
 
 bool LIA::Simulation::load(ShaderManager* shaderManager) {
-    if (_state == LIA_SIM_STATE::ENDED) {
-        reset();
-    }
-    if (_state != LIA_SIM_STATE::EMPTY) {
-        LIA_error("Simulation is already running. Cannot load.");
-        return false;
-    }
-    _state = LIA_SIM_STATE::LOADING;
-    _objManager->print();
-    XmlLoader xmlLoader;
-    XmlLoader::XmlData xmlData = xmlLoader.load("./data/simulation/scene.xml");
-    for (auto [name, path]: xmlData.values) {
-        XmlLoader::XmlNode xmlTypeNode = xmlLoader.getNode(xmlData, name);
-        std::string type = xmlLoader.getString(xmlTypeNode, "type");
-        if (type.compare("grid") == 0) {
-            Grid grid;
-            if (!grid.init(path)) {
-                LIA_error("Failed to initialize grid");
-                return false;
-            }
-            if (!grid.load(*_objManager)) {
-                LIA_error("Failed to create grid");
-                return false;
-            }
-        } else if (type.compare("object") == 0) {
-            if (!loadObject(path)) {
-                LIA_error(std::vformat("Failed to load object from path {}", std::make_format_args(path)));
-                return false;
-            }
-        } else if (type.compare("light") == 0) {
-            LIA_trace("Reading light data");
-            if (!loadLight(path)) {
-                LIA_error_f("Failed to laod light data from path {}", path);
-                return false;
-            }            
+    LIA_TRY
+        if (_state == LIA_SIM_STATE::ENDED) {
+            reset();
         }
-    }
-    if (!_objManager->load(shaderManager)) {
-        LIA_error("Failed to load objects");
-        return false;
-    }
-    _state = LIA_SIM_STATE::LOADED;
-    _gameState = LIA_GAME_STATE::RUNNING;
-    _playerId = _objManager->getPlayer(-1);
-    return true;
+        if (_state != LIA_SIM_STATE::EMPTY) {
+            LIA_error("Simulation is already running. Cannot load.");
+            return false;
+        }
+        _state = LIA_SIM_STATE::LOADING;
+        _objManager->print();
+        XmlLoader xmlLoader;
+        XmlLoader::XmlData xmlData = xmlLoader.load("./data/simulation/scene.xml");
+        for (auto [name, path]: xmlData.values) {
+            XmlLoader::XmlNode xmlTypeNode = xmlLoader.getNode(xmlData, name);
+            std::string type = xmlLoader.getString(xmlTypeNode, "type", "");
+            if (type == "") {
+                LIA_error_f("'type' attribute is missing for scene object '{}'", name);
+                return false;
+            }
+            if (type.compare("grid") == 0) {
+                Grid grid;
+                if (!grid.init(path)) {
+                    LIA_error("Failed to initialize grid");
+                    return false;
+                }
+                if (!grid.load(*_objManager)) {
+                    LIA_error("Failed to create grid");
+                    return false;
+                }
+            } else if (type.compare("object") == 0) {
+                if (!loadObject(path)) {
+                    LIA_error(std::vformat("Failed to load object from path {}", std::make_format_args(path)));
+                    return false;
+                }
+            } else if (type.compare("light") == 0) {
+                LIA_trace("Reading light data");
+                if (!loadLight(path)) {
+                    LIA_error_f("Failed to laod light data from path {}", path);
+                    return false;
+                }            
+            }
+        }
+        if (!_objManager->load(shaderManager)) {
+            LIA_error("Failed to load objects");
+            return false;
+        }
+        _state = LIA_SIM_STATE::LOADED;
+        _gameState = LIA_GAME_STATE::RUNNING;
+        _playerId = _objManager->getPlayer(-1);
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::Simulation::update(AppWindow* appWindow, float deltaTime) {
@@ -149,8 +155,8 @@ bool LIA::Simulation::loadObject(std::string path) {
         XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
         object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
         object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
+        return true;
     LIA_CATCH_RETURN_FALSE
-    return true;
 }
 
 bool LIA::Simulation::loadLight(std::string path) {

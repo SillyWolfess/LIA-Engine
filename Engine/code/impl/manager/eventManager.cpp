@@ -31,19 +31,19 @@ void LIA::EventManager::handleEvent(Event& event) {
         i++;
         LIA_trace(std::vformat("Calling handler {} for event {}", std::make_format_args(i, event.name)));
         LIA_TRY
-        if (event.type == EventType::GUI || event.type == EventType::ANY) {
-            if (handler.guiHandler && handler.guiHandler(event)) {
-                LIA_debug(std::vformat("Event {} was handled by gui handler {}", std::make_format_args(event.name, i)));
+            if (event.type == EventType::GUI || event.type == EventType::ANY) {
+                if (handler.guiHandler && handler.guiHandler(event)) {
+                    LIA_debug(std::vformat("Event {} was handled by gui handler {}", std::make_format_args(event.name, i)));
+                }
             }
-        }
-        LIA_CATCH_EMPTY
+        LIA_CATCH(LIA_error_f("Handling of the event {} failed", event.name);)
         LIA_TRY
-        if (event.type == EventType::SIMULATION || event.type == EventType::ANY) {
-            if (handler.simulationHandler && handler.simulationHandler(event)) {
-                LIA_debug(std::vformat("Event {} was handled by simulation handler {}", std::make_format_args(event.name, i)));
+            if (event.type == EventType::SIMULATION || event.type == EventType::ANY) {
+                if (handler.simulationHandler && handler.simulationHandler(event)) {
+                    LIA_debug(std::vformat("Event {} was handled by simulation handler {}", std::make_format_args(event.name, i)));
+                }
             }
-        }
-        LIA_CATCH_EMPTY
+        LIA_CATCH(LIA_error_f("Handling of the event {} failed", event.name);)
     }
 }
 
@@ -68,5 +68,5 @@ void LIA::EventManager::subscribe(std::string eventName, EventType type, std::fu
             LIA_debug_f("Adding handler as simulation for {}", eventName);
             ev.simulationHandler = handler;
         }
-    LIA_CATCH_EMPTY
+    LIA_CATCH(LIA_error_f("Subscribing to the event {} failed", eventName);)
 }

@@ -87,35 +87,37 @@ void LIA::ObjectManager::reset() {
 #include "manager/materialManager.hpp"
 #include "Engine.hpp"
 bool LIA::ObjectManager::load(ShaderManager* shaderManager) {
-    LIA_info("Loading objects");
-    if (!_modelManager.load(shaderManager)) {
-        LIA_error("Failed to load models");
-        return false;
-    }
-    for (Object &object: _objects) {
-        Model* model = _modelManager.get(object._modelInfo.id);
-        ModelInfo* info = &object._modelInfo;
-
-        if (model->size == 0) {
-            LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
+    LIA_TRY
+        LIA_info("Loading objects");
+        if (!_modelManager.load(shaderManager)) {
+            LIA_error("Failed to load models");
             return false;
-        } else if (!model->isInGpu) {
-            LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
-            return false;
-        } else {
-            LIA_trace(std::vformat("Object {} loaded", std::make_format_args(object._name)));
         }
-        if (object._materialLib != "" && object._materialLib.compare(model->materialLib) != 0) {
-            if(!loadMaterials(object, model)) {
-                LIA_error_f("Failed to load all materials for {}", object._name);
+        for (Object &object: _objects) {
+            Model* model = _modelManager.get(object._modelInfo.id);
+            ModelInfo* info = &object._modelInfo;
+
+            if (model->size == 0) {
+                LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
                 return false;
+            } else if (!model->isInGpu) {
+                LIA_error(std::vformat("Object {} failed to load model {}", std::make_format_args(object._name, model->path)));
+                return false;
+            } else {
+                LIA_trace(std::vformat("Object {} loaded", std::make_format_args(object._name)));
+            }
+            if (object._materialLib != "" && object._materialLib.compare(model->materialLib) != 0) {
+                if(!loadMaterials(object, model)) {
+                    LIA_error_f("Failed to load all materials for {}", object._name);
+                    return false;
+                }
             }
         }
-    }
-    _modelManager.logNameToModelMap();
-    _modelManager.logModels();
-    LIA_debug(std::vformat("Objects.size: {}, Models.size: {}", std::make_format_args(_objects.size(), _modelManager.size())));
-    return true;
+        _modelManager.logNameToModelMap();
+        _modelManager.logModels();
+        LIA_debug(std::vformat("Objects.size: {}, Models.size: {}", std::make_format_args(_objects.size(), _modelManager.size())));
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
