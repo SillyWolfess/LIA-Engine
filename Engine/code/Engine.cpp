@@ -10,8 +10,14 @@ bool LIA::Engine::init() {
         LIA_fatal("Event manager init failed");
         return false;
     }
-    LIA_trace("Event manager intialized");    
+    LIA_trace("Event manager intialized");
 
+    if (!_keybindingManager.init()) {
+        LIA_fatal("Keybinding manager init failed");
+        return false;
+    }    
+    LIA_trace("Keybinding manager intialized");
+    
     if (!_window.init(_game->name())) {
         LIA_fatal("window init failed");
         return false;
