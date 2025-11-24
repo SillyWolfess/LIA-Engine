@@ -9,6 +9,7 @@ namespace LIA {
     class EventManager;
     class ComponentManager;
     class TextureManager;
+    class KeybindingManager;
     class Gui;
     class Component {
         public:
@@ -34,6 +35,7 @@ namespace LIA {
             ComponentManager* getComponentManager() { return _componentManager; }
             Gui* getGuiManager() { return _guiManager; }
             TextureManager* getTextureManager() { return _textureManager; }
+            KeybindingManager* getKeybindingManager() { return _keybindingManager; }
             bool subscribe(std::string);
         private:
             EventManager* _eventManager;
@@ -41,6 +43,7 @@ namespace LIA {
             ComponentManager* _componentManager;
             Gui* _guiManager;
             TextureManager* _textureManager;
+            KeybindingManager* _keybindingManager;
             bool _registerHandlers();
     };
 }
