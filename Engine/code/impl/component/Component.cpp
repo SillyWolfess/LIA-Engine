@@ -10,7 +10,7 @@ bool LIA::Component::initCore() {
     _componentManager = &engine.getComponentManager();
     _guiManager = &engine.getGuiManager();
     _textureManager = &engine.getTextureManager();
-    _keybindingManager = &engine.getKeybidningManager();
+    _keybindingManager = &engine.getKeybindingManager();
     _identifier = -1;
     if (!init()) {
         return false;

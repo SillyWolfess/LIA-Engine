@@ -5,6 +5,7 @@
 //TODO remove
 #include "appWindow.hpp"
 #include "manager/eventManager.hpp"
+#include "Engine.hpp"
 
 bool LIA::Camera::init() {
     LIA_info("Camera init");
@@ -45,33 +46,32 @@ void LIA::Camera::update(EventManager *eventManager) {
             LIA_error("Failed to reload camera controls");
         }
     }
-    
-    if (AppWindow::isKeyPressed("camera", _cameraControl.up)) {
+    if (AppWindow::isKeyPressed("camera", _cameraControls.get("up"))) {
         Position pos = emptyPosition();
         pos.y = _settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else if (AppWindow::isKeyPressed("camera", _cameraControl.down)) {
+    } else if (AppWindow::isKeyPressed("camera", _cameraControls.get("down"))) {
         Position pos = emptyPosition();
         pos.y = -_settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else  if (AppWindow::isKeyPressed("camera", _cameraControl.right)) {
+    } else  if (AppWindow::isKeyPressed("camera", _cameraControls.get("right"))) {
         Position pos = emptyPosition();
         pos.x = -_settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else if (AppWindow::isKeyPressed("camera", _cameraControl.left)) {
+    } else if (AppWindow::isKeyPressed("camera", _cameraControls.get("left"))) {
         Position pos = emptyPosition();
         pos.x = _settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else  if (AppWindow::isKeyPressed("camera", _cameraControl.forward)) {
+    } else  if (AppWindow::isKeyPressed("camera", _cameraControls.get("forward"))) {
         Position pos = emptyPosition();
         pos.z = _settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else if (AppWindow::isKeyPressed("camera", _cameraControl.backward)) {
+    } else if (AppWindow::isKeyPressed("camera", _cameraControls.get("backward"))) {
         Position pos = emptyPosition();
         pos.z = -_settings.step;
         move(pos);
@@ -148,14 +148,16 @@ bool LIA::Camera::loadControls(std::string path) {
         return true;
     }
     LIA_TRY
-        XmlLoader xmlLoader;
-        XmlLoader::XmlData xmlCamera = xmlLoader.load(path);
-        _cameraControl.left = xmlLoader.getChar(xmlCamera, "left", '\0');
-        _cameraControl.right = xmlLoader.getChar(xmlCamera, "right", '\0');
-        _cameraControl.up = xmlLoader.getChar(xmlCamera, "up", '\0');
-        _cameraControl.down = xmlLoader.getChar(xmlCamera, "down", '\0');
-        _cameraControl.forward = xmlLoader.getChar(xmlCamera, "forward", '\0');
-        _cameraControl.backward = xmlLoader.getChar(xmlCamera, "backward", '\0');
+        KeybindingManager& keybindingManager = Engine::getInstance().getKeybindingManager();
+        if (!keybindingManager.registerControls("camera", path)) {
+            LIA_error_f("Failed to register keybindings for camera from '{}'", path);
+            return false;
+        }
+        if (!keybindingManager.load("camera")) {
+            LIA_error_f("Failed to load keybindings for camera");
+            return false;
+        }
+        _cameraControls = keybindingManager.getControls("camera");
         return true;
     LIA_CATCH_RETURN_FALSE
 }

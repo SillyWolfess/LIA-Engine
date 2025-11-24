@@ -3,6 +3,7 @@
 #include "precompiled.hpp"
 #include "data/position.hpp"
 #include "watcher/Watcher.hpp"
+#include "manager/keybindingManager.hpp"
 
 namespace LIA {
     class EventManager;
@@ -36,14 +37,7 @@ namespace LIA {
                 float step;
                 std::string controls;
             } _settings;
-            struct s_cameraControl {
-                char left;
-                char right;
-                char up;
-                char down;
-                char forward;
-                char backward;
-            } _cameraControl;
+            KeybindingControls _cameraControls;
             Watcher _watcher;
         public: 
            bool init();

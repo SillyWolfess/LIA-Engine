@@ -58,7 +58,7 @@ namespace LIA
             ObjectManager& getObjectManager() { return _objectManager; }
             TextureManager& getTextureManager() { return _textureManager; }
             MaterialManager& getMaterialManager() { return _materialManager; }
-            KeybindingManager& getKeybidningManager() { return _keybindingManager; }
+            KeybindingManager& getKeybindingManager() { return _keybindingManager; }
             Gui& getGuiManager() { return _gui; }
             AppWindow& getAppWindow() { return _window; }
             Camera& getMainCamera() { return _window.getCamera(); }
