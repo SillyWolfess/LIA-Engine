@@ -62,7 +62,7 @@ bool LIA::KeybindingManager::load(std::string name) {
             int keyCode = 0;
             keyCode = value[0];
             controls.set(key, keyCode);
-            LIA_info_f("Key mapping '{}' = '{}'", key, keyCode);
+            LIA_trace_f("Key mapping '{}' = '{}'", key, keyCode);
         }
 
         return true;
