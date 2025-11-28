@@ -82,7 +82,7 @@ int LIA::ModelManager::find(std::string modelName) {
 }
 
 LIA::Model* LIA::ModelManager::get(int indx) {
-    return &_models.at(indx < 0 ? 0 : indx);
+    return &_models.at(indx < 0 || indx > _models.size() - 1 ? 0 : indx);
 }
 /*
 LIA::Model* LIA::ModelManager::getByPath(std::string path) {
