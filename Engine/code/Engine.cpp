@@ -209,6 +209,7 @@ bool LIA::Engine::update() {
 
     _watcher.watch();
     _shaderManager.update();
+    _keybindingManager.update();
 
     _window.update();
     if (!_simulation.update(&_window, deltaTime)) {

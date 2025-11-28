@@ -71,7 +71,13 @@ bool LIA::KeybindingManager::load(std::string name) {
 
 bool LIA::KeybindingManager::update() {
     LIA_TRY
-
+        for (auto [name, path] : _pathMap) {
+            if (_watcher.needsReload(path)) {
+                if (!load(name)) {
+                    LIA_error("Failed to reload {} from {}", name, path);
+                }
+            }
+        }
         return true;
     LIA_CATCH_RETURN_FALSE
 }
