@@ -15,6 +15,7 @@ namespace LIA {
         public:
             void set(std::string, int);
             int get(std::string);
+            std::vector<std::string> keySet();
             void clear() { _map.clear(); }
     };
 

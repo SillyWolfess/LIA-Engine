@@ -75,3 +75,13 @@ bool LIA::KeybindingManager::update() {
         return true;
     LIA_CATCH_RETURN_FALSE
 }
+
+std::vector<std::string> LIA::KeybindingControls::keySet() {
+    std::vector<std::string> list;
+    list.reserve(_map.size());
+    std::map<std::string, int>::iterator it;
+    for (it = _map.begin(); it != _map.end(); ++it) {
+        list.push_back(it->first);
+    }
+    return list;
+}
