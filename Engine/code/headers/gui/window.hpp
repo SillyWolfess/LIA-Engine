@@ -215,6 +215,10 @@ namespace LIA {
             void updateList(std::string, std::vector<std::string>, int);
             /**
              * @param {string} id
+             */
+            void updateGrid(std::string);
+            /**
+             * @param {string} id
              * @param {string} value
              */
             void updateField(std::string, std::string);

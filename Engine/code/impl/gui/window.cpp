@@ -207,18 +207,47 @@ void LIA::Window::addLabel(std::string id, std::string value) {
 }
 
 void LIA::Window::addGrid(std::string id, std::string name, int minRows, int maxRows, int minColumns, int maxColumns) {
-    for (int y = 0; y < maxColumns; y++) {
-        for (int x = 0; x < maxRows; x++) {
-            int n = x + (y * maxRows);
-            GuiObject grid;
-            grid._id = std::vformat("{}[{}]", std::make_format_args(id, n));
-            grid._type = GuiObjectType::GRID;
-            grid._labelAlignment = GUI_LABEL_POSITION::PREFIX;
-            grid._value = "";
+    GuiObject data;
+    setDefaults(data);
+    data._id = id;
+    data._label = name;
+    data._type = GuiObjectType::GRID;
+    _children.push_back(data);
+    std::vector<GuiObject> tmp;
+    _childrenMap.emplace(std::pair<std::string, std::vector<GuiObject>>(data._id, tmp));
 
-            setDefaults(grid);
-            _children.push_back(grid);
+    std::vector<GuiObject>& children = _childrenMap[data._id];
+    for (int y = 0; y < maxRows; y++) {
+        for (int x = 0; x < maxColumns; x++) {
+            GuiObject& ggo = children.emplace_back();
+            setDefaults(ggo);
+            ggo._enabled = false;
+            ggo._type = GuiObjectType::BUTTON;
+            ggo._id = std::vformat("{}[{}][{}]", std::make_format_args(data._id, x, y));
+            ggo._grid.x = x;
+            ggo._grid.y = y;
+            ggo._scale.x = ggo._scale.x * 2.0f;
+            ggo._scale.y = ggo._scale.x;
+            ggo._value = "";
         }
+    }
+    
+    updateGrid(data._id);
+}
+
+void LIA::Window::updateGrid(std::string id) {
+    for (GuiObject& child : _children) {
+        if (child._id.compare(id) != 0 || child._type != GuiObjectType::GRID) {
+            continue;
+        }
+        std::vector<GuiObject>& data = _childrenMap[child._id];
+        int indx = 0;
+        for (GuiObject& go : data) {
+            go._value = std::vformat("{}=[{},{}]", std::make_format_args(indx, go._grid.x, go._grid.y));
+            indx++;
+        }
+        _needToResize = true;
+        return;
     }
 }
 
@@ -278,29 +307,29 @@ void LIA::Window::updateField(std::string id, std::string value) {
 
 void LIA::Window::updateList(std::string id, std::vector<std::string> value, int subtype) {
     for (GuiObject& child: _children) {
-        if (child._id.compare(id) == 0) {
-            if (child._type == GuiObjectType::LIST) {
-                std::vector<GuiObject>& data = _childrenMap[child._id];
-                data.clear();
-                data.reserve(value.size());
-                int indx = 0;
-                for (std::string &v : value) {
-                    GuiObject& lgu = data.emplace_back();
-                    setDefaults(lgu);
-
-                    if (subtype == GuiObjectType::BUTTON) {
-                        lgu._type = GuiObjectType::BUTTON;
-                    } else {
-                        lgu._type = GuiObjectType::FIELD;
-                    }
-                    lgu._id = std::vformat("{}[{}]", std::make_format_args(child._id, indx));
-                    lgu._value = v;
-                    indx++;
-                }
-                _needToResize = true;
-            }
-            return;
+        if (child._id.compare(id) != 0 || child._type != GuiObjectType::LIST) {
+            continue;
         }
+        
+        std::vector<GuiObject>& data = _childrenMap[child._id];
+        data.clear();
+        data.reserve(value.size());
+        int indx = 0;
+        for (std::string &v : value) {
+            GuiObject& lgu = data.emplace_back();
+            setDefaults(lgu);
+            
+            if (subtype == GuiObjectType::BUTTON) {
+                lgu._type = GuiObjectType::BUTTON;
+            } else {
+                lgu._type = GuiObjectType::FIELD;
+            }
+            lgu._id = std::vformat("{}[{}]", std::make_format_args(child._id, indx));
+            lgu._value = v;
+            indx++;
+        }
+        _needToResize = true;
+        return;
     }
 }
 
@@ -369,10 +398,13 @@ void LIA::Window::computeScale() {
     int gridX = 0;
     for (GuiObject& button : _children) {
         if (button._type == GuiObjectType::GRID) {
-            gridX++;
-        }
-        if (button._type == GuiObjectType::GRID) {
-        //    yShift = yShift + button._scale.y + _style.padding.bottom;
+            int lastY = 0;
+            for (GuiObject& ch: _childrenMap[button._id]) {
+                if (ch._grid.y > lastY) {
+                    yShift = yShift + ch._scale.y + _style.padding.bottom;
+                }
+                lastY = ch._grid.y;
+            }
         } else if (button._type == GuiObjectType::LIST) {
             for (GuiObject& ch: _childrenMap[button._id]) {
                 yShift = yShift + ch._scale.y + _style.padding.bottom;
@@ -422,14 +454,19 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     int gridX = 0;
     for (GuiObject& button : _children) {
         button._position.x = _position.x + _style.padding.left;
-        if (button._type == GuiObjectType::GRID) {
-            button._position.x = button._position.x + (gridX * button._scale.x);
-            gridX++;
-        }
         button._position.y = _position.y + yShift;
         button._position.z = _position.z + zOffset;
         if (button._type == GuiObjectType::GRID) {
-        //    yShift = yShift + button._scale.y + _style.padding.bottom;
+            button._position.y = _position.y;
+            int lastY = 0;
+            for (GuiObject& ch: _childrenMap[button._id]) {
+                if (ch._grid.y > lastY) {
+                    yShift = yShift + ch._scale.y + _style.padding.bottom;
+                }
+                ch._position.x = button._position.x + (ch._grid.x * ch._scale.x);
+                ch._position.y = button._position.y + yShift;
+                lastY = ch._grid.y;
+            }
         } else if (button._type == GuiObjectType::LIST) {
             button._position.y = _position.y;
             for (GuiObject& ch: _childrenMap[button._id]) {
@@ -510,8 +547,12 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
             for (GuiObject& lchild: lChildren) {
                 passChild(lchild, scene, font);
             }
-        } else if (child._type == GuiObjectType::GRID) { 
-            scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.hoverButtonBgColor : child._bgColor);   
+        } else if (child._type == GuiObjectType::GRID) {
+            std::vector<GuiObject>& gChildren = _childrenMap[child._id];
+            for (GuiObject& gChild: gChildren) {
+                passChild(gChild, scene, font);
+            }
+        //    scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.hoverButtonBgColor : child._bgColor);   
         } else {
            passChild(child, scene, font);
         }

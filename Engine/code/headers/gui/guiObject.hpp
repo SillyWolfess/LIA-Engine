@@ -23,8 +23,12 @@ namespace LIA {
      */
     enum GUI_LABEL_POSITION {PREFIX, SUFFIX};
     enum GuiObjectType {BUTTON, FIELD, CHECKBOX, LABEL, GRID, LIST};
+    struct GridData {
+        int x, y;
+    };
     struct GuiObject {
         GuiObjectType _type;
+        GridData _grid;
         GUI_LABEL_POSITION _labelAlignment = GUI_LABEL_POSITION::PREFIX;
         std::string _id;
         std::string _value;
