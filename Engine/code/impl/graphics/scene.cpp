@@ -11,7 +11,6 @@ bool LIA::Scene::init() {
     background.b = 0;
     background.a = 1;
     _isWireMode = false;
-//    _objects.reserve(10);
     _storage.reserve(10);
     return true;
 }
@@ -32,9 +31,11 @@ bool LIA::Scene::sendLightSource(ShaderProgram& shader) {
     if (_lightSources.size() == 0) {
         return true;
     }
+    int i = 0;
     for (Light& light : _lightSources) {
+        i++;
         if (!shader.sendLight(light)) {
-            LIA_error_f("Failed to send light {} to gpu", 0);
+            LIA_error_f("Failed to send light {} to gpu", i);
             return false;
         }
     }
@@ -78,29 +79,9 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager) {
             }
         }
     }
-    /*
-    for (SceneObject &object : _objects) {
-        if (!drawObject(VP, object, shaderManager)) {
-            LIA_fatal_f("Failed to draw {}", object._identifier);
-            return false;
-        }
-    }
-    */
     return true;
 }
-/*
-bool LIA::Scene::drawObject(glm::mat4& VP, SceneObject& object, ShaderManager* shaderManager) {
-    ShaderProgram& sp = shaderManager->getShader(object._shader);
-    return drawVAO(object, sp, VP);
-}
-*/
-/*
-LIA::Scene::ShaderData LIA::Scene::setShaderProgram(SceneObject& object, ShaderManager* shaderManager) {
-    ShaderData shaderData;
-    shaderData.program = shaderManager->getProgramId(object._shader);
-    return shaderData;
-}
-*/
+
 bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& VP) {
     if (object._size < 1) {
         LIA_warn_f("Trying to draw empty object {}", object._identifier);
@@ -121,16 +102,6 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
 
     glm::mat4 MVP = VP * M;
 
-    /*
-    if (!shader.bind()) {
-        return false;
-    }
-    // Get ids from shader
-    if (!shader.loadUniforms()) {
-        LIA_error("Failed to load uniforms");
-        return false;
-    }
-    */
     // Send data to shader
     if (!shader.sendMVP(glm::value_ptr(MVP))) {
         LIA_error("Failed to send MVP to shader");
@@ -140,12 +111,7 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
         LIA_error("Failed to send M to shader");
         return false;
     }
-    /*
-    if (!shader.sendVP(glm::value_ptr(VP))) {
-        LIA_error("Failed to send VP to shader");
-        return false;
-    }
-    */
+
     if (object._passColor) {
         if (!shader.sendColor(object._color)) {
             LIA_error("Failed to send color to shader");
@@ -159,44 +125,12 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
             LIA_error_f("Failed to use material {} from {}", object._materialName, object._materialLib);
             return false;
         }
-        /*
-        gMaterial& material = object._material;
-        if (!shader.sendMaterial(material)) {
-            LIA_error_f("Failed to send material {} to gpu", material.name);
-            return false;
-
-        }
-        */
     } else {
         shader.unbindTexture("textureDiff", 0);
         shader.unbindTexture("textureBump", 1);
         shader.unbindTexture("textureEm", 2);
     }
-    /*
-    if (object._hasTexture) {
-        if (!shader.bindTexture("textureDiff", 0, object._texture._id, object._texture._name)) {
-            return false;
-        }
-    } else {
-        shader.unbindTexture("textureDiff", 0);
-    }
 
-    if (object._hasBumpTexture) {
-        if (!shader.bindTexture("textureBump", 1, object._bumpTexture._id, object._bumpTexture._name)) {
-            return false;
-        }
-    } else {
-        shader.unbindTexture("textureBump", 1);
-    }
-
-    if (object._hasEmTexture) {
-        if (!shader.bindTexture("textureEm", 2, object._emTexture._id, object._emTexture._name)) {
-            return false;
-        }
-    } else {
-        shader.unbindTexture("textureEm", 2);
-    }
-    */
     glBindVertexArray( object._vao );
     if (catchGlError()) {
         LIA_error("Failed to bind vao");
@@ -209,11 +143,6 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
     if (object._wireMode) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
-    /* else if (!_isWireMode && object._wireMode) {
-        _isWireMode = true;
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-    */
     if (object._useIndices) {
         glDrawElements(object._drawAsPoints ? GL_POINTS : GL_TRIANGLES, size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
     } else {
@@ -338,11 +267,7 @@ bool LIA::Scene::add(Position position, Rotation rotation, Scale scale, GLuint v
 
     object._passColor = false;
     object._hasMaterial = false;
-    /*
-    object._hasTexture = false;
-    object._hasBumpTexture = false;
-    object._hasEmTexture = false;
-    */
+
     object._vao = vao;
     object._shader = shader;
     object._size = size;
@@ -358,12 +283,9 @@ bool LIA::Scene::add(
     bool indices, int size,
     std::string materialLib,
     std::string materialName,
-//    std::vector<LIA::gMaterial>& materials, std::vector<int>& mIds,
-//    std::vector<Texture>& textures, std::vector<Texture>& bump, std::vector<Texture>& em,
     int offset
 )
 {
-//    return add(identifier, position, rotation, scale, vao, shader, indices, size, materials, mIds, textures, bump, em, offset, false);
     return add(identifier, position, rotation, scale, vao, shader, indices, size, materialLib, materialName, offset, false);
 }
 
@@ -374,10 +296,6 @@ bool LIA::Scene::add(
     bool indices, int size,
     std::string materialLib,
     std::string materialName,
-    /*
-    std::vector<LIA::gMaterial>& materials, std::vector<int>& mIds,
-    std::vector<Texture>& textures, std::vector<Texture>& bump, std::vector<Texture>& em,
-    */
     int offset,
     bool asPoints
 ) {
@@ -393,43 +311,6 @@ bool LIA::Scene::add(
     object._materialName = materialName;
 
     object._hasMaterial = object._materialName != "";
-
-    /*
-    TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
-    if (materials.size() > 0 && mIds.size() > offset) {
-        int mId = mIds[offset];
-        if (materials.size() <= mId) {
-            return true;
-        }
-        object._material = materials[mId];
-        object._hasMaterial = true;
-        int tIndex = object._material.textureIndex;
-        if (tIndex < 0) {
-            return true;
-        }
-        if (textures.size() > tIndex) {
-            Texture& mTexture = textureManager.get(textures[tIndex]._name);
-            if (mTexture.isValid()) {
-                object._texture = mTexture;
-                object._hasTexture = true;    
-            }
-        }
-        if (bump.size() > tIndex) {
-            Texture& mTexture = textureManager.get(bump[tIndex]._name);
-            if (mTexture.isValid()) {
-                object._bumpTexture = mTexture;
-                object._hasBumpTexture = true;    
-            }
-        }
-        if (em.size() > tIndex) {
-            Texture& mTexture = textureManager.get(em[tIndex]._name);
-            if (mTexture.isValid()) {
-                object._emTexture = mTexture;
-                object._hasEmTexture = true;    
-            }
-        }
-    }
-    */
     return true;
 }
 
@@ -441,7 +322,6 @@ bool LIA::Scene::addSquare(std::string identifer, Position position, Rotation ro
     if (!square._loaded) {
         return false;
     }
-//    SceneObject &object = _objects.emplace_back();
     SceneObject& object = addToShaderMap(square._shader);
 
     object._identifier = identifer;
@@ -475,7 +355,6 @@ bool LIA::Scene::addCube(Position position, Scale scale, Color color) {
     if (!cube._loaded) {
         return false;
     }
-//    SceneObject &object = _objects.emplace_back();
     SceneObject &object = addToShaderMap(cube._shader);
     object._identifier = "[cube]";
     object._position = position;
