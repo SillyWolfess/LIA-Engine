@@ -401,8 +401,9 @@ void LIA::Window::computeScale() {
             int lastY = 0;
             float lastScaleY = 0.0f;
             for (GuiObject& ch: _childrenMap[button._id]) {
-                if (_style.padding.left + (ch._grid.x * ch._scale.x) + ch._scale.x + _style.padding.right > xMax) {
-                    xMax = _style.padding.left + (ch._grid.x * ch._scale.x) + ch._scale.x + _style.padding.right;
+                float xSize = _style.padding.left + (ch._grid.x * (ch._scale.x + _style.padding.left)) + ch._scale.x + _style.padding.right;
+                if (xSize > xMax) {
+                    xMax = xSize;
                 }
                 if (ch._grid.y > lastY) {
                     yShift = yShift + ch._scale.y + _style.padding.bottom;
@@ -469,7 +470,7 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
                 if (ch._grid.y > lastY) {
                     yShift = yShift + ch._scale.y + _style.padding.bottom;
                 }
-                ch._position.x = button._position.x + (ch._grid.x * ch._scale.x);
+                ch._position.x = button._position.x + (ch._grid.x * (ch._scale.x + _style.padding.left));
                 ch._position.y = button._position.y + yShift;
                 lastY = ch._grid.y;
             }
