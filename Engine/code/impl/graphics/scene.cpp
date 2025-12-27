@@ -11,6 +11,7 @@ bool LIA::Scene::init() {
     background.b = 0;
     background.a = 1;
     _isWireMode = false;
+    _depthTest = true;
     _storage.reserve(10);
     return true;
 }
@@ -55,29 +56,75 @@ bool LIA::Scene::prepareShader(ShaderProgram& shader, glm::mat4& VP) {
         LIA_error("Failed to send VP to shader");
         return false;
     }
+	glEnableVertexAttribArray(0);
+    return true;
 }
 
-bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager) {
+bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) {
     glm::mat4 Projection = camera.getProjection();
     glm::mat4 View = camera.getView();
     glm::mat4 VP = Projection * View;
 
-    for (auto &[shaderName, objects] : _shaderObjectMap) {
-        ShaderProgram& sp = shaderManager->getShader(shaderName);
-        if (!prepareShader(sp, VP)) {
-            LIA_fatal_f("Failed to prepare shader '{}'", shaderName);
-            return false;
-        }
-        if (!sendLightSource(sp)) {
-            LIA_fatal_f("Failed to send light to shader '{}'", shaderName);
-            return false;
-        }
-        for (SceneObject &object: objects) {
-            if (!drawVAO(object, sp, VP)) {
-                LIA_fatal_f("Failed to draw {} with shader {}", object._identifier, shaderName);
+    if (!_depthTest) {
+        glDisable(GL_DEPTH_TEST);
+    }
+    for (auto &[layerId, layer] : _layerMap) {
+        for (auto &[shaderName, objects] : layer._shaderObjectMap) {
+            ShaderProgram& sp = shaderManager->getShader(shaderName);
+            if (!prepareShader(sp, VP)) {
+                LIA_fatal_f("Failed to prepare shader '{}'", shaderName);         
+                if (!_depthTest) {
+                    glEnable(GL_DEPTH_TEST);
+                }
                 return false;
             }
+            if (!sendLightSource(sp)) {
+                LIA_fatal_f("Failed to send light to shader '{}'", shaderName);        
+                if (!_depthTest) {
+                    glEnable(GL_DEPTH_TEST);
+                }
+                return false;
+            }
+            for (SceneObject &object: objects) {
+                if (!drawVAO(object, sp, VP)) {
+                    LIA_fatal_f("Failed to draw {} with shader {}", object._identifier, shaderName);
+                    if (!_depthTest) {
+                        glEnable(GL_DEPTH_TEST);
+                    }
+                    return false;
+                }
+            }
         }
+        // TEST to move text drawing here
+        ShaderProgram& fontShader = shaderManager->getShader("font");
+        if (!fontShader.bind()) {
+            LIA_error("Failed to bind shader");
+            if (!_depthTest) {
+                glEnable(GL_DEPTH_TEST);
+            }
+            return false;
+        }
+        if (!fontShader.loadUniforms()) {
+            LIA_error("Failed to load uniforms");
+            if (!_depthTest) {
+                glEnable(GL_DEPTH_TEST);
+            }
+            return false;
+        }
+        font->prepareForDraw();
+        if (!fontShader.sendVP(glm::value_ptr(VP))) {
+            LIA_error("Failed to send VP to shader");
+            if (!_depthTest) {
+                glEnable(GL_DEPTH_TEST);
+            }
+            return false;
+        }
+        for (Data& data: layer._text) {
+            font->drawText(VP, data.position, data.color, data.size, data.text);
+        }
+    }
+    if (!_depthTest) {
+        glEnable(GL_DEPTH_TEST);
     }
     return true;
 }
@@ -224,15 +271,24 @@ LIA::Scene::Scene() {
 }
 
 void LIA::Scene::clear() {
-    _shaderObjectMap.clear();
+//    _shaderObjectMap.clear();
+    _layerMap.clear();
+    _layerId = 0;
+//    clearText();
 }
 
 LIA::SceneObject& LIA::Scene::addToShaderMap(std::string shader) {
-    if (_shaderObjectMap.find(shader) == _shaderObjectMap.end()) {
-        std::vector<SceneObject> emptyVec;
-        _shaderObjectMap.emplace(std::pair<std::string, std::vector<SceneObject>>(shader, emptyVec));
+    int layerId = _layerId;
+    if (_layerMap.find(layerId) == _layerMap.end()) {
+        Layer emptyLayer;
+        _layerMap.emplace(std::pair<int, Layer>(layerId, emptyLayer));
     }
-    std::vector<SceneObject> &objects = _shaderObjectMap[shader];
+    Layer& layer = _layerMap[layerId];
+    if (layer._shaderObjectMap.find(shader) == layer._shaderObjectMap.end()) {
+        std::vector<SceneObject> emptyVec;
+        layer._shaderObjectMap.emplace(std::pair<std::string, std::vector<SceneObject>>(shader, emptyVec));
+    }
+    std::vector<SceneObject> &objects = layer._shaderObjectMap[shader];
     return objects.emplace_back();
 }
 
@@ -368,6 +424,36 @@ bool LIA::Scene::addCube(Position position, Scale scale, Color color) {
     object._size = cube._size;
     object._useIndices = cube._useIndices;
     return true;
+}
+
+void LIA::Scene::clearText() {
+    /*
+	int size = _data.size();
+	_data.clear();
+	_data.reserve(size);
+    */
+}
+void LIA::Scene::addText(Font* font, std::string text, Position position) {
+	addText(font, text, position, font->getDefaultColor(), font->getDefaultSize());
+}
+void LIA::Scene::addText(Font* font, std::string text, Position position, Color color) {
+	addText(font, text, position, color, font->getDefaultSize());
+}
+void LIA::Scene::addText(Font* font, std::string text, Position position, int size) {
+	addText(font, text, position, font->getDefaultColor(), size);
+}
+void LIA::Scene::addText(Font* font, std::string text, Position position, Color color, int size) {
+    int layerId = _layerId;
+    if (_layerMap.find(layerId) == _layerMap.end()) {
+        Layer emptyLayer;
+        _layerMap.emplace(std::pair<int, Layer>(layerId, emptyLayer));
+    }
+    Layer& layer = _layerMap.at(layerId);
+	Data& data = layer._text.emplace_back();
+	data.text = text;
+	data.position = position;
+	data.color = color;
+	data.size = size;
 }
 
 int LIA::Scene::addLightSource() {

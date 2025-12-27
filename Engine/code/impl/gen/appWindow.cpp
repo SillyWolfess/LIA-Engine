@@ -48,12 +48,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         }
     }
 }
-/*
-void window_size_callback(GLFWwindow* window, int width, int height) {
-    LIA_trace_f("Window resizing: {} x {}", width, height);
-    LIA::AppWindow::windowResized(width, height);
-}
-*/
+
 void character_callback(GLFWwindow* window, unsigned int codepoint) {
     LIA_trace(std::vformat("Character pressed {}", std::make_format_args(codepoint)));
 }
@@ -128,18 +123,6 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
     }
     return false;
 }
-/*
-void LIA::AppWindow::onCameraPositionChanged() {
-        Position& pos = _mainCamera.getPosition();
-        std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
-        UpdateGuiEvent updateGuiEvent("debug", "camera_position", cPos);
-        _eventManager->handleEvent(updateGuiEvent);
-        Position& lookAt = _mainCamera.getLookAt();
-        std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
-        UpdateGuiEvent updateLookAtEvent("debug", "camera_lookAt", cLookAt);
-        _eventManager->handleEvent(updateLookAtEvent);
-}
-*/
 
 bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
     eventManager->subscribe("checkbox_action", EventType::GUI, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
@@ -152,7 +135,7 @@ void LIA::AppWindow::loadSettings() {
 
     XmlLoader xmlLoader;
     XmlLoader::XmlData xmlData = xmlLoader.load("./data/settings/appWindow.xml");
-        
+    _guiDepthTest = xmlLoader.getBoolean(xmlData, "guiDepth", true);    
     _glfwSettings.minor = xmlLoader.getInt(xmlData, "minor");
     _glfwSettings.major = xmlLoader.getInt(xmlData, "major");
     _glfwSettings.compact = xmlLoader.getBoolean(xmlData, "compact");
@@ -178,21 +161,6 @@ void LIA::AppWindow::loadSettings() {
     _background.g = bgColor.g;
     _background.b = bgColor.b;
     _background.a = bgColor.a;
-/*
-    _cameraSettings.locked = xmlLoader.getBoolean(xmlData, "lockedCamera", false);
-    _cameraSettings.ortho = xmlLoader.getBoolean(xmlData, "orthoCamera", false);
-    _cameraSettings.position = xmlLoader.getPosition(xmlData, "cameraPosition");
-    _cameraSettings.step = xmlLoader.getFloat(xmlData, "cameraStep", 0.1);
-*/
-/*
-    XmlLoader::XmlData xmlCamera = xmlLoader.load("./data/settings/controls/camera.xml");
-    _cameraControl.left = xmlLoader.getChar(xmlCamera, "left", '\0');
-    _cameraControl.right = xmlLoader.getChar(xmlCamera, "right", '\0');
-    _cameraControl.up = xmlLoader.getChar(xmlCamera, "up", '\0');
-    _cameraControl.down = xmlLoader.getChar(xmlCamera, "down", '\0');
-    _cameraControl.forward = xmlLoader.getChar(xmlCamera, "forward", '\0');
-    _cameraControl.backward = xmlLoader.getChar(xmlCamera, "backward", '\0');
-*/
 }
 
 bool LIA::AppWindow::init(std::string windowName) {
@@ -278,6 +246,9 @@ bool LIA::AppWindow::init(std::string windowName) {
         LIA_fatal("Failed to init gui");
         return false;
     }
+
+    _gui.setDepthTest(_guiDepthTest);
+
     if (!_terrain.init()) {
         LIA_fatal("Failed to init terrain scene");
         return false;
@@ -290,13 +261,6 @@ bool LIA::AppWindow::init(std::string windowName) {
         LIA_fatal("Failed to load main camera settings");
         return false;
     }
-    /*
-    if (_cameraSettings.ortho) {
-        _mainCamera.switchOrtho();
-    }
-    _mainCamera.setLocked(_cameraSettings.locked);
-    _mainCamera.setPosition(_cameraSettings.position);
-    */
     if (!_guiCamera.init()) {
         LIA_fatal("Failed to init gui camera");
         return false;
@@ -370,24 +334,24 @@ void LIA::AppWindow::draw() {
         glDepthFunc(GL_LESS); 
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (!_terrain.draw(_mainCamera, shaderManager)) {
+        if (!_terrain.draw(_mainCamera, shaderManager, &_font)) {
             LIA_fatal("Failed to draw terrain");
             _closeThis = true;
             return;
         }
-        if (!_scene.draw(_mainCamera, shaderManager)) {
+        if (!_scene.draw(_mainCamera, shaderManager, &_font)) {
             LIA_fatal("Failed to draw scene");
             _closeThis = true;
             return;
         }
     //    glDisable(GL_DEPTH_TEST);
-        if (!_gui.draw(_guiCamera, shaderManager)) {
+        if (!_gui.draw(_guiCamera, shaderManager, &_font)) {
             LIA_fatal("Failed to draw gui");
             _closeThis = true;
             return;
         }
     //    glEnable(GL_DEPTH_TEST);
-        _font.draw(_guiCamera, shaderManager);
+    //    _font.draw(_guiCamera, shaderManager);
     }
 
     // Swap buffers

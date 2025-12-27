@@ -10,6 +10,7 @@
 #include "data/Light.hpp"
 #include "data/ModelData.hpp"
 #include "manager/materialManager.hpp"
+#include "graphics/font.hpp"
 
 #include <vector>
 
@@ -17,6 +18,7 @@ namespace LIA {
     class Scene {
         private:
             bool _isWireMode;
+            bool _depthTest;
             /**
              * r, g, b, a
              */
@@ -45,22 +47,10 @@ namespace LIA {
             std::vector<SceneObject> _storage;
             std::map<std::string, int> _storageMap;
             std::map<std::string, Prefab> _prefabs;
-//            std::vector<SceneObject> _objects;
             std::vector<Light> _lightSources;
 
             std::map<std::string, std::vector<SceneObject>> _shaderObjectMap;
-/*
-            struct ShaderData {
-                GLuint program;
-            };
-*/
-/*
-            bool drawObject(glm::mat4& VP, SceneObject&, ShaderManager*);
-*/
-            /*
-            ShaderData setShaderProgram(SceneObject& object, ShaderManager*);
-            */
-            bool drawVAO(SceneObject& object, ShaderProgram& /* ShaderData& shaderData*/, glm::mat4& VP);
+            bool drawVAO(SceneObject& object, ShaderProgram&, glm::mat4& VP);
 
             bool makePrefab(GLuint, Model&, const char*);
             bool prefabSquare(ShaderManager&);
@@ -71,9 +61,10 @@ namespace LIA {
             bool useMaterial(MaterialManager& materialManager,ShaderProgram& shader,std::string materialLib, std::string materialName);
         public:
             bool init();
+            void setDepthTest(bool value) { _depthTest = value; }
             SceneObject* get(int, std::string);
             bool initPrefab(ShaderManager&);
-            bool draw(Camera&, ShaderManager*);
+            bool draw(Camera&, ShaderManager*, Font*);
 //            void destroy();
 
             /**
@@ -144,13 +135,6 @@ namespace LIA {
                 int,
                 std::string,
                 std::string,
-                /*
-                std::vector<LIA::gMaterial>&,
-                std::vector<int>&,
-                std::vector<Texture>&,
-                std::vector<Texture>&,
-                std::vector<Texture>&,
-                */
                 int,
                 bool
             );
@@ -185,12 +169,6 @@ namespace LIA {
              */
             bool objectFromPrefab(SceneObject&, std::string);
             /**
-             * SceneObject - object information to render
-             */
-            /*
-            bool add(SceneObject&);
-            */
-            /**
              * Adds light source to the scene
              */
             int addLightSource();
@@ -199,6 +177,27 @@ namespace LIA {
             void clear();
             Scene();
             ~Scene();
+            // TEST
+            struct Data {
+                std::string text;
+                Position position;
+                Color color;
+                int size;
+            };
+            struct Layer {
+                std::vector<Data> _text;
+                std::map<std::string, std::vector<SceneObject>> _shaderObjectMap;
+            };
+            int _layerId;
+            std::map<int, Layer> _layerMap;
+        //    std::vector<Data> _data;
+            void addText(Font*, std::string, Position);
+            void addText(Font*, std::string, Position, int);
+            void addText(Font*, std::string, Position, Color);
+            void addText(Font*, std::string, Position, Color, int);
+            void setLayerId(int id) { _layerId = id; };
+            void increaseLayerId() { _layerId++; };
+            void clearText();
     };
 }
 #endif

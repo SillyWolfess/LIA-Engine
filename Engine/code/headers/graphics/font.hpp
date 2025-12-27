@@ -68,7 +68,7 @@ namespace LIA {
 
             void recalculateScale();
 
-            void drawText(glm::mat4, Position, Color, int, std::string);
+        //    void drawText(glm::mat4, Position, Color, int, std::string);
             void drawFont(glm::mat4&, int, Position, Rotation, Scale);
 
             bool load();
@@ -80,7 +80,7 @@ namespace LIA {
             int addFont(const char*, const char*);
             int getFont(char);
             
-            void prepareForDraw();
+        //    void prepareForDraw();
 
             struct Data {
                 std::string text;
@@ -109,6 +109,8 @@ namespace LIA {
             void clearText();
 
             void draw(Camera&, ShaderManager*);
+            void drawText(glm::mat4, Position, Color, int, std::string);  
+            void prepareForDraw();
     };
 }
 #endif

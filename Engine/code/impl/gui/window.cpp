@@ -394,7 +394,7 @@ void LIA::Window::computeScale() {
 
 void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     Scale appScale = appWindow->getWindowScale();
-    float zOffset = 0.1f;
+    float zOffset = 0.0f;
     if (appScale.x == 0 || appScale.y == 0) {
         return;
     }
@@ -466,24 +466,28 @@ void LIA::Window::passChild(GuiObject& child, Scene* scene, Font* font) {
     Rotation rotation = emptyRotation();
     if (child._type == GuiObjectType::FIELD) {
         std::string fieldText = (child._label.compare("") != 0 ? child._label + ": " : "") + (child._value.compare("") == 0 ? child._placeholder : child._value);
-        font->addText(fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
+//        font->addText(fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
+        scene->addText(font, fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::BUTTON) {
-        font->addText(child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
+    //    font->addText(child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
         Color bgColor = child._isHovered ? _style.hoverButtonBgColor : child._bgColor;
         if (!child._enabled) {
             copyColor(bgColor, _style.disbaledButtonColor);
         }
         scene->addSquare(child._id, child._position, rotation, child._scale, bgColor);
+        scene->addText(font, child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::CHECKBOX) {
         Color fontColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
-        font->addText(child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
+        //font->addText(child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
         Color bgColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
         if (!child._enabled) {
             copyColor(bgColor, _style.disbaledButtonColor);
         }
         scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.checkBoxHoverColor : bgColor);
+        scene->addText(font, child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::LABEL) {
-        font->addText(child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
+    //    font->addText(child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
+        scene->addText(font, child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
     } else {
         LIA_error(std::vformat("unknown gui object type of {}", std::make_format_args(static_cast<int>(child._type))));
     }
@@ -497,6 +501,7 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
         compute(&(Engine::getInstance().getAppWindow()));
     }
     Rotation rotation = emptyRotation();
+    scene->increaseLayerId();
     scene->addSquare(_id, _position, rotation, _scale, _style.bgColor);
 
     for (GuiObject &child: _children) {
@@ -516,13 +521,14 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
         GuiObject oHeader;
         oHeader._position.x = _position.x;
         oHeader._position.y = _position.y;
-        oHeader._position.z = _position.z + 0.1f;
+        oHeader._position.z = _position.z;// + 0.1f;
         oHeader._fontSize = defaultFontSize();
         oHeader._scale.x = _scale.x;
         oHeader._scale.y = _headerSize;
         oHeader._scale.z = 1.0f;
         scene->addSquare("header", oHeader._position, rotation, oHeader._scale, _isGrabbed ? (_style.headerGrabbedColor) : (_isHeaderHover ? _style.headerHoverColor : _headerColor));
-        font->addText(_name, computeFontPosition(oHeader, _name), oHeader._fontSize);
+   //     font->addText(_name, computeFontPosition(oHeader, _name), oHeader._fontSize);
+        scene->addText(font, _name, computeFontPosition(oHeader, _name), oHeader._fontSize);
     }
 }
 

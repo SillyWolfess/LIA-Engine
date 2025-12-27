@@ -88,6 +88,8 @@ namespace LIA
                 float r, g, b, a;
             } _background;
 
+            bool _guiDepthTest;
+
             GLFWwindow* _glfwWindow;
             GLFWcursor* _cursor;
             int windowWold, windowHold;

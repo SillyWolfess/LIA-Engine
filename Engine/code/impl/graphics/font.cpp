@@ -38,8 +38,12 @@ void LIA::Font::drawText(glm::mat4 VP, Position position, Color color, int size,
 
     int fontPos = 0;
 
+    ShaderProgram& shader = _shaderManager->getShader("font");
+	if (!shader.sendColor(color)) {
+        LIA_error("Failed to send color to shader");
+	}
 	glEnableVertexAttribArray(0);
-	glUniform3f(vertexColorLocation_, color.r, color.g, color.b);
+//	glUniform3f(vertexColorLocation_, color.r, color.g, color.b);
     if (catchGlError()) {
         LIA_error("Failed to send color to shader");
     }
@@ -80,7 +84,7 @@ void LIA::Font::drawText(glm::mat4 VP, Position position, Color color, int size,
 		moveX  = moveX + (font_[fontId].xSize_ * size) + (settings_.spacing * size);
 	}
 	counter_ = count + counter_;
-	glDisableVertexAttribArray(0);
+//	glDisableVertexAttribArray(0);
 }
 void LIA::Font::drawFont(glm::mat4& VP, int fontId, Position position, Rotation rotation, Scale scale) {
 		
@@ -115,7 +119,23 @@ void LIA::Font::drawFont(glm::mat4& VP, int fontId, Position position, Rotation 
 }
 void LIA::Font::draw(Camera &camera, ShaderManager* shaderManager) {
 	programID_ = _shaderManager->getProgramId("font");
-    prepareForDraw();
+	prepareForDraw();
+    ShaderProgram& shader = _shaderManager->getShader("font");
+	if (!shader.bind()) {
+		LIA_error("Failed to bind font shader");
+		return;
+	}
+	if (!shader.loadUniforms()) {
+		LIA_error("Failed to load uniforms for font shader");
+		return;
+	}
+	glBindVertexArray(VertexArrayID_);
+
+	bool _depthTest = false;
+	if (!_depthTest) {
+        glDisable(GL_DEPTH_TEST);
+    }
+
     glm::mat4 Projection = camera.getProjection();
     glm::mat4 View = camera.getView();
     glm::mat4 VP = Projection * View;
@@ -123,6 +143,9 @@ void LIA::Font::draw(Camera &camera, ShaderManager* shaderManager) {
 	for (Data& data: _data) {
 		drawText(VP, data.position, data.color, data.size, data.text);
 	}
+	if (!_depthTest) {
+        glEnable(GL_DEPTH_TEST);
+    }
 }
 
 void LIA::Font::bindFont(char font, int id)
@@ -238,7 +261,12 @@ bool LIA::Font::initialise(ShaderManager* shanderManager)
 	resolution_.y_ = 1080.0f;
 	 
 	programID_ = shanderManager->getProgramId("font");
-	glUseProgram(programID_);
+	ShaderProgram& shader = shanderManager->getShader("font");
+	if (!shader.bind()) {
+		LIA_error("Failed to bind font shader");
+		return false;
+	}
+//	glUseProgram(programID_);
 	
     glGenVertexArrays(1, &VertexArrayID_);
 	glBindVertexArray(VertexArrayID_);
@@ -251,7 +279,7 @@ bool LIA::Font::initialise(ShaderManager* shanderManager)
 		LIA_fatal("Failed to get MVP uniform from gpu");
         return false;
     }
-    if (!getUniform(vertexColorLocation_, programID_, "newColor")) {
+    if (!getUniform(vertexColorLocation_, programID_, "colour")) {
 		LIA_fatal("Failed to get newColor uniform from gpu");
         return false;
     }
