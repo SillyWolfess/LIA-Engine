@@ -399,12 +399,18 @@ void LIA::Window::computeScale() {
     for (GuiObject& button : _children) {
         if (button._type == GuiObjectType::GRID) {
             int lastY = 0;
+            float lastScaleY = 0.0f;
             for (GuiObject& ch: _childrenMap[button._id]) {
+                if (_style.padding.left + (ch._grid.x * ch._scale.x) + ch._scale.x + _style.padding.right > xMax) {
+                    xMax = _style.padding.left + (ch._grid.x * ch._scale.x) + ch._scale.x + _style.padding.right;
+                }
                 if (ch._grid.y > lastY) {
                     yShift = yShift + ch._scale.y + _style.padding.bottom;
                 }
                 lastY = ch._grid.y;
+                lastScaleY = ch._scale.y + _style.padding.bottom;
             }
+            yShift = yShift + lastScaleY;
         } else if (button._type == GuiObjectType::LIST) {
             for (GuiObject& ch: _childrenMap[button._id]) {
                 yShift = yShift + ch._scale.y + _style.padding.bottom;
