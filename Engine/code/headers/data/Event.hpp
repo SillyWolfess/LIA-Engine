@@ -6,6 +6,7 @@ namespace LIA {
     enum class EventType {ANY, GUI, SIMULATION};
     struct Event {
         EventType type;
+        std::string subtype;
         std::string source;
         std::string name;
         std::string action;
@@ -140,10 +141,23 @@ namespace LIA {
             argi = subtype;
         };
     };
+    struct SetGridFieldEnabledEvent: Event {
+        SetGridFieldEnabledEvent() = delete;
+        SetGridFieldEnabledEvent(std::string window, std::string parent, std::string target, bool value) {
+            name = "set_enabled";
+            type = EventType::GUI;
+            subtype = "grid";
+            this->window = window;
+            this->target = parent;
+            this->arg0 = target;
+            this->argb = value;
+        };
+    };
     struct SetGuiEnabledEvent: Event {
         SetGuiEnabledEvent() = delete;
         SetGuiEnabledEvent(std::string window, std::string target, bool value) {
             name = "set_enabled";
+            subtype = "none";
             type = EventType::GUI;
             this->window = window;
             this->target = target;

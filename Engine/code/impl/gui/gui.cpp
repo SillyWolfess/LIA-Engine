@@ -53,6 +53,11 @@ bool LIA::Gui::init() {
     XmlLoader xmlLoader;
     XmlLoader::XmlData xmlData = xmlLoader.load("./data/gui/gui.xml");
 
+    if (!registerHandlers()) {
+        LIA_fatal("Failed to register gui handlers");
+        return false;
+    }
+
     LIA_TRY
     for (auto [name, path] : xmlData.values) {
         loadWindow(name, path);
@@ -70,10 +75,6 @@ bool LIA::Gui::init() {
     setPosition(mouseData, 500, 100);
     #endif
 
-    if (!registerHandlers()) {
-        LIA_fatal("Failed to register gui handlers");
-        return false;
-    }
     _lastAppScale = _appWindow->getWindowScale();
     _watcher.subscribe("./data/gui/style.xml");
     _watcher.subscribe("./data/gui/gui.xml");
@@ -200,7 +201,7 @@ bool LIA::Gui::loadWindow(std::string name, std::string path) {
         _windowMap.emplace(std::pair<std::string, int>(window.getId(), indx));
         _pathMap.emplace(std::pair<std::string, std::string>(name, path));
         _watcher.subscribe(path);
-        LIA_debug_f("New window {} with id", window.getId(), indx);
+        LIA_debug_f("New window {} with id {}", window.getId(), indx);
         return true;
     LIA_CATCH_RETURN_FALSE
 }
@@ -297,8 +298,13 @@ bool LIA::Gui::handleEnableEvent(Event& event) {
     }
     Window *window = getWindow(event.window);
     if (window != nullptr) {
-        LIA_trace_f("Setting enabled {}.{} = {}", event.window, event.target, event.argb);
-        window->enableField(event.target, event.argb);
+        if (event.subtype.compare("grid") == 0) {
+            LIA_trace_f("Setting enabled {}.{}.{} = {}", event.window, event.target, event.arg0, event.argb);
+            window->enableGridField(event.target, event.arg0, event.argb);
+        } else {
+            LIA_trace_f("Setting enabled {}.{} = {}", event.window, event.target, event.argb);
+            window->enableField(event.target, event.argb);
+        }
         return true;
     }
     return false;

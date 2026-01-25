@@ -16,6 +16,14 @@ std::string LIA::ws2s(const std::wstring& wstr) {
     return converterX.to_bytes(wstr);
 }
 
+bool LIA::equals(std::string &s1, std::string s2) {
+    return s1.compare(s2) == 0;
+}
+
+bool LIA::equals(std::string &s1, const char* s2) {
+    return s1.compare(s2) == 0;
+}
+
 std::string LIA::trim(std::string s) {
     rtrim(s);
     ltrim(s);

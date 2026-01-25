@@ -14,7 +14,8 @@ namespace LIA {
     std::string sanitizeFolderPath(std::string s);
     std::string sanitizeFileName(std::string name, std::string extension);
     std::string replaceAll(const std::string& str,const std::string& from, const std::string& to);
-    
+    bool equals(std::string &s1, std::string s2);
+    bool equals(std::string &s1, const char* s2);
     static class CmdColor {
         public:
             static std::string white() { return "\033[0m";}

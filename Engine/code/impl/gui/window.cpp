@@ -1,4 +1,5 @@
 #include "gui/window.hpp"
+#include "tools.hpp"
 #include "logs.hpp"
 #include "Engine.hpp"
 
@@ -204,6 +205,18 @@ void LIA::Window::addLabel(std::string id, std::string value) {
     label._labelAlignment = GUI_LABEL_POSITION::PREFIX;
     label._value = value;
     _children.push_back(label);
+}
+
+void LIA::Window::enableGridField(std::string id, std::string childId, bool value) {
+    std::vector<GuiObject>& children = _childrenMap[id];
+    for (GuiObject &child: children) {
+        if (equals(child._id, childId)) {
+            if (child._type == GuiObjectType::BUTTON) {
+                child._enabled = value;
+            }
+            break;
+        }
+    }
 }
 
 void LIA::Window::addGrid(std::string id, std::string name, int minRows, int maxRows, int minColumns, int maxColumns) {

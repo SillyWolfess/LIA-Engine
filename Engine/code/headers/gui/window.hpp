@@ -227,6 +227,12 @@ namespace LIA {
              * @param {bool} value
              */
             void enableField(std::string, bool);
+            /**
+             * @param {string} grid id
+             * @param {string} child id
+             * @param {bool} value
+             */
+            void enableGridField(std::string, std::string, bool);
             bool hasField(std::string);
             bool hasButton(std::string);
             void addGrid(std::string id, std::string name, int minRows, int maxRows, int minColumns, int maxColumns);
