@@ -646,7 +646,23 @@ bool LIA::Window::mouseClick(Position& pos, EventManager* eventManager) {
                 );
                 eventManager->handleEvent(checboxEvent);
                 return true;
-            }
+            }  else if (child._type == GuiObjectType::GRID) {
+                for (GuiObject& ch: _childrenMap[child._id]) {
+                    if (ch._isHovered) {
+                        if (ch._type == GuiObjectType::BUTTON) {
+                            LIA_debug(std::vformat("Mouse click {}", std::make_format_args(ch._id)));
+                            ButtonEvent buttonEvent(
+                                std::vformat("{}_{}", std::make_format_args(_id, ch._id)),
+                                ch._action,
+                                ch._arg0,
+                                _id
+                            );
+                            eventManager->handleEvent(buttonEvent);
+                            return true;
+                        }
+                    }
+                }
+        }
         }
     }
     return false;
@@ -669,6 +685,21 @@ bool LIA::Window::mouseHover(Position& pos) {
                 found = true;
             } else {
                 child._isHovered = false;
+            }
+        }
+        else if (child._type == GuiObjectType::GRID) {
+            child._isHovered = false;
+            for (GuiObject& ch: _childrenMap[child._id]) {
+                if (ch._type != GuiObjectType::BUTTON) {
+                    continue;
+                }
+                if (isInRange2D(pos, ch._position, ch._scale)) {
+                    ch._isHovered = true;
+                    child._isHovered = true;
+                    found = true;
+                } else {
+                    ch._isHovered = false;
+                }    
             }
         }
     }

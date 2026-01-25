@@ -58,8 +58,19 @@ namespace LIA {
             this->source = source;
         }
     };
+    /***
+    * @param {string} source
+    * @param {string} action
+    * @param {string} argument
+    * @param {string} window (optional)
+    */
     struct ButtonEvent: Event {
         ButtonEvent() = delete;
+        /***
+         * @param {string} source
+         * @param {string} action
+         * @param {string} argument
+         */
         ButtonEvent(std::string source, std::string action, std::string arg0) {
             this->name = "button_action";
             this->type = EventType::GUI;
@@ -67,6 +78,12 @@ namespace LIA {
             this->action = action;
             this->arg0 = arg0;
         }
+        /***
+         * @param {string} source
+         * @param {string} action
+         * @param {string} argument
+         * @param {string} window
+         */
         ButtonEvent(std::string source, std::string action, std::string arg0, std::string window) {
             this->name = "button_action";
             this->type = EventType::GUI;
