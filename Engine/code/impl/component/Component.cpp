@@ -28,23 +28,23 @@ bool LIA::Component::_registerHandlers() {
 
 bool LIA::Component::subscribe(std::string name) {
     if (name.compare("load") == 0) {
-        getEventManager()->subscribe("load", LIA::EventType::SIMULATION, std::bind(&Component::loadEventHandler, this, std::placeholders::_1));
+        getEventManager()->subscribe("load", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::loadEventHandler, this, std::placeholders::_1));
         return true;
     }
     else if (name.compare("tick") == 0) {
-        getEventManager()->subscribe("tick", LIA::EventType::SIMULATION, std::bind(&Component::tickEvenHandler, this, std::placeholders::_1));
+        getEventManager()->subscribe("tick", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::tickEvenHandler, this, std::placeholders::_1));
         return true;
     }
     else if (name.compare("get_data_gui") == 0) {
-        getEventManager()->subscribe("get_data_gui", LIA::EventType::GUI, std::bind(&Component::getDataGuiEventHandler, this, std::placeholders::_1));
+        getEventManager()->subscribe("get_data_gui", LIA::EventType::GUI, __FILE__, std::bind(&Component::getDataGuiEventHandler, this, std::placeholders::_1));
         return true;
     }
     else if (name.compare("button_action") == 0) {
-        getEventManager()->subscribe("button_action", LIA::EventType::GUI, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
+        getEventManager()->subscribe("button_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
         return true;
     }
     else if (name.compare("init_gui_window") == 0) {
-        getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
+        getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, __FILE__, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
         return true;
     }
     else {

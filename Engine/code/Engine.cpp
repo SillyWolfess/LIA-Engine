@@ -101,6 +101,7 @@ bool LIA::Engine::handleGui(Event& event) {
                 _gui.closeWindow("main_menu");
                 _gui.openWindow("top_bar");
             }
+            LIA_trace("Loaded simulation");
             return true;
         }
         LIA_fatal("loading simulation failed");
@@ -168,9 +169,9 @@ bool LIA::Engine::exit() {
 }
 
 bool LIA::Engine::registerEventHandlers() {
-    _eventManager.subscribe("button_action", EventType::GUI, std::bind(&Engine::handleGui, this, std::placeholders::_1));
-    _eventManager.subscribe("get_data_gui", EventType::GUI, std::bind(&Engine::handleGuiGetData, this, std::placeholders::_1));
-    _eventManager.subscribe("gameLost", EventType::SIMULATION, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
+    _eventManager.subscribe("button_action", EventType::GUI, __FILE__ , std::bind(&Engine::handleGui, this, std::placeholders::_1));
+    _eventManager.subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&Engine::handleGuiGetData, this, std::placeholders::_1));
+    _eventManager.subscribe("gameLost", EventType::SIMULATION, __FILE__, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
     return true;
 }
 

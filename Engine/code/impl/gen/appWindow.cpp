@@ -125,8 +125,8 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
 }
 
 bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
-    eventManager->subscribe("checkbox_action", EventType::GUI, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
-    eventManager->subscribe("get_data_gui", EventType::GUI, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
+    eventManager->subscribe("checkbox_action", EventType::GUI, __FILE__, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
+    eventManager->subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
     return true;
 }
 

@@ -346,11 +346,11 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
 }
 
 bool LIA::Gui::registerHandlers() {
-    _eventManager->subscribe("button_action", EventType::GUI, std::bind(&Gui::handleGuiButton, this, std::placeholders::_1));
+    _eventManager->subscribe("button_action", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiButton, this, std::placeholders::_1));
 //    eventManager.subscribe("checkbox_action", EventType::GUI, std::bind(&Gui::handleCheckbox, this, std::placeholders::_1));
-    _eventManager->subscribe("fps", EventType::GUI, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
-    _eventManager->subscribe("update_gui", EventType::GUI, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
-    _eventManager->subscribe("set_enabled", EventType::GUI, std::bind(&Gui::handleEnableEvent, this, std::placeholders::_1));
+    _eventManager->subscribe("fps", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
+    _eventManager->subscribe("update_gui", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
+    _eventManager->subscribe("set_enabled", EventType::GUI, __FILE__, std::bind(&Gui::handleEnableEvent, this, std::placeholders::_1));
     return true;
 }
 
