@@ -11,6 +11,7 @@ namespace LIA {
     class EventManager {
         private:
             struct EventHandlers {
+                std::string callerName;
                 std::function<bool(Event&)> guiHandler;
                 std::function<bool(Event&)> simulationHandler;
             };
@@ -30,6 +31,13 @@ namespace LIA {
              * std::function<bool(Event&)> - handler for the event
              */
             void subscribe(std::string, EventType, std::function<bool(Event&)> handler);
+                        /**
+             * std::string - event name
+             * EventType - type of the event
+             * std::string - caller name
+             * std::function<bool(Event&)> - handler for the event
+             */
+            void subscribe(std::string, EventType, std::string, std::function<bool(Event&)> handler);
             ~EventManager();
     };
 }

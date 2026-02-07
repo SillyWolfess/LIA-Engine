@@ -121,7 +121,7 @@ bool LIA::ObjectManager::load(ShaderManager* shaderManager) {
 }
 
 bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
-    LIA_trace("Loading material lib {} for object {}", object._materialLib, object._name);
+    LIA_trace_f("Loading material lib {} for object {}", object._materialLib, object._name);
     // Load materials
     LIA::MaterialManager &materialManager = LIA::Engine::getInstance().getMaterialManager();
     if (!materialManager.registerMaterialLib(object._materialLib, model->folder)) {

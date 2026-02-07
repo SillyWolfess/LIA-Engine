@@ -103,6 +103,7 @@ bool LIA::Engine::handleGui(Event& event) {
             }
             return true;
         }
+        LIA_fatal("loading simulation failed");
         return exit();
     }
     if (event.action.compare("continue_simulation") == 0) {

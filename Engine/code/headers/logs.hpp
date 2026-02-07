@@ -4,11 +4,21 @@
 #include <stdarg.h>
 #include <format>
 
-#define LIA_VERSION_RUN 0
+#define LIA_VERSION_RUN 1
+#define LIA_VERSION_DIST 2
+#define LIA_VERSION_DEBUG 3
 
-#ifdef LIA_VERSION_RUN
-    #if LIA_VERSION_RUN == 1
+#define LIA_VERSION LIA_VERSION_DEBUG
+
+#ifdef LIA_VERSION
+    #if LIA_VERSION == LIA_VERSION_RUN
         #define LIA_LOG_LEVEL 3
+    #endif
+    #if LIA_VERSION == LIA_VERSION_DIST
+        #define LIA_LOG_LEVEL 1
+    #endif
+    #if LIA_VERSION == LIA_VERSION_DEBUG
+        #define LIA_LOG_LEVEL 5
     #endif
 #endif
 
