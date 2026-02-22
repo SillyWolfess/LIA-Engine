@@ -19,6 +19,7 @@ namespace LIA {
         private:
             bool _isWireMode;
             bool _depthTest;
+            bool _enableLogs;
             /**
              * r, g, b, a
              */
@@ -198,6 +199,8 @@ namespace LIA {
             void setLayerId(int id) { _layerId = id; };
             void increaseLayerId() { _layerId++; };
             void clearText();
+
+            void enableLogs(bool value) { _enableLogs = value; }
     };
 }
 #endif
