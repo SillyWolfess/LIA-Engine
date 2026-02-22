@@ -27,7 +27,7 @@ bool LIA::Simulation::load(ShaderManager* shaderManager) {
         if (_state == LIA_SIM_STATE::ENDED) {
             reset();
         }
-        if (_state != LIA_SIM_STATE::EMPTY) {
+        if (_state != LIA_SIM_STATE::EMPTY && _state != LIA_SIM_STATE::LOADING) {
             LIA_error("Simulation is already running. Cannot load.");
             return false;
         }
@@ -95,28 +95,31 @@ void LIA::Simulation::passObjects(Scene* scene) {
     if (_state != LIA_SIM_STATE::RUNNING) {
         return;
     }
-    _objManager->pass(scene);
-    
-    for (int indx = 0; indx < _lights.size(); indx++) {
-        Light& _light = _lights[indx];
-        if (_lightIds[indx] == -1) {
-            _lightIds[indx] = scene->addLightSource();
+    LIA_TRY
+        _objManager->pass(scene);
+    LIA_CATCH_EMPTY
+    LIA_TRY
+        for (int indx = 0; indx < _lights.size(); indx++) {
+            Light& _light = _lights[indx];
+            if (_lightIds[indx] == -1) {
+                _lightIds[indx] = scene->addLightSource();
+            }
+            Light& light = scene->getLight(_lightIds[indx]);
+            copy(light._position, _light._position);
+            copy(light._direction, _light._direction);
+            copyColor(light._color, _light._color);
+            light._type = _light._type;
+            light._linear = _light._linear;
+            light._quadratic = _light._quadratic;
+            light._cutoff = _light._cutoff;
+            light._intensity = _light._intensity;
+            Scale scale = emptyScale();
+            setAll(scale, 1.0f);
+            if (light._type == LightType::POINT || light._type == LightType::FLASHLIGHT) {
+                scene->addCube(light._position, scale, light._color);
+            }
         }
-        Light& light = scene->getLight(_lightIds[indx]);
-        copy(light._position, _light._position);
-        copy(light._direction, _light._direction);
-        copyColor(light._color, _light._color);
-        light._type = _light._type;
-        light._linear = _light._linear;
-        light._quadratic = _light._quadratic;
-        light._cutoff = _light._cutoff;
-        light._intensity = _light._intensity;
-        Scale scale = emptyScale();
-        setAll(scale, 1.0f);
-        if (light._type == LightType::POINT || light._type == LightType::FLASHLIGHT) {
-            scene->addCube(light._position, scale, light._color);
-        }
-    }
+    LIA_CATCH_EMPTY
 }
 
 bool LIA::Simulation::loadObject(std::string path) {
