@@ -135,7 +135,7 @@ void LIA::AppWindow::loadSettings() {
 
     XmlLoader xmlLoader;
     XmlLoader::XmlData xmlData = xmlLoader.load("./data/settings/appWindow.xml");
-    _guiDepthTest = xmlLoader.getBoolean(xmlData, "guiDepth", true);    
+    _guiDepthTest = xmlLoader.getBoolean(xmlData, "guiDepth", false);    
     _glfwSettings.minor = xmlLoader.getInt(xmlData, "minor");
     _glfwSettings.major = xmlLoader.getInt(xmlData, "major");
     _glfwSettings.compact = xmlLoader.getBoolean(xmlData, "compact");
