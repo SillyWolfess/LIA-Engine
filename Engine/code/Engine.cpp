@@ -93,19 +93,8 @@ bool LIA::Engine::handleGui(Event& event) {
         return exit();
     }
     if (event.action.compare("start_simulation") == 0) {
-        if (load()) {
-            _simulation.unpause();
-            if (_simulation.getState() != LIA_SIM_STATE::RUNNING) {
-                LIA_error("Failed to start the simulation");
-            } else {
-                _gui.closeWindow("main_menu");
-                _gui.openWindow("top_bar");
-            }
-            LIA_trace("Loaded simulation");
-            return true;
-        }
-        LIA_fatal("loading simulation failed");
-        return exit();
+        _simulation.startLoading();
+        return true;
     }
     if (event.action.compare("continue_simulation") == 0) {
         _simulation.unpause();
@@ -214,7 +203,22 @@ bool LIA::Engine::update() {
     _keybindingManager.update();
 
     _window.update();
-    if (!_simulation.update(&_window, deltaTime)) {
+    if (_simulation.isLoading()) {
+        if (!load()) {
+            LIA_fatal("Simulation failed to load");
+            return false;
+        }
+        
+        _simulation.unpause();
+        if (_simulation.getState() != LIA_SIM_STATE::RUNNING) {
+            LIA_error("Failed to start the simulation");
+        } else {
+            _gui.closeWindow("main_menu");
+            _gui.openWindow("top_bar");
+        }
+        LIA_trace("Loaded simulation");
+    }
+    else if (!_simulation.update(&_window, deltaTime)) {
         LIA_fatal("Simulation update failed");
         return false;
     }

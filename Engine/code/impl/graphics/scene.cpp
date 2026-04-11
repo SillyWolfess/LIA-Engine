@@ -12,6 +12,8 @@ bool LIA::Scene::init() {
     background.a = 1;
     _isWireMode = false;
     _depthTest = true;
+    _layerId = 0;
+    _layerMap.clear();
     _storage.reserve(10);
     return true;
 }
@@ -66,9 +68,15 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
     glm::mat4 VP = Projection * View;
 
     if (!_depthTest) {
+        if (_enableLogs) {
+            LIA_debug("Disabling depth test");
+        }
         glDisable(GL_DEPTH_TEST);
     }
     for (auto &[layerId, layer] : _layerMap) {
+        if (_enableLogs) {
+            LIA_debug_f("Drawing layer {}", layerId);
+        }
         for (auto &[shaderName, objects] : layer._shaderObjectMap) {
             ShaderProgram& sp = shaderManager->getShader(shaderName);
             if (!prepareShader(sp, VP)) {
@@ -95,6 +103,10 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
                 }
             }
         }
+        if (_enableLogs) {
+            LIA_debug("Object drawing done");
+            LIA_debug("Getting font shader");
+        }
         // TEST to move text drawing here
         ShaderProgram& fontShader = shaderManager->getShader("font");
         if (!fontShader.bind()) {
@@ -104,6 +116,9 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
             }
             return false;
         }
+        if (_enableLogs) {
+            LIA_debug("Loading font uniforms");
+        }
         if (!fontShader.loadUniforms()) {
             LIA_error("Failed to load uniforms");
             if (!_depthTest) {
@@ -111,7 +126,13 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
             }
             return false;
         }
+        if (_enableLogs) {
+            LIA_debug("Preparing font to draw");
+        }
         font->prepareForDraw();
+        if (_enableLogs) {
+            LIA_debug("Sending VP to font shader");
+        }
         if (!fontShader.sendVP(glm::value_ptr(VP))) {
             LIA_error("Failed to send VP to shader");
             if (!_depthTest) {
@@ -119,11 +140,21 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
             }
             return false;
         }
+        
+        if (_enableLogs) {
+            LIA_debug("Draing text data");
+        }
         for (Data& data: layer._text) {
             font->drawText(VP, data.position, data.color, data.size, data.text);
         }
+        if (_enableLogs) {
+            LIA_debug_f("Layer {} done", layerId);
+        }
     }
     if (!_depthTest) {
+        if (_enableLogs) {
+            LIA_debug("Enablig depth test");
+        }
         glEnable(GL_DEPTH_TEST);
     }
     return true;
@@ -355,19 +386,21 @@ bool LIA::Scene::add(
     int offset,
     bool asPoints
 ) {
-    if (!add(position, rotation, scale, vao, shader, indices, size)) {
-        return false;
-    }
-    int indx = _shaderObjectMap[shader].size() - 1;
-    SceneObject& object = _shaderObjectMap[shader][indx];
-    object._identifier = identifier;
-    object._offset = offset;
-    object._drawAsPoints = asPoints;
-    object._materialLib = materialLib;
-    object._materialName = materialName;
+    LIA_TRY
+        if (!add(position, rotation, scale, vao, shader, indices, size)) {
+            return false;
+        }
+        int indx = _layerMap[_layerId]._shaderObjectMap[shader].size() - 1;
+        SceneObject& object = _layerMap[_layerId]._shaderObjectMap[shader][indx];
+        object._identifier = identifier;
+        object._offset = offset;
+        object._drawAsPoints = asPoints;
+        object._materialLib = materialLib;
+        object._materialName = materialName;
 
-    object._hasMaterial = object._materialName != "";
-    return true;
+        object._hasMaterial = object._materialName != "";
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::Scene::addSquare(Position position, Rotation rotation, Scale scale, Color color) {

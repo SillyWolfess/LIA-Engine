@@ -219,7 +219,7 @@ void LIA::ObjectManager::pass(Scene *scene) {
         } else {
             LIA_error(std::vformat("Object {} was not loaded", std::make_format_args(object._name)));
         }
-    }    
+    }   
 }
 
 #include <iostream>

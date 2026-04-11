@@ -246,13 +246,13 @@ bool LIA::AppWindow::init(std::string windowName) {
         LIA_fatal("Failed to init gui");
         return false;
     }
-
-    _gui.setDepthTest(_guiDepthTest);
-
     if (!_terrain.init()) {
         LIA_fatal("Failed to init terrain scene");
         return false;
     }
+    
+    _gui.setDepthTest(_guiDepthTest);
+
     if (!_mainCamera.init()) {
         LIA_fatal("Failed to init main camera");
         return false;
