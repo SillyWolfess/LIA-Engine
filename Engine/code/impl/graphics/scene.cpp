@@ -142,7 +142,7 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
         }
         
         if (_enableLogs) {
-            LIA_debug("Draing text data");
+            LIA_debug("Drawing text data");
         }
         for (Data& data: layer._text) {
             font->drawText(VP, data.position, data.color, data.size, data.text);

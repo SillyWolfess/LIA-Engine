@@ -22,7 +22,7 @@ int LIA::Font::getFont(char font)
 	int n = font;
 	int f = fontMap_[n].id_;
 	if(f > maxFonts - 1 || f < 0) {
-		return 0;
+		return -1;
 	}
 	return f;
 }
@@ -52,24 +52,17 @@ void LIA::Font::drawText(glm::mat4 VP, Position position, Color color, int size,
 	{
 		my_font = string_.at(fontPos);
         fontPos++;
-		if(my_font<'A' || my_font>'Z') {
-			if (my_font>='a' && my_font <='z') {
-				// ok
-			} else if (my_font>='0' && my_font<='9') {
-				// ok
-			} else if (my_font == ',' || my_font=='/' || my_font=='-' || my_font=='.' || my_font=='(' || my_font==')' || my_font=='+' || my_font == '?' || my_font == ':') {
-				// ok
-			} else if (my_font==' ') {
-				moveX = moveX + (settings_.spaceLenght * size);
-				count++;
-				continue;
-			} else if (my_font=='\0') {
-				break;
-			} else {
-				continue;
-			}
+		if (my_font==' ') {
+			moveX = moveX + (settings_.spaceLenght * size);
+			count++;
+			continue;
+		} else if (my_font=='\0') {
+			break;
 		}
 		int fontId = getFont(my_font);
+		if (fontId == -1) {
+			continue;
+		}
 		Position newPosition;
 		copy(newPosition, position);
 		newPosition.x = newPosition.x + moveX;

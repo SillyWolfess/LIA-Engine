@@ -49,6 +49,9 @@ int LIA::KeyController::getLastKeyPressed() {
 }
 
 std::string LIA::KeyController::getKeyName(int keyCode) {
+    if (!isKeyCodeValid(keyCode)) {
+        return "";
+    }
     if ('a' <= keyCode && keyCode <= 'z') {
         return std::string{(char) keyCode};
     }

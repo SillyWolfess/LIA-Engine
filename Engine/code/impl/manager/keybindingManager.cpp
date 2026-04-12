@@ -91,3 +91,12 @@ std::vector<std::string> LIA::KeybindingControls::keySet() {
     }
     return list;
 }
+
+std::vector<std::string> LIA::KeybindingManager::keySet() {
+    std::vector<std::string> list;
+    list.reserve(_pathMap.size());
+    for (auto [name, path] : _pathMap) {
+        list.push_back(name);
+    }
+    return list;
+}

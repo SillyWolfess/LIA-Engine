@@ -51,6 +51,7 @@ namespace LIA {
              * call to update file watching
              */
             bool update();
+            std::vector<std::string> keySet();
             ~KeybindingManager();
         private:
             Watcher _watcher;

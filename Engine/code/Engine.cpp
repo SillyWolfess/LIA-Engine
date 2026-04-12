@@ -71,6 +71,22 @@ bool LIA::Engine::init() {
         return false;
     }
     LIA_trace("Event handlers registered");
+
+    if (!initEngineComponents()) {
+        LIA_fatal("Failed to init engine components");
+        return false;
+    }
+    return true;
+}
+
+bool LIA::Engine::initEngineComponents() {
+    LIA_info("Initializing engine components");
+
+    if (_componentManager.addAndInit(&_keyMappingWindow) == -1) {
+        return false;
+    }
+
+    LIA_info("Engine components initialized");
     return true;
 }
 

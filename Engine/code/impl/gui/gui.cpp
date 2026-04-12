@@ -433,6 +433,13 @@ void LIA::Gui::update() {
         info->text = appWindow->getKeyName(lastKey);
     }
     #endif
+    
+    Window *window = getWindow("debug");
+    if (window != nullptr && window->isVisible()) {
+        window->updateField("last_key_code", std::vformat("{}", std::make_format_args(lastKey)));
+        window->updateField("last_key", appWindow->getKeyName(lastKey));
+    }
+    
     Scale appScale = appWindow->getWindowScale();
     bool isFullscreen = appWindow->isFullscreen();
     if (appScale.x != _lastAppScale.x || appScale.y != _lastAppScale.y || isFullscreen != _lastFullscreen) {

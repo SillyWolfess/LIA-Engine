@@ -17,6 +17,8 @@
 #include "watcher/Watcher.hpp"
 #include "counters/FpsCounter.hpp"
 
+#include "windows/keyMappingWindow.hpp"
+
 namespace LIA
 {
     class Engine {
@@ -36,6 +38,8 @@ namespace LIA
             FpsCounter _fpsCounter;
             BaseGame* _game = nullptr;
 
+            KeyMappingWindow _keyMappingWindow;
+
             bool registerEventHandlers();
             bool handleGui(Event& event);
             bool handleGuiGetData(Event& event);
@@ -43,6 +47,7 @@ namespace LIA
             bool exit();
 
             bool init();
+            bool initEngineComponents();
             bool load();
             bool update();
             void draw();
