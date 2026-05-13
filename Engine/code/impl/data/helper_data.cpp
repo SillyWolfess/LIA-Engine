@@ -6,6 +6,15 @@
 #include "data/ModelData.hpp"
 #include "data/sceneObject.hpp"
 #include "data/Padding.hpp"
+#include "math/Math.hpp"
+
+void LIA::applyForceByAngleXZ(LIAV3& vec, float angle, float force) {
+    float fx = LIA::Math::sinOf(angle);
+    float fz = LIA::Math::cosOf(angle);
+
+    vec.x = force * fx;
+    vec.z = force * fz;
+}
 
 bool LIA::isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale) {
     return  target.x < pos.x && pos.x < target.x + scale.x &&
