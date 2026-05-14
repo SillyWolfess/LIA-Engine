@@ -16,10 +16,12 @@
 #include <glm/glm.hpp>
 
 bool LIA::Terrain::load() {
-    if (!_enabled) { 
+    if (!_enabled) {
+        LIA_debug("Terrain is disabled. Skipping loading.");
         return true;
     }
     if (_isInGpu) {
+        LIA_trace("Terrain is already in gpu. Skipping loading.");
         return true;
     }
     XmlLoader xmlLoader;
@@ -342,7 +344,7 @@ bool LIA::Terrain::pass(Scene* scene) {
     )) {
         return false;
     }
-    SceneObject* terrainObject = scene->get(0, "terrain");
+    SceneObject* terrainObject = scene->get(0, 0, "terrain");
     terrainObject->_wireMode = _wireMode;
 
     return true;
@@ -351,6 +353,6 @@ bool LIA::Terrain::pass(Scene* scene) {
 void LIA::Terrain::setWire(bool wire) {
     _wireMode = wire;
     Scene* scene = Engine::getInstance().getTerrainRenderer();
-    SceneObject* terrainObject = scene->get(0, "terrain");
+    SceneObject* terrainObject = scene->get(0, 0, "terrain");
     terrainObject->_wireMode = _wireMode;
 }

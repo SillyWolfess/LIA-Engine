@@ -339,10 +339,11 @@ bool LIA::Scene::objectFromPrefab(SceneObject& object, std::string prefabName) {
     return true;
 }
 
-LIA::SceneObject* LIA::Scene::get(int indx, std::string shader) {
-    LIA_ASSERT(_shaderObjectMap.find(shader) != _shaderObjectMap.end(), "shader not found");
-    LIA_ASSERT(indx > -1 && indx < _shaderObjectMap[shader].size(), "Object out of bounds");
-    return &_shaderObjectMap[shader][indx];
+LIA::SceneObject* LIA::Scene::get(int layerId, int indx, std::string shader) {
+    LIA_ASSERT_F(layerId > -1 && layerId < _layerMap.size(), "Layer id {} is out of bounds for shader {} with index {}", layerId, shader, indx);
+    LIA_ASSERT_F(_layerMap[layerId]._shaderObjectMap.find(shader) != _shaderObjectMap.end(), "shader {} not found", shader);
+    LIA_ASSERT_F(indx > -1 && indx < _layerMap[layerId]._shaderObjectMap[shader].size(), "Object out of bounds for shader {} and index {}", shader, indx);
+    return &_layerMap[layerId]._shaderObjectMap[shader][indx];
 }
 
 bool LIA::Scene::add(Position position, Rotation rotation, Scale scale, GLuint vao, std::string shader, bool indices, int size) {

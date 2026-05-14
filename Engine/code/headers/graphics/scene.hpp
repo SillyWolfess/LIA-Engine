@@ -63,7 +63,7 @@ namespace LIA {
         public:
             bool init();
             void setDepthTest(bool value) { _depthTest = value; }
-            SceneObject* get(int, std::string);
+            SceneObject* get(int, int, std::string);
             bool initPrefab(ShaderManager&);
             bool draw(Camera&, ShaderManager*, Font*);
 //            void destroy();
