@@ -15,6 +15,17 @@ int LIA::ObjectManager::create() {
     return indx;
 }
 
+bool LIA::ObjectManager::remove(std::vector<std::string> &toRemove) {
+    LIA_TRY
+        for (auto name: toRemove) {
+            int index = getByName(-1, name);
+            _objects.erase(_objects.begin() + index);
+            LIA_trace_f("Removed {} from index {}", name, index);
+        }
+        return true;
+    LIA_CATCH_RETURN_FALSE
+}
+
 int LIA::ObjectManager::create(std::string objectName) {
     int objectId = -1;
     LIA_TRY

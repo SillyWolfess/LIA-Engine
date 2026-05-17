@@ -3,7 +3,8 @@
 #include <random>
 
 bool LIA::Math::isColliding(Object* target, Object* source) {
-    return isColliding(target, source->_position, source->_scale);
+    // TODO needs to do reverse check, single does not work if target is smaller than source
+    return isColliding(target, source->_position, source->_scale) || isColliding(source, target->_position, target->_scale);
 }
 
 float LIA::Math::toRadians(float euql) {
@@ -34,6 +35,7 @@ bool LIA::Math::isColliding(Object* target, Position newPosition, Scale scale) {
         }
         return true;
     }
+    return false;
 }
 
 bool LIA::Math::isInBounds(float source, float target, float bound) {

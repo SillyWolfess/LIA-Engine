@@ -39,6 +39,7 @@ namespace LIA {
             bool createObject(std::string, std::string);
 
             int create(std::string);
+            bool remove(std::vector<std::string> &toRemove);
             Object* get(int);
             int size();
             bool load(ShaderManager*);
