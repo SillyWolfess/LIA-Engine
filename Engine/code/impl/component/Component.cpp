@@ -26,26 +26,43 @@ bool LIA::Component::_registerHandlers() {
     return registerHandlers();
 }
 
-bool LIA::Component::subscribe(std::string name) {
-    if (name.compare("load") == 0) {
+bool LIA::Component::subscribe(LIA::ComponentEvent event) {
+    if (event == ComponentEvent::LOAD) {
         getEventManager()->subscribe("load", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::loadEventHandler, this, std::placeholders::_1));
         return true;
-    }
-    else if (name.compare("tick") == 0) {
+    } else if (event == ComponentEvent::TICK) {
         getEventManager()->subscribe("tick", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::tickEvenHandler, this, std::placeholders::_1));
         return true;
-    }
-    else if (name.compare("get_data_gui") == 0) {
+    } else if (event == ComponentEvent::GET_DATA_GUI) {
         getEventManager()->subscribe("get_data_gui", LIA::EventType::GUI, __FILE__, std::bind(&Component::getDataGuiEventHandler, this, std::placeholders::_1));
         return true;
-    }
-    else if (name.compare("button_action") == 0) {
+    } else if (event == ComponentEvent::BUTTON_ACTION) {
         getEventManager()->subscribe("button_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
         return true;
-    }
-    else if (name.compare("init_gui_window") == 0) {
+    } else if (event == ComponentEvent::INIT_GUI_WINDOW) {
         getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, __FILE__, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
         return true;
+    } else {
+        LIA_error("Subscription event unknown");
+        return false;
+    }
+}
+
+bool LIA::Component::subscribe(std::string name) {
+    if (name.compare("load") == 0) {
+        return subscribe(ComponentEvent::LOAD);
+    }
+    else if (name.compare("tick") == 0) {
+        return subscribe(ComponentEvent::TICK);
+    }
+    else if (name.compare("get_data_gui") == 0) {
+        return subscribe(ComponentEvent::GET_DATA_GUI);
+    }
+    else if (name.compare("button_action") == 0) {
+        return subscribe(ComponentEvent::BUTTON_ACTION);
+    }
+    else if (name.compare("init_gui_window") == 0) {
+        return subscribe(ComponentEvent::INIT_GUI_WINDOW);
     }
     else {
         LIA_error_f("Subscription name '{}' is not known to engine", name);

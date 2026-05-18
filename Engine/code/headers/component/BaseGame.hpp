@@ -8,6 +8,7 @@ namespace LIA {
             virtual std::string name() { return std::string{"Game"}; }
         protected:
             bool subscribe(std::string name) { return Component::subscribe(name); }
+            bool subscribe(ComponentEvent event) { return Component::subscribe(event); }
     };
 }
 #endif

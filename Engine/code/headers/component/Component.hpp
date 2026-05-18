@@ -11,6 +11,7 @@ namespace LIA {
     class TextureManager;
     class KeybindingManager;
     class Gui;
+    enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW};
     class Component {
         public:
             bool initCore();
@@ -37,6 +38,7 @@ namespace LIA {
             TextureManager* getTextureManager() { return _textureManager; }
             KeybindingManager* getKeybindingManager() { return _keybindingManager; }
             bool subscribe(std::string);
+            bool subscribe(ComponentEvent);
         private:
             EventManager* _eventManager;
             ObjectManager* _objectManager;
