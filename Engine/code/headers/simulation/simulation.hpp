@@ -62,7 +62,7 @@ namespace LIA {
             bool isWon() { return _gameState == LIA_GAME_STATE::WON; }
             bool isLost() { return _gameState == LIA_GAME_STATE::LOST; }
             bool isProgress() { return !isWon() && !isLost(); }
-            void startLoading() { _state = LIA_SIM_STATE::LOADING; }
+            void startLoading();
             bool isLoading() { return _state == LIA_SIM_STATE::LOADING; }
             void setWon() { _gameState = LIA_GAME_STATE::WON; }
             void setLost() { _gameState = LIA_GAME_STATE::LOST; }

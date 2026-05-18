@@ -50,6 +50,18 @@ namespace LIA {
             this->arg0 = windowToOpen;
         };
     };
+    struct GameWonEvent : Event {
+        GameWonEvent() {
+            this->type = EventType::SIMULATION;
+            this->name = "gameWon";
+            this->arg0 = "end_menu";
+        }
+        GameWonEvent(std::string windowToOpen) {
+            this->type = EventType::SIMULATION;
+            this->name = "gameWon";
+            this->arg0 = windowToOpen;
+        }
+    };
     struct TickEvent : Event {
         TickEvent() = delete;
         TickEvent(std::string source) {

@@ -153,10 +153,15 @@ bool LIA::Engine::handleGuiGetData(Event& event) {
 }
 
 bool LIA::Engine::handleGameState(Event& event) {
-    if (event.name.compare("gameLost") != 0) {
+    if (event.name.compare("gameLost") != 0 && event.name.compare("gameWon") != 0) {
         return false;
     }
-    _simulation.setLost();
+    if (event.name.compare("gameLost") == 0) {
+        _simulation.setLost();
+    }
+    if (event.name.compare("gameWon") == 0) {
+        _simulation.setWon();
+    } 
     _simulation.end();
     if (_simulation.getState() != LIA_SIM_STATE::ENDED) {
         LIA_error("Failed to end the simulation");
@@ -177,6 +182,7 @@ bool LIA::Engine::registerEventHandlers() {
     _eventManager.subscribe("button_action", EventType::GUI, __FILE__ , std::bind(&Engine::handleGui, this, std::placeholders::_1));
     _eventManager.subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&Engine::handleGuiGetData, this, std::placeholders::_1));
     _eventManager.subscribe("gameLost", EventType::SIMULATION, __FILE__, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
+    _eventManager.subscribe("gameWon", EventType::SIMULATION, __FILE__, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
     return true;
 }
 

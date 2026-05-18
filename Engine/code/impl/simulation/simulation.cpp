@@ -22,6 +22,19 @@ void LIA::Simulation::reset() {
     _gameState = LIA_GAME_STATE::RUNNING;
 }
 
+void LIA::Simulation::startLoading() {
+    if (_state == LIA_SIM_STATE::LOADING) {
+        return;
+    }
+    if (_state != LIA_SIM_STATE::ENDED && _state != LIA_SIM_STATE::EMPTY) {
+        LIA_fatal("Simulation is in state when cannot start loading");
+        LIA::Engine::getInstance().fatal();
+        return;
+    }
+    reset();
+    _state = LIA_SIM_STATE::LOADING;
+}
+
 bool LIA::Simulation::load(ShaderManager* shaderManager) {
     LIA_TRY
         if (_state == LIA_SIM_STATE::ENDED) {
