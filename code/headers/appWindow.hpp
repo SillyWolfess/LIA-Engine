@@ -15,6 +15,21 @@ namespace LIA
 {
     class AppWindow {
         public:
+            struct s_glfwSettings {
+                int major;
+                int minor;
+                bool compact;
+                int samples;
+
+                bool experimental;
+                bool maximize;
+                bool fullscreen;
+                bool vSync;
+
+                int width;
+                int height;
+            } _glfwSettings;
+
             static KeyController _keyController;
             static MouseController _mouseController;
             static int _cpX;
@@ -69,20 +84,6 @@ namespace LIA
         //    static int windowW, windowH;
        private:
             EventManager* _eventManager;
-            struct s_glfwSettings {
-                int major;
-                int minor;
-                bool compact;
-                int samples;
-
-                bool experimental;
-                bool maximize;
-                bool fullscreen;
-                bool vSync;
-
-                int width;
-                int height;
-            } _glfwSettings;
             
             struct s_background {
                 float r, g, b, a;
@@ -98,7 +99,7 @@ namespace LIA
             
             void loadSettings();
             void handleMouseInput();
-            bool handleCheckbox(Event& event);
+//            bool handleCheckbox(Event& event);
             bool handleGuiGetData(Event& event);
             bool registerHandlers(EventManager*);
 
@@ -133,7 +134,9 @@ namespace LIA
             bool isKeyReleasedPoll(int);
             Position getMousePos();
             Scale getWindowScale();
+            s_glfwSettings getSettings() { return _glfwSettings;  }
             bool isFullscreen() { return _glfwSettings.fullscreen; }
+            void toogleFullscreen();
     };
 }
 #endif

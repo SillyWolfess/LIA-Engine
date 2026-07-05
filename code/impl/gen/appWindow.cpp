@@ -69,23 +69,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void LIA::AppWindow::toogleFullscreen() {
+    _glfwSettings.fullscreen = !_glfwSettings.fullscreen;
+    LIA_trace_f("fullscreen changed to {}", _glfwSettings.fullscreen);
+    if (_glfwSettings.fullscreen) {
+        glfwGetWindowPos(_glfwWindow, &windowLastX, &windowLastY);
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        LIA_trace_f("Setting fullscreen {} x {}", mode->width, mode->height);
+        glfwSetWindowMonitor(_glfwWindow, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+    }
+    else {
+        glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, _glfwSettings.width, _glfwSettings.height, GLFW_DONT_CARE);
+    }
+}
+/*
 bool LIA::AppWindow::handleCheckbox(Event& event) {
     if (event.name.compare("checkbox_action") != 0) {
         return false;
     }
     if (event.source.compare("settings") == 0) {
         if (event.action.compare("fullscreen") == 0) {
-            _glfwSettings.fullscreen = !_glfwSettings.fullscreen;
-            LIA_trace_f("fullscreen changed to {}", _glfwSettings.fullscreen);
-            if (_glfwSettings.fullscreen) {        
-                glfwGetWindowPos(_glfwWindow , &windowLastX, &windowLastY);
-                GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-                const GLFWvidmode * mode = glfwGetVideoMode(monitor);
-                LIA_trace_f("Setting fullscreen {} x {}", mode->width, mode->height);
-                glfwSetWindowMonitor(_glfwWindow, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
-            } else {
-                glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, _glfwSettings.width, _glfwSettings.height, GLFW_DONT_CARE);
-            }
+            toogleFullscreen();
             UpdateGuiEvent updateGuiEvent("settings", "fullscreen", _glfwSettings.fullscreen);
             _eventManager->handleEvent(updateGuiEvent);
             return true;
@@ -96,12 +101,13 @@ bool LIA::AppWindow::handleCheckbox(Event& event) {
     }
     return false;
 }
-
+*/
 #include "data/position.hpp"
 bool LIA::AppWindow::handleGuiGetData(Event& event) {
     if (event.name.compare("get_data_gui") != 0) {
         return false;
     }
+    /*
     if (event.source.compare("settings") == 0) {
         UpdateGuiEvent updateGuiEvent(event.window, "fullscreen", _glfwSettings.fullscreen);
         _eventManager->handleEvent(updateGuiEvent);
@@ -110,6 +116,7 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
         _eventManager->handleEvent(updateResolutionEvent);
         return true;
     }
+    */
     if (event.source.compare("debug") == 0) {
         Position& pos = _mainCamera.getPosition();
         std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
@@ -125,7 +132,7 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
 }
 
 bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
-    eventManager->subscribe("checkbox_action", EventType::GUI, __FILE__, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
+//    eventManager->subscribe("checkbox_action", EventType::GUI, __FILE__, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
     eventManager->subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
     return true;
 }

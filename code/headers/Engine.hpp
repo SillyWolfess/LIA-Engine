@@ -18,6 +18,7 @@
 #include "counters/FpsCounter.hpp"
 
 #include "windows/keyMappingWindow.hpp"
+#include "windows/settingsWindow.hpp"
 
 namespace LIA
 {
@@ -39,6 +40,7 @@ namespace LIA
             BaseGame* _game = nullptr;
 
             KeyMappingWindow _keyMappingWindow;
+            SettingsWindow _settingsWindow;
 
             bool registerEventHandlers();
             bool handleGui(Event& event);

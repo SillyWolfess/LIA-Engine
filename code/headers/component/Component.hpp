@@ -11,7 +11,8 @@ namespace LIA {
     class TextureManager;
     class KeybindingManager;
     class Gui;
-    enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW};
+    class AppWindow;
+    enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW, CHECKBOX_ACTION};
     class Component {
         public:
             bool initCore();
@@ -22,6 +23,7 @@ namespace LIA {
             bool getDataGuiEventHandler(LIA::Event&);
             bool buttonActionEventHandler(LIA::Event&);
             bool guiWindowInitHandler(LIA::Event&);
+            bool checkboxEventHandler(LIA::Event&);
         protected:
             int _identifier = -1;
             virtual bool registerHandlers();
@@ -31,6 +33,8 @@ namespace LIA {
             virtual bool onGetGuiData(LIA::Event&);
             virtual bool onButtonAction(LIA::Event&);
             virtual bool onGuiWindowInit(LIA::Event&);
+            virtual bool onCheckboxAction(LIA::Event&);
+            AppWindow* getAppWindow() { return _appWindow;  }
             EventManager* getEventManager() { return _eventManager; }
             ObjectManager* getObjectManager() { return _objectManager; }
             ComponentManager* getComponentManager() { return _componentManager; }
@@ -46,6 +50,7 @@ namespace LIA {
             Gui* _guiManager;
             TextureManager* _textureManager;
             KeybindingManager* _keybindingManager;
+            AppWindow* _appWindow;
             bool _registerHandlers();
     };
 }

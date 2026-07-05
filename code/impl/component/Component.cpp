@@ -11,6 +11,7 @@ bool LIA::Component::initCore() {
     _guiManager = &engine.getGuiManager();
     _textureManager = &engine.getTextureManager();
     _keybindingManager = &engine.getKeybindingManager();
+    _appWindow = &engine.getAppWindow();
     _identifier = -1;
     if (!init()) {
         return false;
@@ -42,6 +43,9 @@ bool LIA::Component::subscribe(LIA::ComponentEvent event) {
     } else if (event == ComponentEvent::INIT_GUI_WINDOW) {
         getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, __FILE__, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
         return true;
+    } else if (event == ComponentEvent::CHECKBOX_ACTION) {
+        getEventManager()->subscribe("checkbox_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::checkboxEventHandler, this, std::placeholders::_1));
+        return true;
     } else {
         LIA_error("Subscription event unknown");
         return false;
@@ -63,6 +67,9 @@ bool LIA::Component::subscribe(std::string name) {
     }
     else if (name.compare("init_gui_window") == 0) {
         return subscribe(ComponentEvent::INIT_GUI_WINDOW);
+    }
+    else if (name.compare("checkbox_action") == 0) {
+        return subscribe(ComponentEvent::CHECKBOX_ACTION);
     }
     else {
         LIA_error_f("Subscription name '{}' is not known to engine", name);
@@ -109,6 +116,13 @@ bool LIA::Component::guiWindowInitHandler(LIA::Event& event) {
     return onGuiWindowInit(event);
 }
 
+bool LIA::Component::checkboxEventHandler(LIA::Event& event) {
+    if (event.name.compare("checkbox_action") != 0) {
+        return false;
+    }
+    return onCheckboxAction(event);
+}
+
 bool LIA::Component::onTick(LIA::Event& event) {
     return false;
 }
@@ -126,6 +140,10 @@ bool LIA::Component::onButtonAction(LIA::Event& event) {
 }
 
 bool LIA::Component::onGuiWindowInit(LIA::Event& event) {
+    return false;
+}
+
+bool LIA::Component::onCheckboxAction(LIA::Event& event) {
     return false;
 }
 
