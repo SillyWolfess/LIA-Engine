@@ -163,11 +163,7 @@ void LIA::AppWindow::loadSettings() {
 
     std::map<std::string, XmlLoader::XmlNode> nodes = xmlData.nodes;
     XmlLoader::XmlNode backgroundNode = nodes.at("background");
-    Color bgColor = xmlLoader.getColor(backgroundNode);
-    _background.r = bgColor.r;
-    _background.g = bgColor.g;
-    _background.b = bgColor.b;
-    _background.a = bgColor.a;
+    _background = xmlLoader.getColor(backgroundNode);
 }
 
 bool LIA::AppWindow::init(std::string windowName) {

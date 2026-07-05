@@ -84,11 +84,12 @@ namespace LIA
         //    static int windowW, windowH;
        private:
             EventManager* _eventManager;
-            
+            /*
             struct s_background {
                 float r, g, b, a;
             } _background;
-
+            */
+            Color _background;
             bool _guiDepthTest;
 
             GLFWwindow* _glfwWindow;
