@@ -29,6 +29,14 @@ namespace LIA {
             type = EventType::GUI;
         }
     };
+    struct PositionChangedEvent : Event {
+        PositionChangedEvent() = delete;
+        PositionChangedEvent(std::string source) {
+            this->type = EventType::SIMULATION;
+            this->source = source;
+            this->name = "position_changed";
+        }
+    };
     struct LoadEvent : Event {
         LoadEvent() = delete;
         LoadEvent(std::string source, int id) {

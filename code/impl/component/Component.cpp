@@ -46,6 +46,9 @@ bool LIA::Component::subscribe(LIA::ComponentEvent event) {
     } else if (event == ComponentEvent::CHECKBOX_ACTION) {
         getEventManager()->subscribe("checkbox_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::checkboxEventHandler, this, std::placeholders::_1));
         return true;
+    } else if (event == ComponentEvent::POSITION_CHANGED) {
+        getEventManager()->subscribe("position_changed", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::positionChangedEventHandler, this, std::placeholders::_1));
+        return true;
     } else {
         LIA_error("Subscription event unknown");
         return false;
@@ -123,6 +126,13 @@ bool LIA::Component::checkboxEventHandler(LIA::Event& event) {
     return onCheckboxAction(event);
 }
 
+bool LIA::Component::positionChangedEventHandler(LIA::Event& event) {
+    if (event.name.compare("position_changed") != 0) {
+        return false;
+    }
+    return onPositionChanged(event);
+}
+
 bool LIA::Component::onTick(LIA::Event& event) {
     return false;
 }
@@ -144,6 +154,10 @@ bool LIA::Component::onGuiWindowInit(LIA::Event& event) {
 }
 
 bool LIA::Component::onCheckboxAction(LIA::Event& event) {
+    return false;
+}
+
+bool LIA::Component::onPositionChanged(LIA::Event& event) {
     return false;
 }
 

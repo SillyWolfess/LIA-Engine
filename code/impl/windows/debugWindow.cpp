@@ -13,6 +13,10 @@ bool LIA::DebugWindow::registerHandlers() {
         LIA_fatal("Failed to subscribe to gui update");
         return false;
     }
+    if (!subscribe(ComponentEvent::POSITION_CHANGED)) {
+        LIA_fatal("Failed to subscribe to position changed event");
+        return false;
+    }
     return true;
 }
 
@@ -21,6 +25,28 @@ bool LIA::DebugWindow::onGetGuiData(LIA::Event& event) {
         return false;
     }
     updateData(event.window);
+    return true;
+}
+
+bool LIA::DebugWindow::onPositionChanged(LIA::Event& event) {
+    if (event.source.compare("camera") != 0) {
+        return false;
+    }
+    LIA_TRY
+        AppWindow* appWindow = getAppWindow();
+        Camera camera = appWindow->getCamera();
+        EventManager* eventManager = getEventManager();
+
+        Position& pos = camera.getPosition();
+        std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
+        UpdateGuiEvent updateGuiEvent(_eventSource, "camera_position", cPos);
+        eventManager->handleEvent(updateGuiEvent);
+
+        Position& lookAt = camera.getLookAt();
+        std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
+        UpdateGuiEvent updateLookAtEvent(_eventSource, "camera_lookAt", cLookAt);
+        eventManager->handleEvent(updateLookAtEvent);
+    LIA_CATCH_EMPTY
     return true;
 }
 

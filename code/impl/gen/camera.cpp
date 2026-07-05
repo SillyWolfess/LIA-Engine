@@ -56,7 +56,7 @@ void LIA::Camera::update(EventManager *eventManager) {
         pos.y = -_settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else  if (AppWindow::isKeyPressed("camera", _cameraControls.get("right"))) {
+    } else if (AppWindow::isKeyPressed("camera", _cameraControls.get("right"))) {
         Position pos = emptyPosition();
         pos.x = -_settings.step;
         move(pos);
@@ -66,7 +66,7 @@ void LIA::Camera::update(EventManager *eventManager) {
         pos.x = _settings.step;
         move(pos);
         onPositionChanged(eventManager);
-    } else  if (AppWindow::isKeyPressed("camera", _cameraControls.get("forward"))) {
+    } else if (AppWindow::isKeyPressed("camera", _cameraControls.get("forward"))) {
         Position pos = emptyPosition();
         pos.z = _settings.step;
         move(pos);
@@ -80,14 +80,8 @@ void LIA::Camera::update(EventManager *eventManager) {
 }
 
 void LIA::Camera::onPositionChanged(EventManager *eventManager) {
-        Position& pos = getPosition();
-        std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
-        UpdateGuiEvent updateGuiEvent("debug", "camera_position", cPos);
-        eventManager->handleEvent(updateGuiEvent);
-        Position& lookAt = getLookAt();
-        std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
-        UpdateGuiEvent updateLookAtEvent("debug", "camera_lookAt", cLookAt);
-        eventManager->handleEvent(updateLookAtEvent);
+    PositionChangedEvent event("camera");
+    eventManager->handleEvent(event);
 }
 
 void LIA::Camera::update(float w, float h) {
