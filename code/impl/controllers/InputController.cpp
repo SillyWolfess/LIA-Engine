@@ -2,7 +2,7 @@
 #include "precompiled.hpp"
 
 bool LIA::KeyController::init() {
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < MAX_KEYS; i++) {
         _keyNames[i] = std::vformat("{}", std::make_format_args(i));
     }
     LIA_TRY
@@ -19,7 +19,7 @@ bool LIA::KeyController::init() {
 }
 
 bool LIA::KeyController::isKeyCodeValid(int keyCode) {
-    return keyCode > 0 && keyCode <= 500;
+    return keyCode > 0 && keyCode < MAX_KEYS;
 }
 
 bool LIA::KeyController::isKeyPressed(std::string keyGroup, int keyCode) {
