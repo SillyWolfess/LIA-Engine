@@ -57,6 +57,8 @@ namespace LIA {
            glm::mat4 getView();
            Position& getPosition() { return _position; };
            Position& getLookAt() { return _lookAt; };
+           void enableControls() { _cameraControls.enable(); }
+           void disableControls() { _cameraControls.disable(); }
            void setPosition(Position& position) { copy(_position, position); };
            void onPositionChanged(EventManager*);
            ~Camera();

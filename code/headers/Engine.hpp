@@ -60,6 +60,8 @@ namespace LIA
             Engine();
             bool initImplementation(Component*);
             void run();
+            void disableSimulationControls();
+            void enableSimulationControls();
             void fatal() { _window.close(); }
             ShaderManager& getShaderManager() { return _shaderManager; }
             EventManager& getEventManager() { return _eventManager; }

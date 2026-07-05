@@ -76,7 +76,17 @@ bool LIA::Engine::init() {
         LIA_fatal("Failed to init engine components");
         return false;
     }
+
+    disableSimulationControls();
     return true;
+}
+
+void LIA::Engine::disableSimulationControls() {
+    getMainCamera().disableControls();
+}
+
+void LIA::Engine::enableSimulationControls() {
+    getMainCamera().enableControls();
 }
 
 bool LIA::Engine::initEngineComponents() {
@@ -127,6 +137,7 @@ bool LIA::Engine::handleGui(Event& event) {
         } else {
             _gui.closeWindow("ingame_menu");
             _gui.openWindow("top_bar");
+            enableSimulationControls();
         }
         return true;
     }
@@ -142,6 +153,7 @@ bool LIA::Engine::handleGui(Event& event) {
         } else {
             _gui.closeWindow("top_bar");
             _gui.openWindow("ingame_menu");
+            disableSimulationControls();
         }
         return true;
     }
@@ -245,6 +257,7 @@ bool LIA::Engine::update() {
         } else {
             _gui.closeWindow("main_menu");
             _gui.openWindow("top_bar");
+            enableSimulationControls();
         }
         LIA_trace("Loaded simulation");
     }
