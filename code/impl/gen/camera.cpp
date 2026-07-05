@@ -41,6 +41,9 @@ void LIA::Camera::update(EventManager *eventManager) {
     if (isLocked()) {
         return;
     }
+    if (!_cameraControls.isEnabled()) {
+        return;
+    }
     if (_settings.controls != "" && _watcher.needsReload(_settings.controls)) {
         if (!loadControls(_settings.controls)) {
             LIA_error("Failed to reload camera controls");

@@ -12,7 +12,11 @@ namespace LIA {
              * @param {int} key
              */
             std::map<std::string, int> _map;
+            bool _enabled;
         public:
+            void enable() { _enabled = true;  }
+            void disable() { _enabled = false; }
+            bool isEnabled() { return _enabled;  }
             void set(std::string, int);
             int get(std::string);
             std::vector<std::string> keySet();

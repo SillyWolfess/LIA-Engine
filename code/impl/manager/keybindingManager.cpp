@@ -54,6 +54,7 @@ bool LIA::KeybindingManager::load(std::string name) {
         XmlLoader::XmlData xmlData = xmlLoader.load(path);
         if (_controls.find(name) == _controls.end()) {
             _controls.emplace(std::pair<std::string, KeybindingControls>(name, KeybindingControls()));
+            _controls[name].enable();
         }
         KeybindingControls& controls = _controls[name];
         controls.clear();
