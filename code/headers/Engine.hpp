@@ -46,7 +46,6 @@ namespace LIA
 
             bool registerEventHandlers();
             bool handleGui(Event& event);
-            bool handleGuiGetData(Event& event);
             bool handleGameState(Event&);
             bool exit();
 
@@ -63,6 +62,7 @@ namespace LIA
             void disableSimulationControls();
             void enableSimulationControls();
             void fatal() { _window.close(); }
+            int getFps() { return _fpsCounter.getFps(); }
             ShaderManager& getShaderManager() { return _shaderManager; }
             EventManager& getEventManager() { return _eventManager; }
             ComponentManager& getComponentManager() { return _componentManager; }

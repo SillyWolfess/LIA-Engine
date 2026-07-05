@@ -10,6 +10,7 @@ namespace LIA {
         virtual bool registerHandlers();
         virtual bool onGetGuiData(LIA::Event&);
         virtual bool onPositionChanged(LIA::Event&);
+        bool onFpsChange(LIA::Event&);
     private:
         std::string _eventSource;
         void updateData(std::string);

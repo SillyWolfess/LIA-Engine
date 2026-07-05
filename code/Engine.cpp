@@ -160,18 +160,6 @@ bool LIA::Engine::handleGui(Event& event) {
     return false;
 }
 
-bool LIA::Engine::handleGuiGetData(Event& event) {
-    if (event.name.compare("get_data_gui") != 0) {
-        return false;
-    }
-    if (event.source.compare("debug") == 0) {
-        UpdateGuiEvent updateGuiEvent(event.window, "fps", _fpsCounter.getFps());
-        _eventManager.handleEvent(updateGuiEvent);
-        return true;
-    }
-    return false;
-}
-
 bool LIA::Engine::handleGameState(Event& event) {
     if (event.name.compare("gameLost") != 0 && event.name.compare("gameWon") != 0) {
         return false;
@@ -200,7 +188,6 @@ bool LIA::Engine::exit() {
 
 bool LIA::Engine::registerEventHandlers() {
     _eventManager.subscribe("button_action", EventType::GUI, __FILE__ , std::bind(&Engine::handleGui, this, std::placeholders::_1));
-    _eventManager.subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&Engine::handleGuiGetData, this, std::placeholders::_1));
     _eventManager.subscribe("gameLost", EventType::SIMULATION, __FILE__, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
     _eventManager.subscribe("gameWon", EventType::SIMULATION, __FILE__, std::bind(&Engine::handleGameState, this, std::placeholders::_1));
     return true;

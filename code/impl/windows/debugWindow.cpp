@@ -2,6 +2,7 @@
 #include "manager/eventManager.hpp"
 #include "appWindow.hpp"
 #include "logs.hpp"
+#include "Engine.hpp"
 
 bool LIA::DebugWindow::init() {
     _eventSource = "debug";
@@ -17,6 +18,7 @@ bool LIA::DebugWindow::registerHandlers() {
         LIA_fatal("Failed to subscribe to position changed event");
         return false;
     }
+    getEventManager()->subscribe("fps", LIA::EventType::GUI, __FILE__, std::bind(&DebugWindow::onFpsChange, this, std::placeholders::_1));
     return true;
 }
 
@@ -50,6 +52,13 @@ bool LIA::DebugWindow::onPositionChanged(LIA::Event& event) {
     return true;
 }
 
+bool LIA::DebugWindow::onFpsChange(LIA::Event& event) {
+    EventManager* eventManager = getEventManager();
+    UpdateGuiEvent updateFpsEvent(_eventSource, "fps", LIA::Engine::getInstance().getFps());
+    eventManager->handleEvent(updateFpsEvent);
+    return true;
+}
+
 void LIA::DebugWindow::updateData(std::string window) {
     LIA_TRY
         AppWindow* appWindow = getAppWindow();
@@ -65,5 +74,8 @@ void LIA::DebugWindow::updateData(std::string window) {
         std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
         UpdateGuiEvent updateLookAtEvent(window, "camera_lookAt", cLookAt);
         eventManager->handleEvent(updateLookAtEvent);
+
+        UpdateGuiEvent updateFpsEvent(window, "fps", LIA::Engine::getInstance().getFps());
+        eventManager->handleEvent(updateFpsEvent);
     LIA_CATCH_EMPTY
 }

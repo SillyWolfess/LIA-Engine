@@ -310,7 +310,7 @@ bool LIA::Gui::handleEnableEvent(Event& event) {
     return false;
 }
 bool LIA::Gui::handleGuiUpdate(Event& event) {
-    if (event.name.compare("fps") != 0 && event.name.compare("update_gui") != 0) {
+    if (/*event.name.compare("fps") != 0 &&*/ event.name.compare("update_gui") != 0) {
         return false;
     }
     if (event.name.compare("update_gui") == 0) {
@@ -329,6 +329,7 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
         LIA_warn(std::vformat("Action {} not recognized from {}", std::make_format_args(event.action, event.source)));
         return false;
     }
+    /*
     if (event.action.compare("fps") == 0) {
         Window *window = getWindow("debug");
         if (window != nullptr) {
@@ -339,6 +340,7 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
             return true;
         }
     }
+    */
     else {
         LIA_warn(std::vformat("Action {} not recognized from {}", std::make_format_args(event.action, event.source)));
     }
@@ -348,7 +350,7 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
 bool LIA::Gui::registerHandlers() {
     _eventManager->subscribe("button_action", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiButton, this, std::placeholders::_1));
 //    eventManager.subscribe("checkbox_action", EventType::GUI, std::bind(&Gui::handleCheckbox, this, std::placeholders::_1));
-    _eventManager->subscribe("fps", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
+//    _eventManager->subscribe("fps", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
     _eventManager->subscribe("update_gui", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
     _eventManager->subscribe("set_enabled", EventType::GUI, __FILE__, std::bind(&Gui::handleEnableEvent, this, std::placeholders::_1));
     return true;
