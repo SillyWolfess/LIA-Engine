@@ -13,6 +13,6 @@
         <camera type="field" id="camera_position" label="pos"/>
         <lookAt type="field" id="camera_lookAt" label="eye"/>
         <close action="close_window" arg0="debug" type="button" id="close" name = "Close" x = "0" y = "20"/>
-    </childrens>
+    </children>
     <visible>false</visible>
 </root>
