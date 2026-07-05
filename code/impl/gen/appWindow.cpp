@@ -102,12 +102,12 @@ bool LIA::AppWindow::handleCheckbox(Event& event) {
     return false;
 }
 */
+/*
 #include "data/position.hpp"
 bool LIA::AppWindow::handleGuiGetData(Event& event) {
     if (event.name.compare("get_data_gui") != 0) {
         return false;
     }
-    /*
     if (event.source.compare("settings") == 0) {
         UpdateGuiEvent updateGuiEvent(event.window, "fullscreen", _glfwSettings.fullscreen);
         _eventManager->handleEvent(updateGuiEvent);
@@ -116,7 +116,6 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
         _eventManager->handleEvent(updateResolutionEvent);
         return true;
     }
-    */
     if (event.source.compare("debug") == 0) {
         Position& pos = _mainCamera.getPosition();
         std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
@@ -130,13 +129,14 @@ bool LIA::AppWindow::handleGuiGetData(Event& event) {
     }
     return false;
 }
-
+*/
+/*
 bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
 //    eventManager->subscribe("checkbox_action", EventType::GUI, __FILE__, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
-    eventManager->subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
+//    eventManager->subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
     return true;
 }
-
+*/
 void LIA::AppWindow::loadSettings() {
     LIA_debug("Reading settings");
 
@@ -273,10 +273,12 @@ bool LIA::AppWindow::init(std::string windowName) {
         return false;
     }
     _guiCamera.switchOrtho();
+    /*
     if (!registerHandlers(_eventManager)) {
         LIA_fatal("Failed to register handlers");
         return false;
     }
+    */
     return true;
 }
 

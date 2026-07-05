@@ -90,6 +90,10 @@ bool LIA::Engine::initEngineComponents() {
         return false;
     }
 
+    if (_componentManager.addAndInit(&_debugWindow) == -1) {
+        return false;
+    }
+
     LIA_info("Engine components initialized");
     return true;
 }

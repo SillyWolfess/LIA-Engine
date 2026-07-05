@@ -19,6 +19,7 @@
 
 #include "windows/keyMappingWindow.hpp"
 #include "windows/settingsWindow.hpp"
+#include "windows/debugWindow.hpp"
 
 namespace LIA
 {
@@ -41,6 +42,7 @@ namespace LIA
 
             KeyMappingWindow _keyMappingWindow;
             SettingsWindow _settingsWindow;
+            DebugWindow _debugWindow;
 
             bool registerEventHandlers();
             bool handleGui(Event& event);

@@ -100,8 +100,8 @@ namespace LIA
             void loadSettings();
             void handleMouseInput();
 //            bool handleCheckbox(Event& event);
-            bool handleGuiGetData(Event& event);
-            bool registerHandlers(EventManager*);
+//            bool handleGuiGetData(Event& event);
+//            bool registerHandlers(EventManager*);
 
             bool _closeThis;
 
