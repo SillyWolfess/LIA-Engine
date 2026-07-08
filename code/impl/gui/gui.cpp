@@ -60,7 +60,10 @@ bool LIA::Gui::init() {
 
     LIA_TRY
     for (auto [name, path] : xmlData.values) {
-        loadWindow(name, path);
+        if (!loadWindow(name, path)) {
+            LIA_fatal_f("Failed to load window '{}' from '{}'", name, path);
+            return false;
+        }
     }
     LIA_CATCH_RETURN_FALSE
     #if GUI_DEBUG_ON
@@ -133,11 +136,12 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
                 std::string buttonName = xmlLoader.getString(node, "name");
                 std::string eventAction = xmlLoader.getString(node, "action", "");
                 std::string eventArg0 = xmlLoader.getString(node, "arg0", "");
+                std::string texture = xmlLoader.getString(node, "texture", "");
                 if (buttonId.compare("") == 0) {
                     LIA_fatal("Button id is empty for {}", std::make_format_args(buttonName));
                     return false;
                 }
-                window.addButton(buttonId, buttonName, eventAction, eventArg0);
+                window.addButton(buttonId, buttonName, eventAction, eventArg0, texture);
             }
             else if (childType.compare("field") == 0) {
                 LIA_trace("Adding field");

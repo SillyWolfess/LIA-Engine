@@ -10,6 +10,7 @@
 #include "data/Light.hpp"
 #include "data/ModelData.hpp"
 #include "manager/materialManager.hpp"
+#include "manager/textureManager.hpp"
 #include "graphics/font.hpp"
 
 #include <vector>
@@ -53,13 +54,15 @@ namespace LIA {
             std::map<std::string, std::vector<SceneObject>> _shaderObjectMap;
             bool drawVAO(SceneObject& object, ShaderProgram&, glm::mat4& VP);
 
-            bool makePrefab(GLuint, Model&, const char*);
+            bool makePrefab(GLuint, Model&, const char*, bool hasUvs = false);
             bool prefabSquare(ShaderManager&);
+            bool prefabSprite(ShaderManager&);
             bool prefabCube(ShaderManager&);
             SceneObject& addToShaderMap(std::string);
             bool prepareShader(ShaderProgram& shader, glm::mat4& VP);
             bool sendLightSource(ShaderProgram&);
             bool useMaterial(MaterialManager& materialManager,ShaderProgram& shader,std::string materialLib, std::string materialName);
+            bool useTexture(TextureManager& textureManager, ShaderProgram& shader, std::string textureName);
         public:
             bool init();
             void setDepthTest(bool value) { _depthTest = value; }
@@ -139,6 +142,15 @@ namespace LIA {
                 int,
                 bool
             );
+            /**
+             * string - identifier
+             * Position - position
+             * Rotation - rotation
+             * Scale - scale
+             * Color - color
+             * string - texture
+            */
+            bool addSprite(std::string, Position, Rotation, Scale, Color, std::string);
             /**
              * Position - position
              * Rotation - rotation

@@ -27,6 +27,7 @@ namespace LIA {
                 @param {TextureType} type
             */
             bool registerTexture(std::string, std::string, std::string, TextureType);
+            bool has(std::string);
     };
 }
 #endif

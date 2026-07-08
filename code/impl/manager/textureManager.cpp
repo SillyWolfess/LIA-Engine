@@ -78,6 +78,10 @@ bool LIA::TextureManager::load(std::string name) {
     LIA_CATCH_RETURN_FALSE
 }
 
+bool LIA::TextureManager::has(std::string name) {
+    return _textures.find(name) != _textures.end();
+}
+
 bool LIA::TextureManager::registerTexture(std::string name, std::string folder, std::string path, TextureType type) {
     if (_textures.find(name) == _textures.end()) {
         Texture tmp;

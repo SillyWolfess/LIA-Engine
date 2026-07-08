@@ -32,6 +32,7 @@ namespace LIA {
         GUI_LABEL_POSITION _labelAlignment = GUI_LABEL_POSITION::PREFIX;
         std::string _id;
         std::string _value;
+        std::string _texture;
         bool _valueB;
         std::string _placeholder;
         std::string _label;

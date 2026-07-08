@@ -96,6 +96,10 @@ void LIA::Window::setButtonBgColor(Color& color) {
 }
 
 void LIA::Window::addButton(std::string id, std::string text, Position& position, Scale& scale, Color& fontColor, std::string eventAction, std::string eventArg0) {
+    addButton(id, text, position, scale, fontColor, eventAction, eventArg0, "");
+}
+
+void LIA::Window::addButton(std::string id, std::string text, Position& position, Scale& scale, Color& fontColor, std::string eventAction, std::string eventArg0, std::string texture) {
     GuiObject button;
     button._id = id;
     button._type = GuiObjectType::BUTTON;
@@ -106,6 +110,7 @@ void LIA::Window::addButton(std::string id, std::string text, Position& position
     button._fontColor = fontColor;
     button._action = eventAction;
     button._arg0 = eventArg0;
+    button._texture = texture;
 
     button._fontSize = defaultFontSize();
     button._disabledBgColor = defaultDisabledBgColor();
@@ -138,6 +143,15 @@ void LIA::Window::addButton(std::string id, std::string text, std::string eventA
     Position empty = emptyPosition();
     addButton(id, text, empty, scale, fontColor, eventAction, eventArg0);
 }
+
+
+void LIA::Window::addButton(std::string id, std::string text, std::string eventAction, std::string eventArg0, std::string texture) {
+    Scale scale = defaultScale();
+    Color fontColor = defaultFontColor();
+    Position empty = emptyPosition();
+    addButton(id, text, empty, scale, fontColor, eventAction, eventArg0, texture);
+}
+
 void LIA::Window::addButton(std::string id, std::string text, Position& position, std::string eventAction, std::string eventArg0) {
     Scale scale = defaultScale();
     Color fontColor = defaultFontColor();
@@ -147,6 +161,15 @@ void LIA::Window::addButton(std::string id, std::string text, Position& position
 void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder) {
     Position empty = emptyPosition();
     addField(id, label, value, placeholder, empty);
+}
+
+void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, std::string texture) {
+    Position empty = emptyPosition();
+    addField(id, label, value, placeholder, empty, texture);
+}
+
+void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, Position& position) {
+    addField(id, label, value, placeholder, position, "");
 }
 
 bool LIA::Window::hasField(std::string id) {
@@ -191,6 +214,7 @@ void LIA::Window::setDefaults(GuiObject& object) {
     object._fontSize = defaultFontSize();
     object._fontColor = defaultFontColor();
     object._bgColor = defaultBgColor();
+    object._texture = "";
 
     object._isHovered = false;
     object._enabled = true;
@@ -275,7 +299,7 @@ void LIA::Window::addList(std::string id, std::string name) {
     _childrenMap.emplace(std::pair<std::string, std::vector<GuiObject>>(id, tmp));
 }
 
-void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, Position& position) {
+void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, Position& position, std::string texture) {
     GuiObject field;
     setDefaults(field);
 
@@ -523,19 +547,22 @@ void LIA::Window::passChild(GuiObject& child, Scene* scene, Font* font) {
     Rotation rotation = emptyRotation();
     if (child._type == GuiObjectType::FIELD) {
         std::string fieldText = (child._label.compare("") != 0 ? child._label + ": " : "") + (child._value.compare("") == 0 ? child._placeholder : child._value);
-//        font->addText(fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
         scene->addText(font, fieldText, computeFontPosition(child, fieldText), child._fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::BUTTON) {
-    //    font->addText(child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
-        Color bgColor = child._isHovered ? _style.hoverButtonBgColor : child._bgColor;
+        bool hasTexture = child._texture.compare("") != 0;
+        Color bgColor = child._isHovered ? _style.hoverButtonBgColor : (hasTexture ? whiteColor() : child._bgColor);
         if (!child._enabled) {
             copyColor(bgColor, _style.disbaledButtonColor);
         }
-        scene->addSquare(child._id, child._position, rotation, child._scale, bgColor);
+        if (!hasTexture) {
+            scene->addSquare(child._id, child._position, rotation, child._scale, bgColor);
+        } else {
+            scene->addSprite(child._id, child._position, rotation, child._scale, bgColor, child._texture);
+        }
+        
         scene->addText(font, child._value, computeFontPosition(child, child._value), child._isHovered ? _style.hoverColor : child._fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::CHECKBOX) {
         Color fontColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
-        //font->addText(child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
         Color bgColor = child._valueB ? _style.checkBoxCheckedColor : _style.checkBoxUnCheckedColor;
         if (!child._enabled) {
             copyColor(bgColor, _style.disbaledButtonColor);
@@ -543,7 +570,6 @@ void LIA::Window::passChild(GuiObject& child, Scene* scene, Font* font) {
         scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.checkBoxHoverColor : bgColor);
         scene->addText(font, child._label, computeFontPosition(child, child._label, true), fontColor, child._fontSize);
     } else if (child._type == GuiObjectType::LABEL) {
-    //    font->addText(child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
         scene->addText(font, child._value, computeFontPosition(child, child._value), child._fontColor, child._fontSize);
     } else {
         LIA_error_f("unknown gui object type of {}", static_cast<int>(child._type));
@@ -572,7 +598,6 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
             for (GuiObject& gChild: gChildren) {
                 passChild(gChild, scene, font);
             }
-        //    scene->addSquare(child._id, child._position, rotation, child._scale, child._isHovered ? _style.hoverButtonBgColor : child._bgColor);   
         } else {
            passChild(child, scene, font);
         }

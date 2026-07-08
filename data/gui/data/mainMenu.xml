@@ -11,6 +11,7 @@
         <button3 type="button" action="toggle_window" arg0="debug" id="debug" name = "Debug info"/>
         <button4 type="button" action="toggle_window" arg0="keyMapping" id="keyMapping" name = "Key mapping"/>
         <button5 type="button" action="exit" id="exit" name = "Exit"/>
+		<button6 type="button" action="none" arg0="blue" texture="blue.bmp" id="blue" name=""/>
     </children>
     <visible>true</visible>
 </root>

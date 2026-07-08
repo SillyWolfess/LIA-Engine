@@ -20,6 +20,8 @@ namespace LIA {
 
         std::string _materialLib;
         std::string _materialName;
+
+        std::string _texture;
         /*
         Texture _texture;
         Texture _bumpTexture;
@@ -40,6 +42,7 @@ namespace LIA {
         */
         
         bool _hasMaterial;
+        bool _hasTexture;
         
         bool _useIndices;
         bool _passColor;

@@ -162,6 +162,17 @@ namespace LIA {
              * @param {string} id
              * @param {string} text
              * @param {Position} position
+             * @param {Scale} scale
+             * @param {Color} font color
+             * @param {string} event action
+             * @param {string} event arg0
+             * @param {string} texture
+            */
+            void addButton(std::string, std::string, Position&, Scale&, Color&, std::string, std::string, std::string);
+            /**
+             * @param {string} id
+             * @param {string} text
+             * @param {Position} position
              * @param {string} event action
              * @param {string} event arg0
             */
@@ -173,6 +184,14 @@ namespace LIA {
              * @param {string} event arg0
             */
             void addButton(std::string ,std::string, std::string, std::string);
+            /**
+             * @param {string} id
+             * @param {string} text
+             * @param {string} event action
+             * @param {string} event arg0
+             * @param {string} texture
+            */
+            void addButton(std::string, std::string, std::string, std::string, std::string);
             /***
              * @param {string} id
              * @param {string} text
@@ -180,6 +199,23 @@ namespace LIA {
              * @param {float} y
             */
             void addButton(std::string, std::string, float, float);
+            /**
+             * @param {string} id
+             * @param {string} label
+             * @param {string} value
+             * @param {string} placeholder
+             * @param {Position} position
+             * @param {string} texture
+            */
+            void addField(std::string, std::string, std::string, std::string, Position&, std::string);
+            /**
+             * @param {string} id
+             * @param {string} label
+             * @param {string} value
+             * @param {string} placeholder
+             * @param {string} texture
+            */
+            void addField(std::string, std::string, std::string, std::string, std::string);
             /**
              * @param {string} id
              * @param {string} label

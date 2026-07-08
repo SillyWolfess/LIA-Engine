@@ -27,6 +27,10 @@ bool LIA::Scene::initPrefab(ShaderManager& shaderManager) {
         LIA_fatal("Failed to make cube prefab");
         return false;
     }
+    if (!prefabSprite(shaderManager)) {
+        LIA_fatal("Failed to make sprite prefab");
+        return false;
+    }
     return true;
 }
 
@@ -107,7 +111,6 @@ bool LIA::Scene::draw(Camera &camera, ShaderManager* shaderManager, Font* font) 
             LIA_debug("Object drawing done");
             LIA_debug("Getting font shader");
         }
-        // TEST to move text drawing here
         ShaderProgram& fontShader = shaderManager->getShader("font");
         if (!fontShader.bind()) {
             LIA_error("Failed to bind shader");
@@ -203,7 +206,16 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
             LIA_error_f("Failed to use material {} from {}", object._materialName, object._materialLib);
             return false;
         }
-    } else {
+    } else if (object._hasTexture) {
+        TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
+        if (!useTexture(textureManager, shader, object._texture)) {
+            LIA_error_f("Failed to use texture {}", object._texture);
+            return false;
+        }
+        shader.unbindTexture("textureBump", 1);
+        shader.unbindTexture("textureEm", 2);
+    }
+    else {
         shader.unbindTexture("textureDiff", 0);
         shader.unbindTexture("textureBump", 1);
         shader.unbindTexture("textureEm", 2);
@@ -238,6 +250,19 @@ bool LIA::Scene::drawVAO(SceneObject& object, ShaderProgram& shader, glm::mat4& 
 }
 
 #define SCENE_TRACE 0
+
+bool LIA::Scene::useTexture(TextureManager& textureManager, ShaderProgram& shader, std::string textureName) {
+    LIA_TRY
+        Texture& texture = textureManager.get(textureName);
+        #if SCENE_TRACE == 1
+            LIA_trace_f("Using texture {} from texture name {}", texture._name, textureName);
+        #endif
+        if (!shader.bindTexture("textureDiff", 0, texture._id, texture._name)) {
+            return false;
+        }
+        return true;
+    LIA_CATCH_RETURN_FALSE
+}
 
 bool LIA::Scene::useMaterial(MaterialManager &materialManager, ShaderProgram &shader, std::string materialLib, std::string materialName) {
     #if SCENE_TRACE == 1
@@ -404,6 +429,43 @@ bool LIA::Scene::add(
     LIA_CATCH_RETURN_FALSE
 }
 
+bool LIA::Scene::addSprite(std::string identifer, Position position, Rotation rotation, Scale scale, Color color, std::string texture) {
+    Prefab& sprite = _prefabs["sprite"];
+    if (!sprite._loaded) {
+        return false;
+    }
+    //Lazy texture loading
+    TextureManager& textureManager = LIA::Engine::getInstance().getTextureManager();
+    if (!textureManager.has(texture)) {
+        if (!textureManager.registerTexture(texture, "./data/graphics/textures/", texture, TextureType::ANY)) {
+            LIA_error_f("Failed to lazy register texture {} for {}", texture, identifer);
+            return false;
+        }
+        if (!textureManager.load(texture)) {
+            LIA_fatal_f("Failed to lazy load texture {} for {}", texture, identifer);
+            LIA::Engine::getInstance().fatal();
+            return false;
+        }
+    }
+
+    SceneObject& object = addToShaderMap(sprite._shader);
+
+    object._identifier = identifer;
+    object._position = position;
+    object._rotation = rotation;
+    object._scale = scale;
+    object._color = color;
+
+    object._hasTexture = true;
+    object._texture = texture;
+    object._passColor = sprite._passColor;
+    object._vao = sprite._vao;
+    object._shader = sprite._shader;
+    object._size = sprite._size;
+    object._useIndices = sprite._useIndices;
+    return true;
+}
+
 bool LIA::Scene::addSquare(Position position, Rotation rotation, Scale scale, Color color) {
     return addSquare("[square]", position, rotation, scale, color);
 }
@@ -532,6 +594,30 @@ bool LIA::Scene::prefabSquare(ShaderManager& shaderManager) {
     return true;
 }
 
+bool LIA::Scene::prefabSprite(ShaderManager& shaderManager) {
+    LIA_TRY
+        Prefab tmp;
+        _prefabs.emplace(std::pair<std::string, Prefab>("sprite", tmp));
+        Prefab& sprite = _prefabs["sprite"];
+        sprite._loaded = false;
+        sprite._passColor = true;
+        sprite._shader = "sprite";
+
+        GLuint programId = shaderManager.getProgramId(sprite._shader);
+        Model model;
+        if (!makePrefab(programId, model, "./data/graphics/prefabs/sprite.obj", true)) {
+            LIA_fatal("Failed to make sprite prefab");
+            return false;
+        }
+
+        sprite._size = model.size;
+        sprite._useIndices = model.hasIndices;
+        sprite._vao = model.vao;
+        sprite._loaded = true;
+    LIA_CATCH_RETURN_FALSE
+    return true;
+}
+
 bool LIA::Scene::prefabCube(ShaderManager& shaderManager) {
     LIA_TRY
         Prefab tmp;
@@ -556,7 +642,7 @@ bool LIA::Scene::prefabCube(ShaderManager& shaderManager) {
     return true;
 }
 
-bool LIA::Scene::makePrefab(GLuint programId, Model& model, const char* path) {
+bool LIA::Scene::makePrefab(GLuint programId, Model& model, const char* path, bool hasUvs) {
     ObjLoader::load(
         model.data,
         "./data/graphics/prefabs/",
@@ -601,10 +687,37 @@ bool LIA::Scene::makePrefab(GLuint programId, Model& model, const char* path) {
         return false;
     }
     
+    if (hasUvs) {
+        if (model.data.uvs.size() != model.data.vertices.size()) {
+            LIA_fatal_f("Model is malformed, vertices({}) != uvs({})", model.data.vertices.size(), model.data.uvs.size());
+            vertexArrayObject.destroy();
+            LIA::Engine::getInstance().fatal();
+            return false;
+        }
+        VertexBuffer& uvBuffer = vertexArrayObject.getUvBuffer();
+        if (!uvBuffer.generateAndBind()) {
+            vertexArrayObject.destroy();
+            return false;
+        }
+        if (!uvBuffer.setData(model.data.uvs)) {
+            vertexArrayObject.destroy();
+            return false;
+        }
+        if (!uvBuffer.enableAttributeArray(1)) {
+            vertexArrayObject.destroy();
+            return false;
+        }
+        if (!uvBuffer.enableAttributePointer(1, 2)) {
+            vertexArrayObject.destroy();
+            return false;
+        }
+    }
+    
     model.vao = vertexArrayObject.getId();
     model.vbo = vertexBuffer.getId();
 	model.data.vertices.clear();
 	model.data.colours.clear();
+    model.data.uvs.clear();
     LIA_debug(std::vformat("Vao {} and Vbo {} created with size {}", std::make_format_args(model.vao,  model.vbo, model.size)));
     return true;
 }
