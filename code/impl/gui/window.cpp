@@ -3,25 +3,27 @@
 #include "logs.hpp"
 #include "Engine.hpp"
 
-LIA::Window::Window() : _isMovable{false}, _visible{false}, _isGrabbed{false}, _needToResize{false}
+LIA::Window::Window() : _isMovable{false}, _visible{false}, _isGrabbed{false}, _needToResize{false}, _isHovered{false}
 {
     LIA_trace("Window constructor");
 }
 
 LIA::Window::~Window() {
     LIA_trace("Window destructor");
-}
+} 
 
 void LIA::Window::hide() {
     _visible = false;
     _isHeaderHover = false;
     _isGrabbed = false;
+    _isHovered = false;
 }
 
 void LIA::Window::show(AppWindow* appWindow) {
     _visible = true;
     _isHeaderHover = false;
     _isGrabbed = false;
+    _isHovered = false;
     _lastAppScale = appWindow->getWindowScale();
     compute(appWindow, true);
 }
@@ -609,7 +611,7 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
         oHeader._scale.x = _scale.x;
         oHeader._scale.y = _headerSize;
         oHeader._scale.z = 1.0f;
-        scene->addSquare("header", oHeader._position, rotation, oHeader._scale, _isGrabbed ? (_style.headerGrabbedColor) : (_isHeaderHover ? _style.headerHoverColor : _headerColor));
+        scene->addSquare("header", oHeader._position, rotation, oHeader._scale, _isHeaderHover ? _style.headerHoverColor : _headerColor);
         scene->addText(font, _name, computeFontPosition(oHeader, _name), oHeader._fontSize);
     }
 }
@@ -695,12 +697,35 @@ void LIA::Window::mouseLastPosition(Position& pos) {
     _mouseLastHoverPos = pos;
 }
 
+void LIA::Window::removeHover() {
+    if (!_visible || !_isHovered) {
+        return;
+    }
+    _isHovered = false;
+    _isHeaderHover = false;
+    for (GuiObject& child : _children) {
+        if (child._type == GuiObjectType::BUTTON || child._type == GuiObjectType::CHECKBOX) {
+            child._isHovered = false;
+        }
+        else if (child._type == GuiObjectType::GRID) {
+            child._isHovered = false;
+            for (GuiObject& ch : _childrenMap[child._id]) {
+                if (ch._type != GuiObjectType::BUTTON) {
+                    continue;
+                }
+                ch._isHovered = false;
+            }
+        }
+    }
+}
+
 bool LIA::Window::mouseHover(Position& pos) {
     if (!_visible) {
         return false;
     }
     bool found = false;
     _isHeaderHover = false;
+    _isHovered = false;
     for (GuiObject& child : _children) {
         if (child._type == GuiObjectType::BUTTON || child._type == GuiObjectType::CHECKBOX) {
             if (isInRange2D(pos, child._position, child._scale)) {
@@ -733,9 +758,14 @@ bool LIA::Window::mouseHover(Position& pos) {
         oHeader._scale.z = 1.0f;
         if (isInRange2D(pos, _position, oHeader._scale)) {
             _isHeaderHover = true;
+            _isHovered = true;
             return true;
         }
     }
+    if (!found) {
+        found = isInRange2D(pos, _position, _scale);
+    }
+    _isHovered = found;
     return found;
 }
 LIA::Position LIA::Window::combinePositions(Position& pos1, Position& pos2) {

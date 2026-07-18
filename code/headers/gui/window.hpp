@@ -60,6 +60,7 @@ namespace LIA {
             float _headerSize;
             bool _isHeaderHover;
             bool _isGrabbed;
+            bool _isHovered;
             bool _isMovable;
         //    int _fontSize;
             bool _visible;
@@ -282,6 +283,8 @@ namespace LIA {
             void mouseLastPosition(Position&);
             bool grab(Position&);
             bool isGrabbed() { return _isGrabbed; }
+            bool isHovered() { return _isHovered; }
+            void removeHover();
             void resize(AppWindow*);
             void clear();
     };

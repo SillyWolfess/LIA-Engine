@@ -483,16 +483,52 @@ void LIA::Gui::update() {
         bool mouseClickFound = false;
         bool windowGrabbed = false;
         _lastGrabbedWindow = -1;
+        int hoveredWindow = -1;
         for (int i = 0; i < _windows.size(); i++) {
-            if (_windows[i].isGrabbed()) {
+            if (_lastGrabbedWindow == -1 && _windows[i].isGrabbed()) {
                 _lastGrabbedWindow = i;
-                break;
+            }
+            if (hoveredWindow == -1 && _windows[i].isHovered()) {
+                hoveredWindow = i;
             }
         }
+
+        if (hoveredWindow != -1) {
+            if (!_windows[hoveredWindow].mouseHover(mousePos)) {
+                hoveredWindow = -1;
+            }
+        }
+        if (_lastGrabbedWindow == -1) {
+            for (int i = _windows.size() - 1; i > -1; i--) {
+                if (_windows[i].mouseHover(mousePos)) {
+                    if (hoveredWindow != -1 && hoveredWindow != i) {
+                        _windows[hoveredWindow].removeHover();
+                    }
+                    hoveredWindow = i;
+                    break;
+                }
+            }
+        }
+
+        if (hoveredWindow != -1) {
+            if (mouseClicked) {
+                _windows[hoveredWindow].mouseClick(mousePos, eventManager);
+            }
+            if (_lastGrabbedWindow == -1 && mouseDown) {
+                if (_windows[hoveredWindow].grab(mousePos)) {
+                    _lastGrabbedWindow = hoveredWindow;
+                }
+
+            }
+        }
+        if (_lastGrabbedWindow != -1 && mouseHeld) {
+            _windows[_lastGrabbedWindow].mouseDown(mousePos, eventManager);
+        }
+        /*
         for (Window& window: _windows) {
             if (!mouseClickFound && mouseClicked) {
                 mouseClickFound = window.mouseClick(mousePos, eventManager);
-            } else {
+            } else if (_lastGrabbedWindow == -1) {
                 window.mouseHover(mousePos);
             }
             if (_lastGrabbedWindow == -1 && mouseDown && !windowGrabbed) {
@@ -505,7 +541,7 @@ void LIA::Gui::update() {
                     break;
                 }
             }
-        }
+        }*/
         for (Window& window: _windows) {
            window.mouseLastPosition(mousePos);
         }
