@@ -31,8 +31,11 @@ namespace LIA {
 
         int fontSize;
     };
+    enum class ALIGN {NONE, RIGHT, CENTER, BOTTOM};
     class Window {
         private:
+            ALIGN resolve(std::string);
+
             std::vector<GuiObject> _children;
             std::map<std::string, std::vector<GuiObject>> _childrenMap;
             
@@ -51,8 +54,8 @@ namespace LIA {
             std::string _path;
             std::string _name;
             std::string _id;
-            std::string _alignment;
-            std::string _initAlign;
+            ALIGN _alignment;
+            ALIGN _initAlign;
         
             float _headerSize;
             bool _isHeaderHover;
@@ -84,7 +87,7 @@ namespace LIA {
             std::string getPath() { return _path; };
 
             void setStyle(struct Style style) { _style = style; };
-            void setAlignment(std::string value) { _alignment = value; };
+            void setAlignment(std::string value) { _alignment = resolve(value); };
 
             void setName(std::string name) { _name = name; };
             const std::string getName() { return _name; };

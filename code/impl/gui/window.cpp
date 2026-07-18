@@ -477,13 +477,16 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     _needToResize = false;
     computeScale();
     if (initShow) {
-        if (_initAlign.compare("center") == 0) {
+        if (_initAlign == ALIGN::CENTER) {
             _position.x = appScale.x * 0.5f - (_scale.x * 0.5f);
             _position.y = appScale.y * 0.5f - (_scale.y * 0.5f);
         }
+        else if (_initAlign == ALIGN::RIGHT) {
+            _position.x = appScale.x - _scale.x;
+            _position.y = _position.y * (appScale.y / _lastAppScale.y);
+        }
     }
-    bool alRight = _alignment.compare("right") == 0;
-    if (alRight) {
+    if (_alignment == ALIGN::RIGHT) {
         _position.x = appScale.x - _scale.x;
         _position.y = _position.y * (appScale.y / _lastAppScale.y);
     }
@@ -495,12 +498,13 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     if (_hasHeader) {
         yShift = yShift + _headerSize;
     }
-    if (_alignment.compare("bottom") == 0) {
+    if (_alignment == ALIGN::BOTTOM) {
         _position.y = appScale.y - _scale.y - yShift;
         LIA_debug_f("bottom[{}] => {:.2f}", _name, _position.y);
-    } else {
-        LIA_trace_f("aligment[{}] = {}", _name , _alignment);
     }
+    else if (initShow && _initAlign == ALIGN::BOTTOM) {
+        _position.y = appScale.y - _scale.y - yShift;
+    } 
     int gridX = 0;
     for (GuiObject& button : _children) {
         button._position.x = _position.x + _style.padding.left;
@@ -788,8 +792,21 @@ void LIA::Window::setHeader(bool visible, float size) {
     _headerColor = _style.headerColor;
 }
 
+LIA::ALIGN LIA::Window::resolve(std::string al) {
+    if (al.compare("none") == 0) {
+        return ALIGN::NONE;
+    }
+    else if (al.compare("right") == 0) {
+        return ALIGN::RIGHT;
+    }
+    else if (al.compare("center") == 0) {
+        return ALIGN::CENTER;
+    }
+    return ALIGN::NONE;
+}
+
 void LIA::Window::setInitAlign(std::string initAlign) {
-    _initAlign = initAlign;
+    _initAlign = resolve(initAlign);
 }
 void LIA::Window::setMovable(bool movable) {
     _isMovable = movable;
