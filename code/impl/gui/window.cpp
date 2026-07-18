@@ -217,6 +217,7 @@ void LIA::Window::setDefaults(GuiObject& object) {
     object._fontColor = defaultFontColor();
     object._bgColor = defaultBgColor();
     object._texture = "";
+    object._index = 0;
 
     object._isHovered = false;
     object._enabled = true;
@@ -290,6 +291,88 @@ void LIA::Window::updateGrid(std::string id) {
     }
 }
 
+void LIA::Window::moveOptions(std::string action, std::string parent) {
+    for (int i = 0; i < _children.size(); i++) {
+        if (_children[i]._id.compare(parent) == 0) {
+            if (action.compare("moveLeft") == 0) {
+                _children[i]._index--;
+                if (_children[i]._index < 0) {
+                    _children[i]._index = _children[i]._values.size() - 1;
+                }
+            }
+            else if (action.compare("moveRight") == 0) {
+                _children[i]._index++;
+                if (_children[i]._index > _children[i]._values.size() - 1) {
+                    _children[i]._index = 0;
+                }
+            }
+            int indx = _children[i]._index;
+            if (indx > -1 && indx < _children[i]._values.size()) {
+                for (int x = 0; x < _childrenMap[parent].size(); x++) {
+                    if (_childrenMap[parent][x]._id.compare(parent + "value") == 0) {
+                        _childrenMap[parent][x]._value = _children[i]._values[indx];
+                        break;
+                    }
+                }
+            }
+            return;
+        }
+    }
+}
+
+void LIA::Window::addOptions(std::string id, std::string name) {
+    GuiObject data;
+    setDefaults(data);
+    data._id = id;
+    data._label = name;
+    data._index = 0;
+    data._type = GuiObjectType::OPTIONS;
+    std::vector<std::string> tmpData;
+    /*
+    tmpData.push_back("value 0");
+    tmpData.push_back("value 1");
+    tmpData.push_back("value 2");
+    */
+    data._values = tmpData;
+    _children.push_back(data);
+
+    std::vector<GuiObject> tmp;
+    GuiObject& label = tmp.emplace_back();
+    setDefaults(label);
+    label._type = GuiObjectType::LABEL;
+    label._value = data._label + ":";
+    label._scale.x = ((int) strlen(label._value.c_str())) * (label._fontSize * 0.6f);
+
+    GuiObject& lButton = tmp.emplace_back();
+    setDefaults(lButton);
+    lButton._type = GuiObjectType::BUTTON;
+    lButton._action = "moveLeft";
+    lButton._value = "<";
+    lButton._scale.x = lButton._scale.y;
+    lButton._id = id + "moveLeft";
+    lButton._arg0 = id;
+    lButton._enabled = true;
+
+    GuiObject& value = tmp.emplace_back();
+    setDefaults(value);
+    value._id = id + "value";
+    value._type = GuiObjectType::FIELD;
+    value._value = data._index < data._values.size() ?  data._values[data._index] : "";
+    value._scale.x = 10 * (value._fontSize * 0.6f);
+
+    GuiObject& rButton = tmp.emplace_back();
+    setDefaults(rButton);
+    rButton._type = GuiObjectType::BUTTON;
+    rButton._value = ">";
+    rButton._scale.x = rButton._scale.y;
+    rButton._action = "moveRight";
+    rButton._id = id + "moveRight";
+    rButton._arg0 = id;
+    rButton._enabled = true;
+
+    _childrenMap.emplace(std::pair<std::string, std::vector<GuiObject>>(id, tmp));
+}
+
 void LIA::Window::addList(std::string id, std::string name) {
     GuiObject data;
     setDefaults(data);
@@ -344,12 +427,44 @@ void LIA::Window::updateField(std::string id, std::string value) {
     }
 }
 
-void LIA::Window::updateList(std::string id, std::vector<std::string> value, int subtype) {
-    for (GuiObject& child: _children) {
-        if (child._id.compare(id) != 0 || child._type != GuiObjectType::LIST) {
+void LIA::Window::updateOptions(std::string id, std::vector<std::string> value) {
+    for (GuiObject& child : _children) {
+        if (child._id.compare(id) != 0 || child._type != GuiObjectType::OPTIONS) {
             continue;
         }
-        
+        updateOptions(child, id, value);
+    }
+}
+
+void LIA::Window::updateOptions(GuiObject& child, std::string id, std::vector<std::string> value) {
+     if (child._id.compare(id) != 0 || child._type != GuiObjectType::OPTIONS) {
+        return;
+     }
+     child._values = value;
+     if (child._index > child._values.size() - 1) {
+         child._index = 0;
+     }
+     for (GuiObject& data : _childrenMap[child._id]) {
+         if (data._id.compare(id + "value") == 0) {
+             data._value = child._values.size() > 0 ? child._values[child._index] : "";
+             break;
+          }
+     }
+}
+
+void LIA::Window::updateList(std::string id, std::vector<std::string> value, int subtype) {
+    for (GuiObject& child: _children) {
+        if (child._id.compare(id) != 0) {
+            continue;
+        }
+        if (child._type == GuiObjectType::OPTIONS) {
+            updateOptions(child, id, value);
+            return;
+        }
+        if (child._type != GuiObjectType::LIST) {
+            continue;
+        }
+
         std::vector<GuiObject>& data = _childrenMap[child._id];
         data.clear();
         data.reserve(value.size());
@@ -455,6 +570,16 @@ void LIA::Window::computeScale() {
             for (GuiObject& ch: _childrenMap[button._id]) {
                 yShift = yShift + ch._scale.y + _style.padding.bottom;
             }
+        } else if (button._type == GuiObjectType::OPTIONS) {
+            float xShift = 0.0f;
+            for (GuiObject& ch : _childrenMap[button._id]) {
+                float xSize = _style.padding.left + button._position.x + xShift + ch._scale.x + _style.padding.right;
+                if (xSize > xMax) {
+                    xMax = xSize;
+                }
+                xShift = xShift + ch._scale.x;
+            }
+            yShift = yShift + button._scale.y + _style.padding.bottom;
         } else {
             yShift = yShift + button._scale.y + _style.padding.bottom;
         }
@@ -533,6 +658,16 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
                 yShift = yShift + ch._scale.y + _style.padding.bottom;
                 LIA_trace_f("button[{}].position = {:.2f} x {:.2f} x {:.2f}", ch._id, ch._position.x, ch._position.y, ch._position.z);
             }
+        } else if (button._type == GuiObjectType::OPTIONS) {
+            button._position.y = _position.y;
+            float xShift = 0.0f;
+            for (GuiObject& ch : _childrenMap[button._id]) {
+                ch._position.x = button._position.x + xShift;
+                ch._position.y = button._position.y + yShift;
+                ch._position.z = button._position.z;
+                xShift = xShift + ch._scale.x;
+            }
+            yShift = yShift + button._scale.y + _style.padding.bottom;
         } else {
             yShift = yShift + button._scale.y + _style.padding.bottom;
         }
@@ -587,7 +722,12 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
     scene->addSquare(_id, _position, rotation, _scale, _style.bgColor);
 
     for (GuiObject &child: _children) {
-        if (child._type == GuiObjectType::LIST) {
+        if (child._type == GuiObjectType::OPTIONS) {
+            std::vector<GuiObject>& gChildren = _childrenMap[child._id];
+            for (GuiObject& gChild : gChildren) {
+                passChild(gChild, scene, font);
+            }
+        } else if (child._type == GuiObjectType::LIST) {
             std::vector<GuiObject>& lChildren = _childrenMap[child._id];
             for (GuiObject& lchild: lChildren) {
                 passChild(lchild, scene, font);
@@ -689,6 +829,24 @@ bool LIA::Window::mouseClick(Position& pos, EventManager* eventManager) {
                 }
             }
         }
+        else if (child._type == GuiObjectType::OPTIONS) {
+            for (GuiObject& ch : _childrenMap[child._id]) {
+                if (!ch._isHovered) {
+                    continue;
+                }
+                if (ch._type == GuiObjectType::BUTTON) {
+                    LIA_debug(std::vformat("Mouse click {}", std::make_format_args(ch._id)));
+                    ButtonEvent buttonEvent(
+                        std::vformat("{}_{}", std::make_format_args(_id, ch._id)),
+                        ch._action,
+                        ch._arg0,
+                        _id
+                    );
+                    eventManager->handleEvent(buttonEvent);
+                    return true;
+                }
+            }
+        }
     }
     return false;
 }
@@ -706,6 +864,15 @@ void LIA::Window::removeHover() {
     for (GuiObject& child : _children) {
         if (child._type == GuiObjectType::BUTTON || child._type == GuiObjectType::CHECKBOX) {
             child._isHovered = false;
+        }
+        else if (child._type == GuiObjectType::OPTIONS) {
+            child._isHovered = false;
+            for (GuiObject& ch : _childrenMap[child._id]) {
+                if (ch._type != GuiObjectType::BUTTON) {
+                    continue;
+                }
+                ch._isHovered = false;
+            }
         }
         else if (child._type == GuiObjectType::GRID) {
             child._isHovered = false;
@@ -733,6 +900,22 @@ bool LIA::Window::mouseHover(Position& pos) {
                 found = true;
             } else {
                 child._isHovered = false;
+            }
+        }
+        else if (child._type == GuiObjectType::OPTIONS) {
+            child._isHovered = false;
+            for (GuiObject& ch : _childrenMap[child._id]) {
+                if (ch._type != GuiObjectType::BUTTON) {
+                    continue;
+                }
+                if (isInRange2D(pos, ch._position, ch._scale)) {
+                    ch._isHovered = true;
+                    child._isHovered = true;
+                    found = true;
+                }
+                else {
+                    ch._isHovered = false;
+                }
             }
         }
         else if (child._type == GuiObjectType::GRID) {

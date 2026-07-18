@@ -201,6 +201,12 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
                 std::string name = xmlLoader.getString(node, "name");
                 window.addGrid(id, name, minRows, maxRows, minColumns, maxColumns);
             }
+            else if (childType.compare("options") == 0) {
+                LIA_trace("Adding options");
+                std::string id = xmlLoader.getString(node, "id");
+                std::string label = xmlLoader.getString(node, "label");
+                window.addOptions(id, label);
+            }
             else if(childType.compare("list") == 0) {
                 LIA_trace("Adding list");
                 std::string id = xmlLoader.getString(node, "id");
@@ -284,7 +290,16 @@ bool LIA::Gui::handleGuiButton(Event& event) {
     if (event.name.compare("button_action") != 0) {
         return false;
     }
-    if (event.action.compare("open_window_and_close") == 0) {
+    if (event.action.compare("moveRight") == 0 || event.action.compare("moveLeft") == 0) {
+        Window* window = getWindow(event.window);
+        if (window == nullptr) {
+            LIA_warn_f("No window found for id '{}", event.window);
+            return false;
+        }
+        window->moveOptions(event.action, event.arg0);
+        return true;
+    }
+    else if (event.action.compare("open_window_and_close") == 0) {
         if (event.arg0.compare("") == 0) {
             LIA_error(std::vformat("No argument for open_window_and_close from {}", std::make_format_args(event.source)));
             return false;
@@ -360,18 +375,6 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
         LIA_warn(std::vformat("Action {} not recognized from {}", std::make_format_args(event.action, event.source)));
         return false;
     }
-    /*
-    if (event.action.compare("fps") == 0) {
-        Window *window = getWindow("debug");
-        if (window != nullptr) {
-            if (!window->isVisible()) {
-                return false;
-            }
-            window->updateField("fps", std::to_string(event.argi));
-            return true;
-        }
-    }
-    */
     else {
         LIA_warn(std::vformat("Action {} not recognized from {}", std::make_format_args(event.action, event.source)));
     }
@@ -380,8 +383,6 @@ bool LIA::Gui::handleGuiUpdate(Event& event) {
 
 bool LIA::Gui::registerHandlers() {
     _eventManager->subscribe("button_action", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiButton, this, std::placeholders::_1));
-//    eventManager.subscribe("checkbox_action", EventType::GUI, std::bind(&Gui::handleCheckbox, this, std::placeholders::_1));
-//    _eventManager->subscribe("fps", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
     _eventManager->subscribe("update_gui", EventType::GUI, __FILE__, std::bind(&Gui::handleGuiUpdate, this, std::placeholders::_1));
     _eventManager->subscribe("set_enabled", EventType::GUI, __FILE__, std::bind(&Gui::handleEnableEvent, this, std::placeholders::_1));
     return true;
@@ -524,24 +525,6 @@ void LIA::Gui::update() {
         if (_lastGrabbedWindow != -1 && mouseHeld) {
             _windows[_lastGrabbedWindow].mouseDown(mousePos, eventManager);
         }
-        /*
-        for (Window& window: _windows) {
-            if (!mouseClickFound && mouseClicked) {
-                mouseClickFound = window.mouseClick(mousePos, eventManager);
-            } else if (_lastGrabbedWindow == -1) {
-                window.mouseHover(mousePos);
-            }
-            if (_lastGrabbedWindow == -1 && mouseDown && !windowGrabbed) {
-                windowGrabbed = window.grab(mousePos);
-            }
-        }
-        if ((windowGrabbed || _lastGrabbedWindow != -1) && mouseHeld) {
-            for (Window& window: _windows) {
-                if (window.mouseDown(mousePos, eventManager)) {
-                    break;
-                }
-            }
-        }*/
         for (Window& window: _windows) {
            window.mouseLastPosition(mousePos);
         }

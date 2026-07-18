@@ -22,7 +22,7 @@ namespace LIA {
      * bool isHovered
      */
     enum GUI_LABEL_POSITION {PREFIX, SUFFIX};
-    enum GuiObjectType {BUTTON, FIELD, CHECKBOX, LABEL, GRID, LIST};
+    enum GuiObjectType {BUTTON, FIELD, CHECKBOX, LABEL, GRID, LIST, OPTIONS};
     struct GridData {
         int x, y;
     };
@@ -32,7 +32,9 @@ namespace LIA {
         GUI_LABEL_POSITION _labelAlignment = GUI_LABEL_POSITION::PREFIX;
         std::string _id;
         std::string _value;
+        std::vector<std::string> _values;
         std::string _texture;
+        int _index;
         bool _valueB;
         std::string _placeholder;
         std::string _label;

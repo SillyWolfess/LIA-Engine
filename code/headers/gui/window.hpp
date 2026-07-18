@@ -237,6 +237,11 @@ namespace LIA {
             void addField(std::string, std::string, std::string, std::string);
             /**
              * @param {string} id
+             * @param {string} label
+            */
+            void addOptions(std::string, std::string);
+            /**
+             * @param {string} id
              * @param {string} name/label
              * @param {bool} value
              * @param {string} event action
@@ -253,6 +258,17 @@ namespace LIA {
              * @param {int} type of children
              */
             void updateList(std::string, std::vector<std::string>, int);
+            /**
+             * @param {string} id
+             * @param {list<string>} list of values
+            */
+            void updateOptions(std::string, std::vector<std::string>);
+            /**
+             * @param {GuiObject} gui object
+             * @param {string} id
+             * @param {list<string>} list of values
+            */
+            void updateOptions(GuiObject&, std::string, std::vector<std::string>);
             /**
              * @param {string} id
              */
@@ -273,6 +289,11 @@ namespace LIA {
              * @param {bool} value
              */
             void enableGridField(std::string, std::string, bool);
+            /**
+             * @param {string} action
+             * @param {string} options id
+            */
+            void moveOptions(std::string, std::string);
             bool hasField(std::string);
             bool hasButton(std::string);
             void addGrid(std::string id, std::string name, int minRows, int maxRows, int minColumns, int maxColumns);

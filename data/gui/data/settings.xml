@@ -6,9 +6,9 @@
     <scale x = "200" y = "20"/>
     <buttonScale x = "150" y = "20" />
     <header visible="true" size="20" />
-	<movable>true</movable>
     <children>
         <resolution action="resolution" type="field" id="resolution" label="resolution"/>
+		<resolution2 action="resolution2" type="options" id="resolution2" label="resolution2"/>
         <fullscreen action="fullscreen" type="checkbox" id="fullscreen" label="Fullscreen" checked="true"/>
         <button action="close_window" arg0="settings" type="button" id="close" name = "Close" x = "0" y = "0"/>
     </children>
