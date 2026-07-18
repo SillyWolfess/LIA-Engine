@@ -8,34 +8,72 @@ bool LIA::Gui::loadStyle() {
     LIA_TRY
         LIA_info("Load style");
         XmlLoader::XmlData styleData = xmlLoader.load("./data/gui/style.xml");
-        LIA_trace("Loading style header");
-        style.headerColor = xmlLoader.getColor(styleData, "header");
-        LIA_trace("Loading header hover color");
-        style.headerHoverColor = xmlLoader.getColor(styleData, "headerHover");
-        LIA_trace("Loading header grabbed color");
-        style.headerGrabbedColor = xmlLoader.getColor(styleData, "headerGrabbed");
-        LIA_trace("Loading style hoverButtonBgColor");
-        style.hoverButtonBgColor = xmlLoader.getColor(styleData, "hoverButtonBgColor");
-        LIA_trace("Loading buttonBgColor");
-        style.buttonBgColor = xmlLoader.getColor(styleData, "buttonBgColor");
-        LIA_trace("Loading bgColor");
-        style.bgColor = xmlLoader.getColor(styleData, "bgColor");
-        LIA_trace("Loading disbaledButtonColor");
-        style.disbaledButtonColor = xmlLoader.getColor(styleData, "disbaledButtonColor");
-        LIA_trace("Loading hoverColor");
-        style.hoverColor = xmlLoader.getColor(styleData, "hoverColor");
-        LIA_trace("Loading fontSize");
-        style.fontSize = xmlLoader.getInt(styleData, "fontSize");
+        std::map<std::string, XmlLoader::XmlNode> nodes = styleData.nodes;
+
+        LIA_trace("Loading header style");
+        XmlLoader::XmlNode header = nodes.at("header");
+        std::list<XmlLoader::XmlNode> headerNodes = header.children;
+        for (auto node : headerNodes) {
+            if (node.name.compare("color") == 0) {
+                style.headerColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("hoverColor") == 0) {
+                style.headerHoverColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("grabbedColor") == 0) {
+                style.headerGrabbedColor = xmlLoader.getColor(node);
+            }
+        }
+
+        LIA_trace("Loading font style");
+        XmlLoader::XmlNode font = nodes.at("font");
+        std::list<XmlLoader::XmlNode> fontNodes = font.children;
+        for (auto node : fontNodes) {
+            if (node.name.compare("hoverColor") == 0) {
+                style.hoverColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("size") == 0) {
+                style.fontSize = xmlLoader.getInt(node);
+            }
+        }
+
+        LIA_trace("Loading button style");
+        XmlLoader::XmlNode button = nodes.at("button");
+        std::list<XmlLoader::XmlNode> buttonNodes = button.children;
+        for (auto node : buttonNodes) {
+            if (node.name.compare("color") == 0) {
+                style.buttonBgColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("hoverColor") == 0) {
+                style.hoverButtonBgColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("disabledColor") == 0) {
+                style.disbaledButtonColor = xmlLoader.getColor(node);
+            }
+        }
+
+        LIA_trace("Loading checkbox style");
+        XmlLoader::XmlNode checkbox = nodes.at("checkBox");
+        std::list<XmlLoader::XmlNode> checkboxNodes = checkbox.children;
+        for (auto node : checkboxNodes) {
+            if (node.name.compare("color") == 0) {
+                style.checkBoxUnCheckedColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("checkedColor") == 0) {
+                style.checkBoxCheckedColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("hoverColor") == 0) {
+                style.checkBoxHoverColor = xmlLoader.getColor(node);
+            }
+            if (node.name.compare("scale") == 0) {
+                style.checkBoxScale = xmlLoader.getScale2D(node);
+            }
+        }
+
         LIA_trace("Loading padding");
         style.padding = xmlLoader.getPadding(styleData);
-        LIA_trace("Loading checkbox scale");
-        style.checkBoxScale = xmlLoader.getScale2D(styleData, "checkBoxScale");
-        LIA_trace("Loading checkbox checked color");
-        style.checkBoxCheckedColor = xmlLoader.getColor(styleData, "checkBoxCheckedColor");
-        LIA_trace("Loading checkbox unckecked color");
-        style.checkBoxUnCheckedColor = xmlLoader.getColor(styleData, "checkBoxUnCheckedColor");
-        LIA_trace("Loading checkbox hover color");
-        style.checkBoxHoverColor = xmlLoader.getColor(styleData, "checkBoxHoverColor");
+        LIA_trace("Loading bgColor");
+        style.bgColor = xmlLoader.getColor(styleData, "bgColor");
         return true;
     LIA_CATCH_RETURN_FALSE
 }

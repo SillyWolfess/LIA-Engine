@@ -102,6 +102,14 @@ std::string LIA::XmlLoader::getValue(XmlData& data, std::string name) {
     return data.values.at(name);
 }
 
+std::string LIA::XmlLoader::getValue(XmlNode& node) {
+    return node.value;
+}
+
+int LIA::XmlLoader::getInt(XmlNode& node) {
+    return integer(getValue(node));
+}
+
 std::string LIA::XmlLoader::getValue(XmlData& data, std::string name, std::string defaultValue) {
     if (data.values.find(name) == data.values.end()) {
         return defaultValue;

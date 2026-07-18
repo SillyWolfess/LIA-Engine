@@ -38,6 +38,9 @@ namespace LIA {
             std::string getValue(XmlData&, std::string);
             std::string getValue(XmlData&, std::string, std::string);
 
+            std::string getValue(XmlNode&);
+            int getInt(XmlNode&);
+
             bool getBoolean(XmlData&, std::string);
             bool getBoolean(XmlData&, std::string, bool);
             char getChar(XmlData&, std::string);
