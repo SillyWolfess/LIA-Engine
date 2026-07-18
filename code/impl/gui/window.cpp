@@ -482,10 +482,16 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
             _position.y = appScale.y * 0.5f - (_scale.y * 0.5f);
         }
     }
-    _position.x = _position.x * (appScale.x / _lastAppScale.x);
-    _position.y = _position.y * (appScale.y / _lastAppScale.y);
+    bool alRight = _alignment.compare("right") == 0;
+    if (alRight) {
+        _position.x = appScale.x - _scale.x;
+        _position.y = _position.y * (appScale.y / _lastAppScale.y);
+    }
+    else {
+        _position.x = _position.x * (appScale.x / _lastAppScale.x);
+        _position.y = _position.y * (appScale.y / _lastAppScale.y);
+    }
     float yShift = _style.padding.top;
-//    float xMax = 0.0f;
     if (_hasHeader) {
         yShift = yShift + _headerSize;
     }
@@ -525,21 +531,8 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
             yShift = yShift + button._scale.y + _style.padding.bottom;
         }
 
-        /*
-        if (_style.padding.left + button._scale.x + _style.padding.right > xMax) {
-            xMax = _style.padding.left + button._scale.x + _style.padding.right;
-        }
-        */
         LIA_trace_f("button[{}].position = {:.2f} x {:.2f} x {:.2f}", button._id, button._position.x, button._position.y, button._position.z);
     }
-    /*
-    if (_scale.y < yShift) {
-        _scale.y = yShift;
-    }
-    if (_scale.x < xMax) {
-        _scale.x = xMax;
-    }
-    */
     _lastAppScale = appScale;
 }
 
@@ -613,7 +606,6 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
         oHeader._scale.y = _headerSize;
         oHeader._scale.z = 1.0f;
         scene->addSquare("header", oHeader._position, rotation, oHeader._scale, _isGrabbed ? (_style.headerGrabbedColor) : (_isHeaderHover ? _style.headerHoverColor : _headerColor));
-   //     font->addText(_name, computeFontPosition(oHeader, _name), oHeader._fontSize);
         scene->addText(font, _name, computeFontPosition(oHeader, _name), oHeader._fontSize);
     }
 }
@@ -648,46 +640,48 @@ bool LIA::Window::mouseClick(Position& pos, EventManager* eventManager) {
         return false;
     }
     for (GuiObject &child: _children) {
-        if (child._isHovered) {
-            if (!child._enabled) {
-                return true;
-            }
-            if (child._type == GuiObjectType::BUTTON) {
-                LIA_debug(std::vformat("Mouse click {}", std::make_format_args(child._id)));
-                ButtonEvent buttonEvent(
-                    std::vformat("{}_{}", std::make_format_args(_id, child._id)),
-                    child._action,
-                    child._arg0,
-                    _id
-                );
-                eventManager->handleEvent(buttonEvent);
-                return true;
-            }
-            else if (child._type == GuiObjectType::CHECKBOX) {
-                LIA_debug(std::vformat("Mouse click {}", std::make_format_args(child._id)));
-                CheckBoxEvent checboxEvent(
-                    _id,
-                    child._action
-                );
-                eventManager->handleEvent(checboxEvent);
-                return true;
-            }  else if (child._type == GuiObjectType::GRID) {
-                for (GuiObject& ch: _childrenMap[child._id]) {
-                    if (ch._isHovered) {
-                        if (ch._type == GuiObjectType::BUTTON) {
-                            LIA_debug(std::vformat("Mouse click {}", std::make_format_args(ch._id)));
-                            ButtonEvent buttonEvent(
-                                std::vformat("{}_{}", std::make_format_args(_id, ch._id)),
-                                ch._action,
-                                ch._arg0,
-                                _id
-                            );
-                            eventManager->handleEvent(buttonEvent);
-                            return true;
-                        }
-                    }
-                }
+        if (!child._isHovered) {
+            continue;
         }
+        if (!child._enabled) {
+            return true;
+        }
+        if (child._type == GuiObjectType::BUTTON) {
+            LIA_debug(std::vformat("Mouse click {}", std::make_format_args(child._id)));
+            ButtonEvent buttonEvent(
+                std::vformat("{}_{}", std::make_format_args(_id, child._id)),
+                child._action,
+                child._arg0,
+                _id
+            );
+            eventManager->handleEvent(buttonEvent);
+            return true;
+        }
+        else if (child._type == GuiObjectType::CHECKBOX) {
+            LIA_debug(std::vformat("Mouse click {}", std::make_format_args(child._id)));
+            CheckBoxEvent checboxEvent(
+                _id,
+                child._action
+            );
+            eventManager->handleEvent(checboxEvent);
+            return true;
+        }  else if (child._type == GuiObjectType::GRID) {
+            for (GuiObject& ch: _childrenMap[child._id]) {
+                if (!ch._isHovered) {
+					continue;
+				}
+                if (ch._type == GuiObjectType::BUTTON) {
+                    LIA_debug(std::vformat("Mouse click {}", std::make_format_args(ch._id)));
+                    ButtonEvent buttonEvent(
+                        std::vformat("{}_{}", std::make_format_args(_id, ch._id)),
+                        ch._action,
+                        ch._arg0,
+                        _id
+                    );
+                    eventManager->handleEvent(buttonEvent);
+                    return true;
+                }
+            }
         }
     }
     return false;

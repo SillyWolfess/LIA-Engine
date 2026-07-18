@@ -2,6 +2,7 @@
     <name>Debug info</name>
     <id>debug</id>
     <position x = "300" y = "0" z = "-1"/>
+	<align>right</align>
     <scale x = "250" y = "20"/>
     <buttonScale x = "250" y = "20" />
     <header visible="false" size="20" />
