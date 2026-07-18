@@ -66,18 +66,7 @@ bool LIA::Gui::init() {
         }
     }
     LIA_CATCH_RETURN_FALSE
-    #if GUI_DEBUG_ON
-    int infoId = add("last key pressed");
-    Data* infoData = &_data.at(infoId);
-    setDefaults(infoData);
-    setPosition(infoData, 300, 50);
-
-    int mouseId = add("mouse position");
-    Data* mouseData = &_data.at(mouseId);
-    setDefaults(mouseData);
-    setPosition(mouseData, 500, 100);
-    #endif
-
+    
     _lastAppScale = _appWindow->getWindowScale();
     _watcher.subscribe("./data/gui/style.xml");
     _watcher.subscribe("./data/gui/gui.xml");
@@ -433,12 +422,6 @@ void LIA::Gui::update() {
     AppWindow* appWindow = _appWindow;
     EventManager* eventManager = _eventManager;
     int lastKey = appWindow->lastKeyPressed();
-    #if GUI_DEBUG_ON
-    if (lastKey != -1) {
-        Data* info = &_data.at(0);
-        info->text = appWindow->getKeyName(lastKey);
-    }
-    #endif
     
     Window *window = getWindow("debug");
     if (window != nullptr && window->isVisible()) {
@@ -458,12 +441,6 @@ void LIA::Gui::update() {
         bool mouseClicked = appWindow->wasMouseClicked();
         bool mouseHeld = appWindow->isMouseHeld();
         bool mouseDown = appWindow->isMousePressed();
-
-        #if GUI_DEBUG_ON
-        Data* mouseInfo = &_data.at(1);
-        std::string mouseString = std::vformat("mouse {} x {}", std::make_format_args(mousePos.x, mousePos.y));
-        mouseInfo->text = mouseString;
-        #endif
 
         bool mouseClickFound = false;
         bool windowGrabbed = false;
