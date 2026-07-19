@@ -296,7 +296,10 @@ bool LIA::Gui::handleGuiButton(Event& event) {
             LIA_warn_f("No window found for id '{}", event.window);
             return false;
         }
-        window->moveOptions(event.action, event.arg0);
+        int newIndex = window->moveOptions(event.action, event.arg0);
+        if (newIndex != -1) {
+            //TODO send option selection changed event
+        }
         return true;
     }
     else if (event.action.compare("open_window_and_close") == 0) {

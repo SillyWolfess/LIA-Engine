@@ -291,9 +291,10 @@ void LIA::Window::updateGrid(std::string id) {
     }
 }
 
-void LIA::Window::moveOptions(std::string action, std::string parent) {
+int LIA::Window::moveOptions(std::string action, std::string parent) {
     for (int i = 0; i < _children.size(); i++) {
         if (_children[i]._id.compare(parent) == 0) {
+            int cIndex = _children[i]._index;
             if (action.compare("moveLeft") == 0) {
                 _children[i]._index--;
                 if (_children[i]._index < 0) {
@@ -315,9 +316,13 @@ void LIA::Window::moveOptions(std::string action, std::string parent) {
                     }
                 }
             }
-            return;
+            if (cIndex == _children[i]._index) {
+                return -1;
+            }
+            return _children[i]._index;
         }
     }
+    return -1;
 }
 
 void LIA::Window::addOptions(std::string id, std::string name) {

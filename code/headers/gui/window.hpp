@@ -293,8 +293,9 @@ namespace LIA {
             /**
              * @param {string} action
              * @param {string} options id
+             * @returns {int} index if was changed
             */
-            void moveOptions(std::string, std::string);
+            int moveOptions(std::string, std::string);
             bool hasField(std::string);
             bool hasButton(std::string);
             void addGrid(std::string id, std::string name, int minRows, int maxRows, int minColumns, int maxColumns);
