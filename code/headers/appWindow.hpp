@@ -30,6 +30,13 @@ namespace LIA
                 int height;
             } _glfwSettings;
 
+            struct s_windowModes {
+                int width;
+                int height;
+            };
+
+            std::vector<s_windowModes> _supportedResolutions;
+
             static KeyController _keyController;
             static MouseController _mouseController;
             static int _cpX;
@@ -136,6 +143,7 @@ namespace LIA
             Position getMousePos();
             Scale getWindowScale();
             s_glfwSettings getSettings() { return _glfwSettings;  }
+            std::vector<s_windowModes> getResolutions() { return _supportedResolutions; }
             bool isFullscreen() { return _glfwSettings.fullscreen; }
             void toogleFullscreen();
     };

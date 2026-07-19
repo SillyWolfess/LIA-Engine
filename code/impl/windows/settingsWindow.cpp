@@ -58,15 +58,12 @@ void LIA::SettingsWindow::updateData(std::string window) {
         UpdateGuiEvent updateGuiEvent(window, "fullscreen", glfwSettings.fullscreen);
         eventManager->handleEvent(updateGuiEvent);
         
-        std::string res = std::vformat("{} x {}", std::make_format_args(glfwSettings.width, glfwSettings.height));
-        UpdateGuiEvent updateResolutionEvent(_eventSource, "resolution", res);
-        eventManager->handleEvent(updateResolutionEvent);
-
         std::vector<std::string> resList;
-        resList.push_back("res 1");
-        resList.push_back("res 2");
-        resList.push_back("res 3");
-        UpdateGuiListEvent updateResolution2Event(_eventSource, "resolution2", resList);
+        std::vector<AppWindow::s_windowModes> resolutions = appWindow->getResolutions();
+        for (AppWindow::s_windowModes& mode: resolutions) {
+            resList.push_back(std::vformat("{} x {}", std::make_format_args(mode.width, mode.height)));
+        }
+        UpdateGuiListEvent updateResolution2Event(_eventSource, "resolution", resList);
         eventManager->handleEvent(updateResolution2Event);
     LIA_CATCH_EMPTY
 }

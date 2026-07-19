@@ -4,11 +4,10 @@
     <position x = "200" y = "0" z = "-1"/>
     <initAlign>center</initAlign>
     <scale x = "200" y = "20"/>
-    <buttonScale x = "200" y = "20" />
+    <buttonScale x = "400" y = "20" />
     <header visible="true" size="20" />
     <children>
-        <resolution action="resolution" type="field" id="resolution" label="resolution"/>
-		<resolution2 action="resolution2" type="options" id="resolution2" label="resolution2"/>
+		<resolution action="resolution" type="options" id="resolution" label="resolution"/>
         <fullscreen action="fullscreen" type="checkbox" id="fullscreen" label="Fullscreen" checked="true"/>
         <button action="close_window" arg0="settings" type="button" id="close" name = "Close" x = "0" y = "0"/>
     </children>

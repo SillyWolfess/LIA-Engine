@@ -83,60 +83,6 @@ void LIA::AppWindow::toogleFullscreen() {
         glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, _glfwSettings.width, _glfwSettings.height, GLFW_DONT_CARE);
     }
 }
-/*
-bool LIA::AppWindow::handleCheckbox(Event& event) {
-    if (event.name.compare("checkbox_action") != 0) {
-        return false;
-    }
-    if (event.source.compare("settings") == 0) {
-        if (event.action.compare("fullscreen") == 0) {
-            toogleFullscreen();
-            UpdateGuiEvent updateGuiEvent("settings", "fullscreen", _glfwSettings.fullscreen);
-            _eventManager->handleEvent(updateGuiEvent);
-            return true;
-        }
-    }
-    else {
-        LIA_warn(std::vformat("Action {} not recognized from {}", std::make_format_args(event.action, event.source)));
-    }
-    return false;
-}
-*/
-/*
-#include "data/position.hpp"
-bool LIA::AppWindow::handleGuiGetData(Event& event) {
-    if (event.name.compare("get_data_gui") != 0) {
-        return false;
-    }
-    if (event.source.compare("settings") == 0) {
-        UpdateGuiEvent updateGuiEvent(event.window, "fullscreen", _glfwSettings.fullscreen);
-        _eventManager->handleEvent(updateGuiEvent);
-        std::string res = std::vformat("{} x {}", std::make_format_args(_glfwSettings.width, _glfwSettings.height));
-        UpdateGuiEvent updateResolutionEvent("settings", "resolution", res);
-        _eventManager->handleEvent(updateResolutionEvent);
-        return true;
-    }
-    if (event.source.compare("debug") == 0) {
-        Position& pos = _mainCamera.getPosition();
-        std::string cPos = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(pos.x, pos.y, pos.z));
-        UpdateGuiEvent updateGuiEvent(event.window, "camera_position", cPos);
-        _eventManager->handleEvent(updateGuiEvent);
-        Position& lookAt = _mainCamera.getLookAt();
-        std::string cLookAt = std::vformat("{:.3f} x {:.3f} x {:.3f}", std::make_format_args(lookAt.x, lookAt.y, lookAt.z));
-        UpdateGuiEvent updateLookAtEvent(event.window, "camera_lookAt", cLookAt);
-        _eventManager->handleEvent(updateLookAtEvent);
-        return true;
-    }
-    return false;
-}
-*/
-/*
-bool LIA::AppWindow::registerHandlers(EventManager* eventManager) {
-//    eventManager->subscribe("checkbox_action", EventType::GUI, __FILE__, std::bind(&AppWindow::handleCheckbox, this, std::placeholders::_1));
-//    eventManager->subscribe("get_data_gui", EventType::GUI, __FILE__, std::bind(&AppWindow::handleGuiGetData, this, std::placeholders::_1));
-    return true;
-}
-*/
 void LIA::AppWindow::loadSettings() {
     LIA_debug("Reading settings");
 
@@ -164,6 +110,12 @@ void LIA::AppWindow::loadSettings() {
     std::map<std::string, XmlLoader::XmlNode> nodes = xmlData.nodes;
     XmlLoader::XmlNode backgroundNode = nodes.at("background");
     _background = xmlLoader.getColor(backgroundNode);
+
+    _supportedResolutions.clear();
+    s_windowModes resolution;
+    resolution.height = _glfwSettings.height;
+    resolution.width = _glfwSettings.width;
+    _supportedResolutions.push_back(resolution);
 }
 
 bool LIA::AppWindow::init(std::string windowName) {
@@ -269,12 +221,6 @@ bool LIA::AppWindow::init(std::string windowName) {
         return false;
     }
     _guiCamera.switchOrtho();
-    /*
-    if (!registerHandlers(_eventManager)) {
-        LIA_fatal("Failed to register handlers");
-        return false;
-    }
-    */
     return true;
 }
 
@@ -290,9 +236,9 @@ bool LIA::AppWindow::initPrefab() {
     }
 }
 
-bool LIA::AppWindow::initFont(/*GLuint programId*/) {
+bool LIA::AppWindow::initFont() {
     ShaderManager* shaderManager = &(LIA::Engine::getInstance().getShaderManager());
-    if (!_font.initialise(/*programId*/shaderManager)) {
+    if (!_font.initialise(shaderManager)) {
         LIA_fatal("Failed to init font");
         return false;
     }
@@ -349,14 +295,11 @@ void LIA::AppWindow::draw() {
             _closeThis = true;
             return;
         }
-    //    glDisable(GL_DEPTH_TEST);
         if (!_gui.draw(_guiCamera, shaderManager, &_font)) {
             LIA_fatal("Failed to draw gui");
             _closeThis = true;
             return;
         }
-    //    glEnable(GL_DEPTH_TEST);
-    //    _font.draw(_guiCamera, shaderManager);
     }
 
     // Swap buffers
