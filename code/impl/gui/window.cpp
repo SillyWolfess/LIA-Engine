@@ -427,15 +427,18 @@ void LIA::Window::updateOptions(std::string id, std::vector<std::string> value) 
         if (child._id.compare(id) != 0 || child._type != GuiObjectType::OPTIONS) {
             continue;
         }
-        updateOptions(child, id, value);
+        updateOptions(child, id, value, -1);
     }
 }
 
-void LIA::Window::updateOptions(GuiObject& child, std::string id, std::vector<std::string> value) {
+void LIA::Window::updateOptions(GuiObject& child, std::string id, std::vector<std::string> value, int selection) {
      if (child._id.compare(id) != 0 || child._type != GuiObjectType::OPTIONS) {
         return;
      }
      child._values = value;
+     if (selection != -1) {
+         child._index = selection;
+     }
      if (child._index > child._values.size() - 1) {
          child._index = 0;
      }
@@ -447,13 +450,13 @@ void LIA::Window::updateOptions(GuiObject& child, std::string id, std::vector<st
      }
 }
 
-void LIA::Window::updateList(std::string id, std::vector<std::string> value, int subtype) {
+void LIA::Window::updateList(std::string id, std::vector<std::string> value, int additionalData) {
     for (GuiObject& child: _children) {
         if (child._id.compare(id) != 0) {
             continue;
         }
         if (child._type == GuiObjectType::OPTIONS) {
-            updateOptions(child, id, value);
+            updateOptions(child, id, value, additionalData);
             return;
         }
         if (child._type != GuiObjectType::LIST) {
@@ -468,7 +471,7 @@ void LIA::Window::updateList(std::string id, std::vector<std::string> value, int
             GuiObject& lgu = data.emplace_back();
             setDefaults(lgu);
             
-            if (subtype == GuiObjectType::BUTTON) {
+            if (additionalData == GuiObjectType::BUTTON) {
                 lgu._type = GuiObjectType::BUTTON;
             } else {
                 lgu._type = GuiObjectType::FIELD;

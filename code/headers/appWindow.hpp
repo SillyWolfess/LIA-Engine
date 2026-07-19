@@ -28,6 +28,8 @@ namespace LIA
 
                 int width;
                 int height;
+
+                int windowMode;
             } _glfwSettings;
 
             struct s_windowModes {
@@ -106,6 +108,7 @@ namespace LIA
             int windowLastX, windowLastY;
             
             void loadSettings();
+            void loadResolutions();
             void handleMouseInput();
 //            bool handleCheckbox(Event& event);
 //            bool handleGuiGetData(Event& event);

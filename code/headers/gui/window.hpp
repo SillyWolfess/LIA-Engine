@@ -267,8 +267,9 @@ namespace LIA {
              * @param {GuiObject} gui object
              * @param {string} id
              * @param {list<string>} list of values
+             * @param {int} selection
             */
-            void updateOptions(GuiObject&, std::string, std::vector<std::string>);
+            void updateOptions(GuiObject&, std::string, std::vector<std::string>, int);
             /**
              * @param {string} id
              */

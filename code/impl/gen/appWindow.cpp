@@ -116,6 +116,7 @@ void LIA::AppWindow::loadSettings() {
     resolution.height = _glfwSettings.height;
     resolution.width = _glfwSettings.width;
     _supportedResolutions.push_back(resolution);
+    _glfwSettings.windowMode = 0;
 }
 
 bool LIA::AppWindow::init(std::string windowName) {
@@ -140,6 +141,7 @@ bool LIA::AppWindow::init(std::string windowName) {
     }
     
     loadSettings();
+    loadResolutions();
 
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, _glfwSettings.major );
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, _glfwSettings.minor );
@@ -222,6 +224,37 @@ bool LIA::AppWindow::init(std::string windowName) {
     }
     _guiCamera.switchOrtho();
     return true;
+}
+
+void LIA::AppWindow::loadResolutions() {
+    _supportedResolutions.clear();
+    int count;
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* modes = glfwGetVideoModes(monitor, &count);
+    LIA_debug_f("Supported resolution count {}", count);
+    for (int i = 0; i < count; i++) {
+        if (i > 0) {
+            if (modes[i].width == modes[i - 1].width && modes[i].height == modes[i - 1].height) {
+                continue;
+            }
+        }
+        LIA_debug_f("Supported resolution {}: {} x {}", i, modes[i].width, modes[i].height);
+        s_windowModes wMode;
+        wMode.width = modes[i].width;
+        wMode.height = modes[i].height;
+        _supportedResolutions.push_back(wMode);
+    }
+
+    for (int i = 0; i < _supportedResolutions.size(); i++) {
+        if (
+                _supportedResolutions[i].height == _glfwSettings.height &&
+                _supportedResolutions[i].width == _glfwSettings.width
+            ) {
+            _glfwSettings.windowMode = i;
+            break;
+        }
+    }
 }
 
 bool LIA::AppWindow::initPrefab() {

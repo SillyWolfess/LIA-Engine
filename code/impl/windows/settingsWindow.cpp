@@ -63,7 +63,7 @@ void LIA::SettingsWindow::updateData(std::string window) {
         for (AppWindow::s_windowModes& mode: resolutions) {
             resList.push_back(std::vformat("{} x {}", std::make_format_args(mode.width, mode.height)));
         }
-        UpdateGuiListEvent updateResolutionEvent(_eventSource, "resolution", resList);
+        UpdateGuiListEvent updateResolutionEvent(_eventSource, "resolution", resList, glfwSettings.windowMode);
         eventManager->handleEvent(updateResolutionEvent);
     LIA_CATCH_EMPTY
 }
