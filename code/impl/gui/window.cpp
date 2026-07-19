@@ -328,11 +328,6 @@ void LIA::Window::addOptions(std::string id, std::string name) {
     data._index = 0;
     data._type = GuiObjectType::OPTIONS;
     std::vector<std::string> tmpData;
-    /*
-    tmpData.push_back("value 0");
-    tmpData.push_back("value 1");
-    tmpData.push_back("value 2");
-    */
     data._values = tmpData;
     _children.push_back(data);
 
@@ -341,7 +336,7 @@ void LIA::Window::addOptions(std::string id, std::string name) {
     setDefaults(label);
     label._type = GuiObjectType::LABEL;
     label._value = data._label + ":";
-    label._scale.x = ((int) strlen(label._value.c_str())) * (label._fontSize * 0.6f);
+    label._scale.x = data._scale.x * 0.5f;
 
     GuiObject& lButton = tmp.emplace_back();
     setDefaults(lButton);
@@ -358,7 +353,7 @@ void LIA::Window::addOptions(std::string id, std::string name) {
     value._id = id + "value";
     value._type = GuiObjectType::FIELD;
     value._value = data._index < data._values.size() ?  data._values[data._index] : "";
-    value._scale.x = 10 * (value._fontSize * 0.6f);
+    value._scale.x = (data._scale.x * 0.5f) - (2.0f * lButton._scale.x);
 
     GuiObject& rButton = tmp.emplace_back();
     setDefaults(rButton);
@@ -573,7 +568,7 @@ void LIA::Window::computeScale() {
         } else if (button._type == GuiObjectType::OPTIONS) {
             float xShift = 0.0f;
             for (GuiObject& ch : _childrenMap[button._id]) {
-                float xSize = _style.padding.left + button._position.x + xShift + ch._scale.x + _style.padding.right;
+                float xSize = _style.padding.left + xShift + ch._scale.x + _style.padding.right;
                 if (xSize > xMax) {
                     xMax = xSize;
                 }

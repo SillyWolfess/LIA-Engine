@@ -356,7 +356,7 @@ bool LIA::Gui::handleEnableEvent(Event& event) {
     return false;
 }
 bool LIA::Gui::handleGuiUpdate(Event& event) {
-    if (/*event.name.compare("fps") != 0 &&*/ event.name.compare("update_gui") != 0) {
+    if (event.name.compare("update_gui") != 0) {
         return false;
     }
     if (event.name.compare("update_gui") == 0) {
