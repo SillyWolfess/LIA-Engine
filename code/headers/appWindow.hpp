@@ -148,6 +148,7 @@ namespace LIA
             s_glfwSettings getSettings() { return _glfwSettings;  }
             std::vector<s_windowModes> getResolutions() { return _supportedResolutions; }
             bool isFullscreen() { return _glfwSettings.fullscreen; }
+            void setMode(int);
             void toogleFullscreen();
     };
 }

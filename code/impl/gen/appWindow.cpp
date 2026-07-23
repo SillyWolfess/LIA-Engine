@@ -83,6 +83,28 @@ void LIA::AppWindow::toogleFullscreen() {
         glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, _glfwSettings.width, _glfwSettings.height, GLFW_DONT_CARE);
     }
 }
+
+void LIA::AppWindow::setMode(int modeIndex) {
+    if (modeIndex < 0 || modeIndex > _supportedResolutions.size() - 1) {
+        return;
+    }
+    _glfwSettings.height = _supportedResolutions[modeIndex].height;
+    _glfwSettings.width = _supportedResolutions[modeIndex].width;
+    _glfwSettings.windowMode = modeIndex;
+    int maximized = glfwGetWindowAttrib(_glfwWindow, GLFW_MAXIMIZED);
+    if (!_glfwSettings.fullscreen) {
+        if (maximized > 0) {
+            glfwSetWindowAttrib(_glfwWindow, GLFW_MAXIMIZED, GLFW_FALSE);
+        }
+        glfwGetWindowPos(_glfwWindow, &windowLastX, &windowLastY);
+        glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, _glfwSettings.width, _glfwSettings.height, GLFW_DONT_CARE);
+        // TODO does not work
+        if (maximized > 0) {
+            glfwMaximizeWindow(_glfwWindow);
+        }
+    }
+}
+
 void LIA::AppWindow::loadSettings() {
     LIA_debug("Reading settings");
 

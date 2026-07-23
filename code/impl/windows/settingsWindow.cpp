@@ -51,7 +51,8 @@ bool LIA::SettingsWindow::onOptionChanged(LIA::Event& event) {
 void LIA::SettingsWindow::handleOptionChanged(LIA::Event& event) {
     LIA_TRY
         if (event.action.compare("resolution") == 0) {
-            LIA_info_f("Handled {}", event.argi);
+            AppWindow* appWindow = getAppWindow();
+            appWindow->setMode(event.argi);
         }
     LIA_CATCH_EMPTY
 }
