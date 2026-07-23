@@ -10,12 +10,12 @@ namespace LIA {
         virtual bool registerHandlers();
         virtual bool onGetGuiData(LIA::Event&);
         virtual bool onCheckboxAction(LIA::Event&);
-        //            virtual bool onButtonAction(LIA::Event&);
-        //            virtual bool onGuiWindowInit(LIA::Event&);
+        virtual bool onOptionChanged(LIA::Event&);
     private:
         std::string _eventSource;
         void updateData(std::string);
         void handleCheckbox(LIA::Event&);
+        void handleOptionChanged(LIA::Event&);
     };
 }
 #endif

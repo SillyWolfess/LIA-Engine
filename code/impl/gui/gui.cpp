@@ -298,7 +298,8 @@ bool LIA::Gui::handleGuiButton(Event& event) {
         }
         int newIndex = window->moveOptions(event.action, event.arg0);
         if (newIndex != -1) {
-            //TODO send option selection changed event
+            OptionSelectionChangeEvent selectionChangeEvent(event.window, event.arg0, newIndex);
+            _eventManager->handleEvent(selectionChangeEvent);
         }
         return true;
     }

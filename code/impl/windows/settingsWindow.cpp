@@ -17,6 +17,10 @@ bool LIA::SettingsWindow::registerHandlers() {
         LIA_fatal("Failed to subscribe to checkbox action");
         return false;
     }
+    if (!subscribe(ComponentEvent::OPTION_ACTION)) {
+        LIA_fatal("Failed to subscribe to option change action");
+        return false;
+    }
     return true;
 }
 
@@ -34,6 +38,22 @@ bool LIA::SettingsWindow::onCheckboxAction(LIA::Event& event) {
     }
     handleCheckbox(event);
     return true;
+}
+
+bool LIA::SettingsWindow::onOptionChanged(LIA::Event& event) {
+    if (event.source.compare(_eventSource) != 0) {
+        return false;
+    }
+    handleOptionChanged(event);
+    return true;
+}
+
+void LIA::SettingsWindow::handleOptionChanged(LIA::Event& event) {
+    LIA_TRY
+        if (event.action.compare("resolution") == 0) {
+            LIA_info_f("Handled {}", event.argi);
+        }
+    LIA_CATCH_EMPTY
 }
 
 void LIA::SettingsWindow::handleCheckbox(LIA::Event& event) {

@@ -122,6 +122,17 @@ namespace LIA {
             this->action = action;
         }
     };
+    struct OptionSelectionChangeEvent: Event {
+        OptionSelectionChangeEvent() = delete;
+        OptionSelectionChangeEvent(std::string window, std::string action, int index) {
+            this->name = "option_action";
+            this->type = EventType::GUI;
+            this->source = window;
+            this->window = window;
+            this->action = action;
+            this->argi = index;
+        }
+    };
     //UpdateGuiEvent updateGuiEvent("settings", "fullscreen", _glfwSettings.maximize);
     struct UpdateGuiEvent: Event {
         UpdateGuiEvent() = delete;
