@@ -776,6 +776,10 @@ void LIA::Window::passObjects(Scene* scene, Font* font) {
     }
 }
 
+void LIA::Window::removeGrab() {
+    _isGrabbed = false;
+}
+
 bool LIA::Window::grab(Position& pos) {
     if (!_visible || !_isMovable || !_isHeaderHover) {
         return false;

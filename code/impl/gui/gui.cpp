@@ -108,6 +108,8 @@ bool LIA::Gui::init() {
     _lastAppScale = _appWindow->getWindowScale();
     _watcher.subscribe("./data/gui/style.xml");
     _watcher.subscribe("./data/gui/gui.xml");
+    _lastGrabbedWindow = -1;
+    _lastHoveredWindow = -1;
     return true;
 }
 
@@ -557,8 +559,14 @@ void LIA::Gui::update() {
             _windows[tooltipWindowIndex].updateField("tooltip", "");
             _windows[tooltipWindowIndex].hide();
         }
-        if (_lastGrabbedWindow != -1 && mouseHeld) {
-            _windows[_lastGrabbedWindow].mouseDown(mousePos, eventManager);
+        if (_lastGrabbedWindow != -1) {
+            if (mouseHeld) {
+                _windows[_lastGrabbedWindow].mouseDown(mousePos, eventManager);
+            }
+            else if (mouseClicked) {
+                _windows[_lastGrabbedWindow].removeGrab();
+                _lastGrabbedWindow = -1;
+            }
         }
         for (Window& window: _windows) {
            window.mouseLastPosition(mousePos);

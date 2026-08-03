@@ -320,6 +320,7 @@ namespace LIA {
             bool isGrabbed() { return _isGrabbed; }
             bool isHovered() { return _isHovered; }
             void removeHover();
+            void removeGrab();
             void resize(AppWindow*);
             void clear();
     };
