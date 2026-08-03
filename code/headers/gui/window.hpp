@@ -54,10 +54,12 @@ namespace LIA {
             std::string _path;
             std::string _name;
             std::string _id;
+            std::string _hooveredTooltip;
             ALIGN _alignment;
             ALIGN _initAlign;
         
             float _headerSize;
+            bool _allwaysOnTop;
             bool _isHeaderHover;
             bool _isGrabbed;
             bool _isHovered;
@@ -99,6 +101,16 @@ namespace LIA {
             void hide();
             void show(AppWindow*);
             const bool isVisible() { return _visible; };
+
+            /**
+            * @param {string} id
+            * @param {string} tooltip
+            */
+            void setTooltip(std::string, std::string);
+            std::string getTooltip();
+
+            void setAllwaysOnTop(bool);
+            bool getAllwaysOnTop() { return _allwaysOnTop;  }
 
             void setPosition(float x, float y, float z);
             void setPosition(float x, float y);

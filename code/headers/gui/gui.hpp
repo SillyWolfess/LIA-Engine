@@ -40,6 +40,7 @@ namespace LIA
             std::map<std::string, std::string> _pathMap;
 
             int _lastGrabbedWindow;
+            int _lastHoveredWindow;
 
             std::map<int, bool> _keyMap;
             bool registerHandlers();

@@ -6,6 +6,7 @@
     <scale x = "200" y = "20"/>
     <buttonScale x = "400" y = "20" />
     <header visible="true" size="20" />
+	<movable>true</movable>
     <children>
 		<resolution action="resolution" type="options" id="resolution" label="resolution"/>
         <fullscreen action="fullscreen" type="checkbox" id="fullscreen" label="Fullscreen" checked="true"/>

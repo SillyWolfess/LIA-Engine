@@ -41,6 +41,7 @@ namespace LIA {
         
         std::string _action;
         std::string _arg0;
+        std::string _tooltip;
 
         Position _position;
         Scale _scale;

@@ -6,4 +6,5 @@
     <settings>./data//gui/data/settings.xml</settings>
     <debugInfo>./data/gui/data/debugInfo.xml</debugInfo>
     <keyMapping>./data/gui/data/keyMapping.xml</keyMapping>
+	<tooltip>./data/gui/data/tooltip.xml</tooltip>
 </root>

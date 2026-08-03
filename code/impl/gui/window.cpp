@@ -3,7 +3,7 @@
 #include "logs.hpp"
 #include "Engine.hpp"
 
-LIA::Window::Window() : _isMovable{false}, _visible{false}, _isGrabbed{false}, _needToResize{false}, _isHovered{false}
+LIA::Window::Window() : _isMovable{false}, _visible{false}, _isGrabbed{false}, _needToResize{false}, _isHovered{false}, _allwaysOnTop{false}
 {
     LIA_trace("Window constructor");
 }
@@ -51,6 +51,10 @@ void LIA::Window::setScale(float x, float y) {
     _scale.x = x;
     _scale.y = y;
     _scale.z = 1;
+}
+
+void LIA::Window::setAllwaysOnTop(bool value) {
+    _allwaysOnTop = value;
 }
 
 void LIA::Window::setScale(Scale& scale) {
@@ -172,6 +176,19 @@ void LIA::Window::addField(std::string id, std::string label, std::string value,
 
 void LIA::Window::addField(std::string id, std::string label, std::string value, std::string placeholder, Position& position) {
     addField(id, label, value, placeholder, position, "");
+}
+
+void LIA::Window::setTooltip(std::string id, std::string tooltip) {
+    for (GuiObject& child : _children) {
+        if (child._id.compare(id) == 0) {
+            child._tooltip = tooltip;
+            return;
+        }
+    }
+}
+
+std::string LIA::Window::getTooltip() {
+    return _hooveredTooltip;
 }
 
 bool LIA::Window::hasField(std::string id) {
@@ -864,6 +881,7 @@ void LIA::Window::removeHover() {
     }
     _isHovered = false;
     _isHeaderHover = false;
+    _hooveredTooltip = "";
     for (GuiObject& child : _children) {
         if (child._type == GuiObjectType::BUTTON || child._type == GuiObjectType::CHECKBOX) {
             child._isHovered = false;
@@ -896,10 +914,12 @@ bool LIA::Window::mouseHover(Position& pos) {
     bool found = false;
     _isHeaderHover = false;
     _isHovered = false;
+    _hooveredTooltip = "";
     for (GuiObject& child : _children) {
         if (child._type == GuiObjectType::BUTTON || child._type == GuiObjectType::CHECKBOX) {
             if (isInRange2D(pos, child._position, child._scale)) {
                 child._isHovered = true;
+                _hooveredTooltip = child._tooltip;
                 found = true;
             } else {
                 child._isHovered = false;
@@ -913,6 +933,7 @@ bool LIA::Window::mouseHover(Position& pos) {
                 }
                 if (isInRange2D(pos, ch._position, ch._scale)) {
                     ch._isHovered = true;
+                    _hooveredTooltip = child._tooltip;
                     child._isHovered = true;
                     found = true;
                 }
@@ -930,6 +951,7 @@ bool LIA::Window::mouseHover(Position& pos) {
                 if (isInRange2D(pos, ch._position, ch._scale)) {
                     ch._isHovered = true;
                     child._isHovered = true;
+                    _hooveredTooltip = child._tooltip;
                     found = true;
                 } else {
                     ch._isHovered = false;

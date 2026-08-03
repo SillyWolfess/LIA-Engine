@@ -151,35 +151,39 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
         LIA_trace("Setting alignment");
         std::string alignment = xmlLoader.getString(xmlWindow, "align", "none");
         window.setAlignment(alignment);
+        LIA_trace("Setting allways on top flag");
+        bool allwaysOnTop = xmlLoader.getBoolean(xmlWindow, "allwaysOnTop", false);
+        window.setAllwaysOnTop(allwaysOnTop);
         LIA_trace("Loading children");
         XmlLoader::XmlNode childrenNode = nodes.at("children");
         std::list<XmlLoader::XmlNode> chidlren = childrenNode.children;
         for (auto node: chidlren) {
             LIA_trace("Loading child");
             std::string childType = xmlLoader.getString(node, "type");
+            std::string id = "";
             if (childType.compare("button") == 0) {
                 LIA_trace("Adding button");
-                std::string buttonId = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string buttonName = xmlLoader.getString(node, "name");
                 std::string eventAction = xmlLoader.getString(node, "action", "");
                 std::string eventArg0 = xmlLoader.getString(node, "arg0", "");
                 std::string texture = xmlLoader.getString(node, "texture", "");
-                if (buttonId.compare("") == 0) {
+                if (id.compare("") == 0) {
                     LIA_fatal("Button id is empty for {}", std::make_format_args(buttonName));
                     return false;
                 }
-                window.addButton(buttonId, buttonName, eventAction, eventArg0, texture);
+                window.addButton(id, buttonName, eventAction, eventArg0, texture);
             }
             else if (childType.compare("field") == 0) {
                 LIA_trace("Adding field");
-                std::string fieldId = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string fieldLabel = xmlLoader.getString(node, "label");
                 std::string fieldPlaceholder = xmlLoader.getString(node, "placeholder", "");
-                window.addField(fieldId, fieldLabel, "", fieldPlaceholder);
+                window.addField(id, fieldLabel, "", fieldPlaceholder);
             }
             else if (childType.compare("checkbox") == 0) {
                 LIA_trace("Adding checkbox");
-                std::string id = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string eventAction = xmlLoader.getString(node, "action");
                 std::string label = xmlLoader.getString(node, "label");
                 bool isChecked = xmlLoader.getBoolean(node, "checked", false);
@@ -187,7 +191,7 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
             }
             else if (childType.compare("label") == 0) {
                 LIA_trace("Adding label");
-                std::string id = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string value = xmlLoader.getString(node, "value");
                 window.addLabel(id, value);
             }
@@ -197,24 +201,29 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
                 int maxRows = xmlLoader.getInt(node, "maxRows", 1);
                 int minColumns = xmlLoader.getInt(node, "minColumns", 1);
                 int maxColumns = xmlLoader.getInt(node, "maxColumns", 1);
-                std::string id = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string name = xmlLoader.getString(node, "name");
                 window.addGrid(id, name, minRows, maxRows, minColumns, maxColumns);
             }
             else if (childType.compare("options") == 0) {
                 LIA_trace("Adding options");
-                std::string id = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string label = xmlLoader.getString(node, "label");
                 window.addOptions(id, label);
             }
             else if(childType.compare("list") == 0) {
                 LIA_trace("Adding list");
-                std::string id = xmlLoader.getString(node, "id");
+                id = xmlLoader.getString(node, "id");
                 std::string name = xmlLoader.getString(node, "name");
                 window.addList(id, name);
             }
             else {
                 LIA_error(std::vformat("Unknown child type {} in {}", std::make_format_args(childType, name)));
+            }
+            std::string tooltip = xmlLoader.getString(node, "tooltip", "");
+            if (id.compare("") != 0 && tooltip.compare("") != 0) {
+                LIA_trace_f("Adding tooltip '{}' to {}", tooltip, id);
+                window.setTooltip(id, tooltip);
             }
         }
         if (initShow) {
@@ -488,13 +497,18 @@ void LIA::Gui::update() {
         bool mouseClickFound = false;
         bool windowGrabbed = false;
         _lastGrabbedWindow = -1;
+        _lastHoveredWindow = -1;
         int hoveredWindow = -1;
+        int tooltipWindowIndex = -1;
         for (int i = 0; i < _windows.size(); i++) {
             if (_lastGrabbedWindow == -1 && _windows[i].isGrabbed()) {
                 _lastGrabbedWindow = i;
             }
             if (hoveredWindow == -1 && _windows[i].isHovered()) {
                 hoveredWindow = i;
+            }
+            if (_windows[i].getId().compare("tooltip") == 0) {
+                tooltipWindowIndex = i;
             }
         }
 
@@ -516,6 +530,19 @@ void LIA::Gui::update() {
         }
 
         if (hoveredWindow != -1) {
+            if (_lastHoveredWindow != hoveredWindow) {
+                _lastHoveredWindow = hoveredWindow;
+                bool hasTooltip = _windows[hoveredWindow].getTooltip().compare("") != 0;
+                if (tooltipWindowIndex != -1) {
+                    _windows[tooltipWindowIndex].updateField("tooltip", _windows[hoveredWindow].getTooltip());
+                    if (hasTooltip && !_windows[tooltipWindowIndex].isVisible()) {
+                        _windows[tooltipWindowIndex].show(appWindow);
+                    }
+                    else if (!hasTooltip && _windows[tooltipWindowIndex].isVisible()) {
+                        _windows[tooltipWindowIndex].hide();
+                    }
+                }
+            }
             if (mouseClicked) {
                 _windows[hoveredWindow].mouseClick(mousePos, eventManager);
             }
@@ -526,11 +553,22 @@ void LIA::Gui::update() {
 
             }
         }
+        if (_lastHoveredWindow == -1 && tooltipWindowIndex != -1 && _windows[tooltipWindowIndex].isVisible()) {
+            _windows[tooltipWindowIndex].updateField("tooltip", "");
+            _windows[tooltipWindowIndex].hide();
+        }
         if (_lastGrabbedWindow != -1 && mouseHeld) {
             _windows[_lastGrabbedWindow].mouseDown(mousePos, eventManager);
         }
         for (Window& window: _windows) {
            window.mouseLastPosition(mousePos);
+        }
+        if (tooltipWindowIndex != -1 && _windows[tooltipWindowIndex].isVisible()) {
+            Position p;
+            copy(p, mousePos);
+            p.x = p.x + 10;
+            _windows[tooltipWindowIndex].setPosition(p);
+            _windows[tooltipWindowIndex].resize(appWindow);
         }
     }
     _lastAppScale = appScale;
@@ -546,7 +584,15 @@ void LIA::Gui::passObjects(Scene* scene, Font* font) {
         font->addText(data.text, data.position, data.color, data.size);
     }
     for (Window& window: _windows) {
+        if (window.getAllwaysOnTop()) {
+            continue;
+        }
         window.passObjects(scene, font);
+    }
+    for (Window& window : _windows) {
+        if (window.getAllwaysOnTop()) {
+            window.passObjects(scene, font);
+        }
     }
 }
 
