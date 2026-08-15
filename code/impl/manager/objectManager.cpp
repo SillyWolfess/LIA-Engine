@@ -315,7 +315,13 @@ bool LIA::ObjectManager::createObject(std::string id, std::string name) {
 bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
     LIA_TRY
         XmlLoader xmlLoader;
-        XmlLoader::XmlData xmlObject = xmlLoader.load(path);
+        XmlLoader::XmlData xmlObject;
+        if (_cache.contains(path)) {
+            xmlObject = _cache.at(path);
+        } else {
+            xmlObject = xmlLoader.load(path);
+            _cache.emplace(path, xmlObject);
+        }
         LIA_trace("Reading object name");
         std::string name = xmlLoader.getValue(xmlObject, "object");
         LIA_trace("Reading object type");

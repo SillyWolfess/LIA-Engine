@@ -11,6 +11,7 @@ namespace LIA {
     class ObjectManager {
         private:
             ModelManager _modelManager;
+            std::map<std::string, XmlLoader::XmlData> _cache;
             std::map<std::string, std::string> _paths;
             std::map<std::string, std::string> _templatePaths;
             std::vector<Object> _objects;
