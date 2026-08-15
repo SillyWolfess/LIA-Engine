@@ -13,6 +13,8 @@
         <cameraLabel type="label" id="cameraLabel" value="Camera"/>
         <camera type="field" id="camera_position" label="pos"/>
         <lookAt type="field" id="camera_lookAt" label="eye"/>
+		<engineUpdate type="field" id="engineUpdate" label="update"/>
+		<engineDraw type="field" id="engineDraw" label="draw"/>
         <close action="close_window" arg0="debug" type="button" id="close" name = "Close" x = "0" y = "20"/>
     </children>
     <visible>false</visible>
