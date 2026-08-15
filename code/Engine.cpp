@@ -78,6 +78,8 @@ bool LIA::Engine::init() {
     }
 
     disableSimulationControls();
+    _counterDraw.setName("engineDraw");
+    _counterUpdate.setName("engineUpdate");
     return true;
 }
 
@@ -226,6 +228,10 @@ bool LIA::Engine::update() {
     double currentTime = glfwGetTime();
     _fpsCounter.update(currentTime, _eventManager);
     double deltaTime = _fpsCounter.getDelta();
+    _counterUpdate.notify(_eventManager);
+    _counterDraw.notify(_eventManager);
+
+    _counterUpdate.start();
 
     _watcher.watch();
     _shaderManager.update();
@@ -270,8 +276,11 @@ void LIA::Engine::draw() {
 
     _simulation.passObjects(scene);
     _gui.passObjects(guiScene, font);
+    _counterUpdate.end();
 
+    _counterDraw.start();
     _window.draw();
+    _counterDraw.end();
 }
 
 bool LIA::Engine::isExit() {

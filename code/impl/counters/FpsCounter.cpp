@@ -6,7 +6,6 @@ void LIA::FpsCounter::update(double currentTime, EventManager& eventManager) {
     _deltaTime = currentTime - _lastTime;
     _nFrames++;
     if (_deltaTime >= 1.0) {
-        double value = 1000.0 / double(_nFrames);
         if (_fps != _nFrames) {
             _fps = _nFrames;
             FpsEvent event(_fps);

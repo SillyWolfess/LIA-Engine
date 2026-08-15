@@ -14,6 +14,7 @@ namespace LIA {
         std::string target;
         std::string arg0;
         int argi;
+        double argd;
         bool argb;
         bool useList = false;
         std::vector<std::string> argl;
@@ -26,6 +27,15 @@ namespace LIA {
             name = "fps";
             argi = fps;
             arg0 = "";
+            type = EventType::GUI;
+        }
+    };
+    struct TimerEvent : Event {
+        TimerEvent() = delete;
+        TimerEvent(std::string timerName, double value) {
+            source = timerName;
+            name = "timer";
+            argd = value;
             type = EventType::GUI;
         }
     };
@@ -144,6 +154,13 @@ namespace LIA {
             arg0 = value ? "true" : "false";
         }
         UpdateGuiEvent(std::string window, std::string target, int value) {
+            name = "update_gui";
+            type = EventType::GUI;
+            this->window = window;
+            this->target = target;
+            arg0 = std::to_string(value);
+        }
+        UpdateGuiEvent(std::string window, std::string target, double value) {
             name = "update_gui";
             type = EventType::GUI;
             this->window = window;

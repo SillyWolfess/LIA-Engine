@@ -18,6 +18,10 @@ bool LIA::DebugWindow::registerHandlers() {
         LIA_fatal("Failed to subscribe to position changed event");
         return false;
     }
+    if (!subscribe(ComponentEvent::TIMER)) {
+        LIA_fatal("Failed to subscribe to timer event");
+        return false;
+    }
     getEventManager()->subscribe("fps", LIA::EventType::GUI, __FILE__, std::bind(&DebugWindow::onFpsChange, this, std::placeholders::_1));
     return true;
 }
@@ -56,6 +60,15 @@ bool LIA::DebugWindow::onFpsChange(LIA::Event& event) {
     EventManager* eventManager = getEventManager();
     UpdateGuiEvent updateFpsEvent(_eventSource, "fps", LIA::Engine::getInstance().getFps());
     eventManager->handleEvent(updateFpsEvent);
+    return true;
+}
+
+bool LIA::DebugWindow::onTimer(LIA::Event& event) {
+    LIA_TRY
+        EventManager* eventManager = getEventManager();
+        UpdateGuiEvent updateGuiEvent(_eventSource, event.source, event.argd);
+        eventManager->handleEvent(updateGuiEvent);
+    LIA_CATCH_EMPTY
     return true;
 }
 

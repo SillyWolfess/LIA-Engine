@@ -51,6 +51,8 @@ bool LIA::Component::subscribe(LIA::ComponentEvent event) {
         return true;
     } else if (event == ComponentEvent::OPTION_ACTION) {
         getEventManager()->subscribe("option_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::optionChangedHandler, this, std::placeholders::_1));
+    } else if (event == ComponentEvent::TIMER) {
+        getEventManager()->subscribe("timer", LIA::EventType::GUI, __FILE__, std::bind(&Component::timerHandler, this, std::placeholders::_1));
     } else {
         LIA_error("Subscription event unknown");
         return false;
@@ -140,6 +142,17 @@ bool LIA::Component::optionChangedHandler(LIA::Event& event) {
         return false;
     }
     return onOptionChanged(event);
+}
+
+bool LIA::Component::timerHandler(LIA::Event& event) {
+    if (event.name.compare("timer") != 0) {
+        return false;
+    }
+    return onTimer(event);
+}
+
+bool LIA::Component::onTimer(LIA::Event& event) {
+    return false;
 }
 
 bool LIA::Component::onTick(LIA::Event& event) {

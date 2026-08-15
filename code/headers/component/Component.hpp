@@ -12,7 +12,7 @@ namespace LIA {
     class KeybindingManager;
     class Gui;
     class AppWindow;
-    enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW, CHECKBOX_ACTION, OPTION_ACTION, POSITION_CHANGED};
+    enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW, CHECKBOX_ACTION, OPTION_ACTION, POSITION_CHANGED, TIMER};
     class Component {
         public:
             bool initCore();
@@ -26,6 +26,7 @@ namespace LIA {
             bool checkboxEventHandler(LIA::Event&);
             bool positionChangedEventHandler(LIA::Event&);
             bool optionChangedHandler(LIA::Event&);
+            bool timerHandler(LIA::Event&);
         protected:
             int _identifier = -1;
             virtual bool registerHandlers();
@@ -38,6 +39,7 @@ namespace LIA {
             virtual bool onCheckboxAction(LIA::Event&);
             virtual bool onPositionChanged(LIA::Event&);
             virtual bool onOptionChanged(LIA::Event&);
+            virtual bool onTimer(LIA::Event&);
             AppWindow* getAppWindow() { return _appWindow;  }
             EventManager* getEventManager() { return _eventManager; }
             ObjectManager* getObjectManager() { return _objectManager; }

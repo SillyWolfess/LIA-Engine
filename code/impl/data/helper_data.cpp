@@ -21,6 +21,11 @@ bool LIA::isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale)
             target.y < pos.y && pos.y < target.y + scale.y;
 }
 
+bool LIA::isInRangeCentered2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale) {
+    return  target.x - (scale.x * 0.5f) < pos.x && pos.x < target.x + (scale.x * 0.5f) &&
+        target.y - (scale.y * 0.5f) < pos.y && pos.y < target.y + (scale.y * 0.5f);
+}
+
 void LIA::copyPadding(Padding& target, Padding& source) {
     target.left = source.left;
     target.right = source.right;

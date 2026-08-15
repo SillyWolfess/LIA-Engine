@@ -24,6 +24,7 @@ namespace LIA {
     void copy(LIAV3& target, const LIAV3& source);
 
     bool isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);
+    bool isInRangeCentered2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);
     void applyForceByAngleXZ(LIAV3& vec, float angle, float force);
     void setZero(LIAV3& target);
     void setOne(LIAV3& target);

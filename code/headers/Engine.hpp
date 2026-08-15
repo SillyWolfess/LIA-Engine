@@ -16,6 +16,7 @@
 
 #include "watcher/Watcher.hpp"
 #include "counters/FpsCounter.hpp"
+#include "counters/TimeCounter.hpp"
 
 #include "windows/keyMappingWindow.hpp"
 #include "windows/settingsWindow.hpp"
@@ -43,6 +44,9 @@ namespace LIA
             KeyMappingWindow _keyMappingWindow;
             SettingsWindow _settingsWindow;
             DebugWindow _debugWindow;
+
+            TimeCounter _counterDraw;
+            TimeCounter _counterUpdate;
 
             bool registerEventHandlers();
             bool handleGui(Event& event);
