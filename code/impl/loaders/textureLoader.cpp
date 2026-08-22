@@ -9,6 +9,7 @@
 #include "3d-party/stb_image.h"
 
 bool LIA::TextureLoader::loadBMP(GLuint &textureID_out, std::string imagepath) {
+	stbi_set_flip_vertically_on_load(true);
 	LIA_TRY
 		const bool debug_texture = false;
 		LIA_debug_f("Reading bmp image {}", imagepath);
@@ -96,6 +97,7 @@ bool LIA::TextureLoader::loadBMP(GLuint &textureID_out, std::string imagepath) {
 }
 
 bool LIA::TextureLoader::_loadTexture(GLuint &textureID_out, std::string imagepath, GLenum format) {
+	stbi_set_flip_vertically_on_load(true);
 	LIA_TRY
 		LIA_debug_f("Reading image {}", imagepath);
 		int width, height, nrChannels;
@@ -145,6 +147,7 @@ bool LIA::TextureLoader::loadTextureRGB(GLuint &textureID_out, std::string image
 }
 
 bool LIA::TextureLoader::loadTexture(GLuint &textureID_out, std::string imagepath) {
+	stbi_set_flip_vertically_on_load(true);
     LIA_debug_f("Reading image {}", imagepath);
 	int width, height, nrChannels;
 	unsigned char *data = stbi_load(imagepath.c_str(), &width, &height, &nrChannels, 0); 
@@ -192,6 +195,7 @@ bool LIA::TextureLoader::loadTexture(GLuint &textureID_out, std::string imagepat
 }
 
 bool LIA::TextureLoader::loadTextureHDR(GLuint &textureID_out, std::string imagepath) {
+	stbi_set_flip_vertically_on_load(true);
     LIA_debug_f("Reading image HDR [RGB locked] {}", imagepath);
 	int width, height, nrChannels;
 	unsigned char *data = stbi_load(imagepath.c_str(), &width, &height, &nrChannels, 0); 
