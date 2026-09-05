@@ -24,6 +24,12 @@ void cursor_position_callback(GLFWwindow* window, double x, double y){
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (action != GLFW_PRESS && action != GLFW_RELEASE) {
+        return;
+    }
+    if (button != GLFW_MOUSE_BUTTON_LEFT && button != button == GLFW_MOUSE_BUTTON_RIGHT) {
+        return;
+    }
     if (!glfwGetWindowAttrib(window, GLFW_HOVERED)) {
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
             LIA::AppWindow::setButtonEvent(1);
@@ -36,16 +42,24 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
             LIA::AppWindow::setCp(0, 0);
         }
     } else {
-        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
-            double x, y;
-            glfwGetCursorPos(window, &x, &y);
-            LIA::AppWindow::mouseClick(0, x, y);
-        }
-        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
-            double x, y;
-            glfwGetCursorPos(window, &x, &y);
-            LIA::AppWindow::mouseRelease(0, x, y);
-        }
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            if (action == GLFW_PRESS) {
+                LIA::AppWindow::mouseClick(1, x, y);
+            }
+            else if (action == GLFW_RELEASE) {
+                LIA::AppWindow::mouseRelease(1, x, y);
+            }
+
+        } else if (button == GLFW_MOUSE_BUTTON_LEFT) {
+            if (action == GLFW_PRESS) {
+                LIA::AppWindow::mouseClick(0, x, y);
+            } else if (action == GLFW_RELEASE) {
+                LIA::AppWindow::mouseRelease(0, x, y);
+            }
+        } 
+        
     }
 }
 

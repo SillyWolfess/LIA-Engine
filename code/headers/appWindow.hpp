@@ -66,11 +66,11 @@ namespace LIA
             }
 
             static void mouseClick(int button, float x, float y) {
-                _mouseController.setMouseClick(x, y);
+                _mouseController.setMouseClick(button, x, y);
             }
 
             static void mouseRelease(int button, float x, float y) {
-                _mouseController.setMouseRelease(x, y);
+                _mouseController.setMouseRelease(button, x, y);
             }
 
             static int getCpX() { return _cpX; }
@@ -87,6 +87,11 @@ namespace LIA
             static bool isMousePressed() { return _mouseController.isMouseClicked(); }
             static bool wasMouseClicked() { return _mouseController.wasMouseClicked(); }
             static bool isMouseHeld() { return _mouseController.isHeld(); }
+
+            static bool isRMousePressed() { return _mouseController.isRMouseClicked(); }
+            static bool wasRMouseClicked() { return _mouseController.wasRMouseClicked(); }
+            static bool isRMouseHeld() { return _mouseController.isRHeld(); }
+
             static void resetState() { _mouseController.resetState(); }
 
         //    static void windowResized(int w, int h) { windowW = w; windowH = h; };
