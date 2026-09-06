@@ -98,6 +98,10 @@ LIA::XmlLoader::XmlNode LIA::XmlLoader::getNode(XmlData& data, std::string name)
     return data.nodes.at(name);
 }
 
+bool LIA::XmlLoader::hasNode(XmlData& data, std::string name) {
+    return data.nodes.find(name) != data.nodes.end();
+}
+
 std::string LIA::XmlLoader::getValue(XmlData& data, std::string name) {
     return data.values.at(name);
 }
@@ -296,6 +300,14 @@ LIA::Position LIA::XmlLoader::getPosition(XmlData& data) {
     return getPosition(node);
 }
 
+LIA::Position LIA::XmlLoader::getPositionDefault0(XmlData& data) {
+    if (!hasNode(data, "position")) {
+        return emptyPosition();
+    }
+    XmlNode node = getNode(data, "position");
+    return getPosition(node);
+}
+
 LIA::Position LIA::XmlLoader::getPosition(XmlData& data, std::string nodeName) {
     XmlNode node = getNode(data, nodeName);
     return getPosition(node);
@@ -306,12 +318,28 @@ LIA::Rotation LIA::XmlLoader::getRotation(XmlData& data) {
     return getRotation(node);
 }
 
+LIA::Rotation LIA::XmlLoader::getRotationDefault0(XmlData& data) {
+    if (!hasNode(data, "rotation")) {
+        return emptyRotation();
+    }
+    XmlNode node = getNode(data, "rotation");
+    return getRotation(node);
+}
+
 LIA::Direction LIA::XmlLoader::getDirection(XmlData& data) {
     XmlNode node = getNode(data, "direction");
     return getDirection(node);
 }
 
 LIA::Scale LIA::XmlLoader::getScale(XmlData& data) {
+    XmlNode node = getNode(data, "scale");
+    return getScale(node);
+}
+
+LIA::Scale LIA::XmlLoader::getScaleDefault1(XmlData& data) {
+    if (!hasNode(data, "scale")) {
+        return emptyScale();
+    }
     XmlNode node = getNode(data, "scale");
     return getScale(node);
 }

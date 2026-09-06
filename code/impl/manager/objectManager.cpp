@@ -335,7 +335,6 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
         if (customName.compare("") != 0) {
             object->_name = customName;
         }
-//        if (!object->_modelInfo.infoLoaded) {
         if (object->_modelInfo.id < 0) {
             LIA_fatal_f("Failed to get info for the model of object {}", name);
             return false;
@@ -343,21 +342,26 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
         LIA_trace("Setting object type");
         setType(object, type);
         LIA_trace("Setting posititon");
-        Position position = xmlLoader.getPosition(xmlObject);
+        Position position = xmlLoader.getPositionDefault0(xmlObject);
         setPosition(object, position);
         LIA_trace("Setting scale");
-        Scale scale = xmlLoader.getScale(xmlObject);
+        Scale scale = xmlLoader.getScaleDefault1(xmlObject);
         setScale(object, scale);
         LIA_trace("Setting rotation");
-        Rotation rotation = xmlLoader.getRotation(xmlObject);
+        Rotation rotation = xmlLoader.getRotationDefault0(xmlObject);
         rotation = convertRotation(rotation);
         setRotation(object, rotation);
         
         LIA_trace("Getting physics node");
-        XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
-        object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
-        object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
-
+        if (xmlLoader.hasNode(xmlObject, "physics")) {
+            XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
+            object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
+            object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
+        }
+        else {
+            object->_collison._grounded = false;
+            object->_physics._mass = 1;
+        }
         if (!loadModel(*object)) {
             LIA_error("Failed to load model");
             return false;

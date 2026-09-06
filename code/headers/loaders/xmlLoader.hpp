@@ -33,6 +33,7 @@ namespace LIA {
             char makeChar(std::string value) { return value.length() == 0 ? '\0' : value[0]; }
             
             XmlNode getNode(XmlData&, std::string);
+            bool hasNode(XmlData&, std::string);
             std::string getAttribute(XmlNode&, std::string);
             std::string getAttribute(XmlNode&, std::string, std::string);
             std::string getValue(XmlData&, std::string);
@@ -65,6 +66,7 @@ namespace LIA {
 
             Position getPosition(XmlNode&);
             Position getPosition(XmlData&);
+            Position getPositionDefault0(XmlData&);
             Position getPosition(XmlData&, std::string);
             Position getPosition2D(XmlNode&);
 
@@ -76,11 +78,13 @@ namespace LIA {
             
             Rotation getRotation(XmlNode&);
             Rotation getRotation(XmlData&);
+            Rotation getRotationDefault0(XmlData&);
 
             Scale getScale2D(XmlData&, std::string);
             Scale getScale2D(XmlNode&);
             Scale getScale(XmlNode&);
             Scale getScale(XmlData&);
+            Scale getScaleDefault1(XmlData&);
 
             Color getColor(XmlNode&);
             Int2D getInt2D(XmlNode&);
