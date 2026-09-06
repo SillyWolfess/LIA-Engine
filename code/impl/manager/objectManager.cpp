@@ -34,10 +34,26 @@ int LIA::ObjectManager::create(std::string objectName) {
         XmlLoader xmlLoader;
         if (objectPathDef.compare("") == 0) {
             // Get data from xml
-            XmlLoader::XmlData xmlData = xmlLoader.load("./data/objects/list.xml");
+            XmlLoader::XmlData xmlData;
+            if (_pathCache.contains("./data/objects/list.xml")) {
+                LIA_trace("Reading ./data/objects/list.xml from cache");
+                xmlData = _pathCache.at("./data/objects/list.xml");
+            } else {
+                LIA_trace("Reading ./data/objects/list.xml from filesystem");
+                xmlData = xmlLoader.load("./data/objects/list.xml");
+                _pathCache.emplace("./data/objects/list.xml", xmlData);
+            }
             objectPathDef = xmlData.values.at(objectName);
         }
-        XmlLoader::XmlData xmlObjectData = xmlLoader.load(objectPathDef);
+        XmlLoader::XmlData xmlObjectData;
+        if (_objectCache.contains(objectPathDef)) {
+            LIA_trace_f("Reading {} with path {} from cache", objectName, objectPathDef);
+            xmlObjectData = _objectCache.at(objectPathDef);
+        } else {
+            LIA_trace_f("Reading {} with path {} from filesystem", objectName, objectPathDef);
+            xmlObjectData = xmlLoader.load(objectPathDef);
+            _objectCache.emplace(objectPathDef, xmlObjectData);
+        }
         std::string mModel = xmlLoader.getString(xmlObjectData, "model");
         std::string oName = xmlLoader.getString(xmlObjectData, "name");
         std::string materialLib = xmlLoader.getString(xmlObjectData, "materialLib", "");
@@ -317,8 +333,10 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
         XmlLoader xmlLoader;
         XmlLoader::XmlData xmlObject;
         if (_cache.contains(path)) {
+            LIA_trace_f("Reading {} with path {} from cache", customName, path);
             xmlObject = _cache.at(path);
         } else {
+            LIA_trace_f("Reading {} with path {} from filesystem", customName, path);
             xmlObject = xmlLoader.load(path);
             _cache.emplace(path, xmlObject);
         }
