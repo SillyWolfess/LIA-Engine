@@ -565,7 +565,9 @@ void LIA::Window::compute(AppWindow* appWindow) {
 
 void LIA::Window::computeScale() {
     float yShift = _style.padding.top;
+    float xShift = _style.padding.left;
     float xMax = 0.0f;
+    float yMax = 0.0f;
     if (_hasHeader) {
         yShift = yShift + _headerSize;
     }
@@ -601,14 +603,32 @@ void LIA::Window::computeScale() {
             }
             yShift = yShift + button._scale.y + _style.padding.bottom;
         } else {
-            yShift = yShift + button._scale.y + _style.padding.bottom;
+            if (_childrenAlign == CHALIGN::VERTICAL) {
+                yShift = yShift + button._scale.y + _style.padding.bottom;
+            }
+            else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                xShift = xShift + button._scale.x + _style.padding.right;
+            }
         }
-        if (_style.padding.left + button._scale.x + _style.padding.right > xMax) {
-            xMax = _style.padding.left + button._scale.x + _style.padding.right;
+        if (_childrenAlign == CHALIGN::VERTICAL) {
+            if (xShift + button._scale.x + _style.padding.right > xMax) {
+                xMax = xShift + button._scale.x + _style.padding.right;
+            }
+        }
+        if (_childrenAlign == CHALIGN::HORIZONTAL) {
+            if (yShift + button._scale.y + _style.padding.bottom > yMax) {
+                yMax = yShift + button._scale.y + _style.padding.bottom;
+            }
         }
     }
     if (_scale.y < yShift) {
         _scale.y = yShift;
+    }
+    if (_scale.y < yMax) {
+        _scale.y = yMax;
+    }
+    if (_scale.x < xShift) {
+        _scale.x = xShift;
     }
     if (_scale.x < xMax) {
         _scale.x = xMax;
@@ -642,6 +662,7 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
         _position.y = _position.y * (appScale.y / _lastAppScale.y);
     }
     float yShift = _style.padding.top;
+    float xShift = _style.padding.left;
     if (_hasHeader) {
         yShift = yShift + _headerSize;
     }
@@ -654,7 +675,7 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
     } 
     int gridX = 0;
     for (GuiObject& button : _children) {
-        button._position.x = _position.x + _style.padding.left;
+        button._position.x = _position.x + xShift;
         button._position.y = _position.y + yShift;
         button._position.z = _position.z + zOffset;
         if (button._type == GuiObjectType::GRID) {
@@ -671,7 +692,7 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
         } else if (button._type == GuiObjectType::LIST) {
             button._position.y = _position.y;
             for (GuiObject& ch: _childrenMap[button._id]) {
-                ch._position.x = button._position.x;
+                ch._position.x = button._position.x + xShift;
                 ch._position.y = button._position.y + yShift;
                 ch._position.z = button._position.z;
                 LIA_trace_f("yShift = {:.2f} + {:.2f} + {:.2f} = {:.2f}", yShift, ch._scale.y, _style.padding.bottom, (yShift + ch._scale.y + _style.padding.bottom));
@@ -680,16 +701,20 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
             }
         } else if (button._type == GuiObjectType::OPTIONS) {
             button._position.y = _position.y;
-            float xShift = 0.0f;
+            float xShiftO = xShift;
             for (GuiObject& ch : _childrenMap[button._id]) {
-                ch._position.x = button._position.x + xShift;
+                ch._position.x = button._position.x + xShiftO;
                 ch._position.y = button._position.y + yShift;
                 ch._position.z = button._position.z;
-                xShift = xShift + ch._scale.x;
+                xShiftO = xShiftO + ch._scale.x;
             }
             yShift = yShift + button._scale.y + _style.padding.bottom;
         } else {
-            yShift = yShift + button._scale.y + _style.padding.bottom;
+            if (_childrenAlign == CHALIGN::VERTICAL) {
+                yShift = yShift + button._scale.y + _style.padding.bottom;
+            } else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                xShift = xShift + button._scale.x + _style.padding.right;
+            }
         }
 
         LIA_trace_f("button[{}].position = {:.2f} x {:.2f} x {:.2f}", button._id, button._position.x, button._position.y, button._position.z);
@@ -1045,6 +1070,13 @@ LIA::ALIGN LIA::Window::resolve(std::string al) {
         return ALIGN::CENTER;
     }
     return ALIGN::NONE;
+}
+
+LIA::CHALIGN LIA::Window::resolveCh(std::string al) {
+    if (al.compare("horizontal") == 0) {
+        return CHALIGN::HORIZONTAL;
+    }
+    return CHALIGN::VERTICAL;
 }
 
 void LIA::Window::setInitAlign(std::string initAlign) {

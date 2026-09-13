@@ -32,9 +32,11 @@ namespace LIA {
         int fontSize;
     };
     enum class ALIGN {NONE, RIGHT, CENTER, BOTTOM};
+    enum class CHALIGN {VERTICAL, HORIZONTAL};
     class Window {
         private:
             ALIGN resolve(std::string);
+            CHALIGN resolveCh(std::string);
 
             std::vector<GuiObject> _children;
             std::map<std::string, std::vector<GuiObject>> _childrenMap;
@@ -57,6 +59,7 @@ namespace LIA {
             std::string _hooveredTooltip;
             ALIGN _alignment;
             ALIGN _initAlign;
+            CHALIGN _childrenAlign;
         
             float _headerSize;
             bool _allwaysOnTop;
@@ -91,6 +94,7 @@ namespace LIA {
 
             void setStyle(struct Style style) { _style = style; };
             void setAlignment(std::string value) { _alignment = resolve(value); };
+            void setChAlignment(std::string value) { _childrenAlign = resolveCh(value); };
 
             void setName(std::string name) { _name = name; };
             const std::string getName() { return _name; };

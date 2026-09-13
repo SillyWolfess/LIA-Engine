@@ -147,6 +147,9 @@ bool LIA::Gui::loadWindow(Window& window, std::string path, bool initShow) {
         LIA_trace("Setting initial align");
         std::string initAlign = xmlLoader.getString(xmlWindow, "initAlign", "none");
         window.setInitAlign(initAlign);
+        LIA_trace("Setting children align");
+        std::string chAlign = xmlLoader.getString(xmlWindow, "chAlign", "none");
+        window.setChAlignment(chAlign);
         LIA_trace("Setting movable");
         bool isMovable = xmlLoader.getBoolean(xmlWindow, "movable", false);
         window.setMovable(isMovable);
