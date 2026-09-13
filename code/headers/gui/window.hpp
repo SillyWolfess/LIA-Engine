@@ -327,6 +327,7 @@ namespace LIA {
             void removeGrab();
             void resize(AppWindow*);
             void clear();
+            LIA::Scale getScale() { return _scale;  }
     };
 }
 #endif

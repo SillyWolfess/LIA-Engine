@@ -593,15 +593,22 @@ void LIA::Window::computeScale() {
                 yShift = yShift + ch._scale.y + _style.padding.bottom;
             }
         } else if (button._type == GuiObjectType::OPTIONS) {
-            float xShift = 0.0f;
+            float xShiftO = xShift;
             for (GuiObject& ch : _childrenMap[button._id]) {
-                float xSize = _style.padding.left + xShift + ch._scale.x + _style.padding.right;
+                float xSize = _style.padding.left + xShiftO + ch._scale.x + _style.padding.right;
                 if (xSize > xMax) {
                     xMax = xSize;
                 }
-                xShift = xShift + ch._scale.x;
+                xShiftO = xShiftO + ch._scale.x;
             }
-            yShift = yShift + button._scale.y + _style.padding.bottom;
+            if (xShiftO > xShift) {
+                xShift = xShiftO;
+            }
+            if (_childrenAlign == CHALIGN::VERTICAL) {
+                yShift = yShift + button._scale.y + _style.padding.bottom;
+            } else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                xShift = xShift + _style.padding.right;
+            }
         } else {
             if (_childrenAlign == CHALIGN::VERTICAL) {
                 yShift = yShift + button._scale.y + _style.padding.bottom;
@@ -701,6 +708,7 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
             }
         } else if (button._type == GuiObjectType::OPTIONS) {
             button._position.y = _position.y;
+            button._position.x = 0;
             float xShiftO = xShift;
             for (GuiObject& ch : _childrenMap[button._id]) {
                 ch._position.x = button._position.x + xShiftO;
@@ -708,7 +716,14 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
                 ch._position.z = button._position.z;
                 xShiftO = xShiftO + ch._scale.x;
             }
-            yShift = yShift + button._scale.y + _style.padding.bottom;
+            if (xShiftO > xShift) {
+                xShift = xShiftO;
+            }
+            if (_childrenAlign == CHALIGN::VERTICAL) {
+                yShift = yShift + button._scale.y + _style.padding.bottom;
+            } else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                xShift = xShift + _style.padding.right;
+            }
         } else {
             if (_childrenAlign == CHALIGN::VERTICAL) {
                 yShift = yShift + button._scale.y + _style.padding.bottom;

@@ -30,6 +30,8 @@ namespace LIA
                 int height;
 
                 int windowMode;
+                bool enableResize;
+                bool enableMaximize;
             } _glfwSettings;
 
             struct s_windowModes {
@@ -155,6 +157,7 @@ namespace LIA
             bool isFullscreen() { return _glfwSettings.fullscreen; }
             void setMode(int);
             void toogleFullscreen();
+            void resize(int, int);
     };
 }
 #endif

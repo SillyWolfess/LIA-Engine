@@ -4,6 +4,7 @@
 #include <format>
 #include <map>
 #include "Engine.hpp"
+#include "GLFW/glfw3native.h"
 
 int LIA::AppWindow::_cpX = 0;
 int LIA::AppWindow::_cpY = 0;
@@ -83,6 +84,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void LIA::AppWindow::resize(int x, int y) {
+    if (_glfwSettings.fullscreen) {
+        return;
+    }
+    _glfwSettings.width = x;
+    _glfwSettings.height = y;
+    glfwGetWindowPos(_glfwWindow, &windowLastX, &windowLastY);
+    glfwSetWindowMonitor(_glfwWindow, NULL, windowLastX, windowLastY, x, y, GLFW_DONT_CARE);
+}
+
 void LIA::AppWindow::toogleFullscreen() {
     _glfwSettings.fullscreen = !_glfwSettings.fullscreen;
     LIA_trace_f("fullscreen changed to {}", _glfwSettings.fullscreen);
@@ -142,6 +153,8 @@ void LIA::AppWindow::loadSettings() {
     _glfwSettings.vSync = xmlLoader.getBoolean(xmlData, "vSync", true);
 
     _glfwSettings.fullscreen = xmlLoader.getBoolean(xmlData, "fullscreen", false);
+    _glfwSettings.enableMaximize = xmlLoader.getBoolean(xmlData, "enableMaximize", true);
+    _glfwSettings.enableResize = xmlLoader.getBoolean(xmlData, "enableResize", true);
 
     std::map<std::string, XmlLoader::XmlNode> nodes = xmlData.nodes;
     XmlLoader::XmlNode backgroundNode = nodes.at("background");
@@ -169,21 +182,24 @@ bool LIA::AppWindow::init(std::string windowName) {
     }
 
     LIA_info(std::format("Init GLFW {}", glfwGetVersionString()));
-    glfwSetErrorCallback( error_callback_glfw );
+    glfwSetErrorCallback(error_callback_glfw);
 
     if (!glfwInit()) {
-       LIA_fatal("Could not start GLFW3.");
-       return false;
+        LIA_fatal("Could not start GLFW3.");
+        return false;
     }
-    
+
     loadSettings();
     loadResolutions();
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, _glfwSettings.major );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, _glfwSettings.minor );
-    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, _glfwSettings.compact );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    glfwWindowHint( GLFW_SAMPLES, _glfwSettings.samples );
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, _glfwSettings.major);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, _glfwSettings.minor);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, _glfwSettings.compact);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, _glfwSettings.samples);
+    if (!_glfwSettings.enableMaximize && !_glfwSettings.enableResize) {
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    }
 
     _glfwWindow = glfwCreateWindow( _glfwSettings.width, _glfwSettings.height, windowName.c_str(), NULL, NULL );
     if ( !_glfwWindow ) {
