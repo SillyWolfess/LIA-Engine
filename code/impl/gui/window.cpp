@@ -601,12 +601,12 @@ void LIA::Window::computeScale() {
                 }
                 xShiftO = xShiftO + ch._scale.x;
             }
-            if (xShiftO > xShift) {
-                xShift = xShiftO;
-            }
             if (_childrenAlign == CHALIGN::VERTICAL) {
                 yShift = yShift + button._scale.y + _style.padding.bottom;
             } else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                if (xShiftO > xShift) {
+                    xShift = xShiftO;
+                }
                 xShift = xShift + _style.padding.right;
             }
         } else {
@@ -708,20 +708,20 @@ void LIA::Window::compute(AppWindow* appWindow, bool initShow) {
             }
         } else if (button._type == GuiObjectType::OPTIONS) {
             button._position.y = _position.y;
-            button._position.x = 0;
-            float xShiftO = xShift;
+            button._position.x = _position.x + xShift;
+            float xShiftO = 0.0f;
             for (GuiObject& ch : _childrenMap[button._id]) {
                 ch._position.x = button._position.x + xShiftO;
                 ch._position.y = button._position.y + yShift;
                 ch._position.z = button._position.z;
                 xShiftO = xShiftO + ch._scale.x;
             }
-            if (xShiftO > xShift) {
-                xShift = xShiftO;
-            }
             if (_childrenAlign == CHALIGN::VERTICAL) {
                 yShift = yShift + button._scale.y + _style.padding.bottom;
             } else if (_childrenAlign == CHALIGN::HORIZONTAL) {
+                if (xShiftO > xShift) {
+                    xShift = xShiftO;
+                }
                 xShift = xShift + _style.padding.right;
             }
         } else {
