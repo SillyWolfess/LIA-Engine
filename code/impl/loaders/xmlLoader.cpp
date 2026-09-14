@@ -103,6 +103,9 @@ bool LIA::XmlLoader::hasNode(XmlData& data, std::string name) {
 }
 
 std::string LIA::XmlLoader::getValue(XmlData& data, std::string name) {
+    if (data.values.find(name) == data.values.end()) {
+        LIA_error_f("No value for '{}'", name);
+    }
     return data.values.at(name);
 }
 
@@ -157,6 +160,10 @@ LIA::Color LIA::XmlLoader::getColor(XmlData& data, std::string name) {
 }
 
 std::string LIA::XmlLoader::getAttribute(XmlNode& node, std::string attribute) {
+    if (node.attributes.find(attribute) == node.attributes.end()) {
+        LIA_fatal_f("Missing mandatory attribute {}", attribute);
+        return node.attributes.at(attribute);
+    }
     return node.attributes.at(attribute);
 }
 

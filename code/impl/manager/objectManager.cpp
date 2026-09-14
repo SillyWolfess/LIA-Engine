@@ -1,3 +1,4 @@
+#include <iostream>
 #include "manager/objectManager.hpp"
 #include "manager/shaderManager.hpp"
 #include "graphics/scene.hpp"
@@ -43,6 +44,10 @@ int LIA::ObjectManager::create(std::string objectName) {
                 xmlData = xmlLoader.load("./data/objects/list.xml");
                 _pathCache.emplace("./data/objects/list.xml", xmlData);
             }
+            if (xmlData.values.find(objectName) == xmlData.values.end()) {
+                LIA_error_f("Cannot find object definition for '{}'", objectName);
+                return -1;
+            }
             objectPathDef = xmlData.values.at(objectName);
         }
         XmlLoader::XmlData xmlObjectData;
@@ -59,6 +64,10 @@ int LIA::ObjectManager::create(std::string objectName) {
         std::string materialLib = xmlLoader.getString(xmlObjectData, "materialLib", "");
 
         objectId = create();
+        if (objectId < 0) {
+            LIA_error_f("Failed to create object for '{}'", objectName);
+            return -1;
+        }
         Object* object = get(objectId);
         object->_name = oName;
         object->_materialLib = materialLib;
@@ -249,7 +258,6 @@ void LIA::ObjectManager::pass(Scene *scene) {
     }   
 }
 
-#include <iostream>
 void LIA::ObjectManager::print(Object* object) {
     LIA_debug(std::vformat("{}", std::make_format_args(object->_name)));
 }
@@ -263,7 +271,7 @@ void LIA::ObjectManager::print() {
 
 void LIA::ObjectManager::setModel(Object* object, std::string modelName) {
     LIA_TRY
-        LIA_debug(std::vformat("Setting model {} to object {}", std::make_format_args(modelName, object->_name)));
+        LIA_debug_f("Setting model {} to object {}", modelName, object->_name);
         Model* model = _modelManager.create(modelName);
         object->_modelInfo.name = modelName;
         object->_modelInfo.id = model->indx;
@@ -389,10 +397,11 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
 }
 
 bool LIA::ObjectManager::loadModel(Object& object) {
-    LIA_info("Loading objects");
+    LIA_info("Loading model of object");
     Model* model = _modelManager.get(object._modelInfo.id);
     if (!model->isInGpu) {
         if (!_modelManager.loadModel(object._modelInfo.id)) {
+            LIA_error_f("Failed to load model {} into gpu for object {}", object._modelInfo.id, object._name);
             return false;
         }
         model = _modelManager.get(object._modelInfo.id);
