@@ -273,6 +273,10 @@ void LIA::ObjectManager::setModel(Object* object, std::string modelName) {
     LIA_TRY
         LIA_debug_f("Setting model {} to object {}", modelName, object->_name);
         Model* model = _modelManager.create(modelName);
+        if (model == nullptr) {
+            LIA_error_f("Failed to create model {}", modelName);
+            return;
+        }
         object->_modelInfo.name = modelName;
         object->_modelInfo.id = model->indx;
         LIA_debug("Done");

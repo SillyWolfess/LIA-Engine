@@ -49,6 +49,10 @@ LIA::Model* LIA::ModelManager::create(std::string modelName) {
         if (modelPathDef.compare("") == 0) {
             // Get data from xml
             XmlLoader::XmlData xmlData = xmlLoader.load("./data/models/list.xml");
+            if (xmlData.values.find(modelName) == xmlData.values.end()) {
+                LIA_error_f("Failed to find model definition for {}", modelName);
+                return nullptr;
+            }
             modelPathDef = xmlData.values.at(modelName);
         }
         XmlLoader::XmlData xmlModelData = xmlLoader.load(modelPathDef);

@@ -7,14 +7,21 @@ bool LIA::Math::isColliding(Object* target, Object* source) {
     return isColliding(target, source->_position, source->_scale) || isColliding(source, target->_position, target->_scale);
 }
 
+bool LIA::Math::isColliding(CollidingObject* target, CollidingObject* source) {
+    // TODO needs to do reverse check, single does not work if target is smaller than source
+    return isColliding(target, source->position, source->scale) || isColliding(source, target->position, target->scale);
+}
+
+bool LIA::Math::isColliding(CollidingObject* target, Object* source) {
+    // TODO needs to do reverse check, single does not work if target is smaller than source
+    return isColliding(target, source->_position, source->_scale) || isColliding(source, target->position, target->scale);
+}
+
 float LIA::Math::toRadians(float euql) {
     return euql * PiOver180;
 }
 
-bool LIA::Math::isColliding(Object* target, Position newPosition, Scale scale) {
-    const Position targetPos = target->_position;
-    const Scale targetScale = target->_scale;
-        
+bool LIA::Math::isColliding(Position targetPos, Scale targetScale, Position newPosition, Scale scale) {
     bool xLeft = isInBounds(newPosition.x - scale.x, targetPos.x, targetScale.x);
     bool xRight = isInBounds(newPosition.x + scale.x, targetPos.x, targetScale.x);
     bool yUp = isInBounds(newPosition.y - scale.y, targetPos.y, targetScale.y);
@@ -25,17 +32,31 @@ bool LIA::Math::isColliding(Object* target, Position newPosition, Scale scale) {
     }
     if (yUp || yDown) {
         if (!xLeft && !xRight) {
-              return false;
-        }     
+            return false;
+        }
         return true;
     }
     if (xLeft || xRight) {
         if (!yUp && !yDown) {
-               return false;
+            return false;
         }
         return true;
     }
     return false;
+}
+
+bool LIA::Math::isColliding(CollidingObject* target, Position newPosition, Scale scale) {
+    const Position targetPos = target->position;
+    const Scale targetScale = target->scale;
+
+    return isColliding(targetPos, targetScale, newPosition, scale);
+}
+
+bool LIA::Math::isColliding(Object* target, Position newPosition, Scale scale) {
+    const Position targetPos = target->_position;
+    const Scale targetScale = target->_scale;
+        
+    return isColliding(targetPos, targetScale, newPosition, scale);
 }
 
 bool LIA::Math::isInBounds(float source, float target, float bound) {
