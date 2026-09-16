@@ -88,6 +88,14 @@ namespace LIA {
             this->source = source;
         }
     };
+    struct DrawPassEvent : Event {
+        DrawPassEvent() = delete;
+        DrawPassEvent(std::string source) {
+            this->type = EventType::SIMULATION;
+            this->name = "drawPass";
+            this->source = source;
+        }
+    };
     /***
     * @param {string} source
     * @param {string} action

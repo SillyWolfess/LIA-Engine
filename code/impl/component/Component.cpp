@@ -51,12 +51,19 @@ bool LIA::Component::subscribe(LIA::ComponentEvent event) {
         return true;
     } else if (event == ComponentEvent::OPTION_ACTION) {
         getEventManager()->subscribe("option_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::optionChangedHandler, this, std::placeholders::_1));
+        return true;
     } else if (event == ComponentEvent::TIMER) {
         getEventManager()->subscribe("timer", LIA::EventType::GUI, __FILE__, std::bind(&Component::timerHandler, this, std::placeholders::_1));
+        return true;
+    } else if (event == ComponentEvent::DRAW_PASS) {
+        getEventManager()->subscribe("drawPass", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::drawPassEventHandler, this, std::placeholders::_1));
+        return true;
     } else {
         LIA_error("Subscription event unknown");
         return false;
     }
+    LIA_error("Return statement missing");
+    return false;
 }
 
 bool LIA::Component::subscribe(std::string name) {
@@ -151,6 +158,13 @@ bool LIA::Component::timerHandler(LIA::Event& event) {
     return onTimer(event);
 }
 
+bool LIA::Component::drawPassEventHandler(LIA::Event& event) {
+    if (event.name.compare("drawPass") != 0) {
+        return false;
+    }
+    return onDrawPass(event);
+}
+
 bool LIA::Component::onTimer(LIA::Event& event) {
     return false;
 }
@@ -197,4 +211,8 @@ bool LIA::Component::init() {
 
 bool LIA::Component::afterInit() {
     return true;
+}
+
+bool LIA::Component::onDrawPass(LIA::Event& event) {
+    return false;
 }

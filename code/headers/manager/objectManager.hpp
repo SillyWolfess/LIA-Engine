@@ -17,6 +17,7 @@ namespace LIA {
             std::map<std::string, std::string> _paths;
             std::map<std::string, std::string> _templatePaths;
             std::vector<Object> _objects;
+            Scene* _scene;
             int create();
             std::string getPath(std::string);
             std::string getTemplatePath(std::string);
@@ -49,7 +50,9 @@ namespace LIA {
             bool loadObject(std::string, std::string);
             bool loadModel(Object&);
 
+            void setScene(Scene* scene) { _scene = scene; }
             void pass(Scene*);
+            void passObjectAt(Object& object, Position& position, Rotation& rotation, Scale& scale);
             void setModel(Object* object, std::string);
 
             void setPosition(Object* object, float x, float y, float z);

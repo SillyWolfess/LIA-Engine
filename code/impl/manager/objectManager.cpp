@@ -229,33 +229,39 @@ bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
     return true;
 }
 
+void LIA::ObjectManager::passObjectAt(Object& object, Position& position, Rotation& rotation, Scale& scale) {
+    Model* model = _modelManager.get(object._modelInfo.id);
+    if (model->isInGpu) {
+        std::vector<int> offsets = model->data.offsets;
+        for (int i = 0; i < offsets.size(); i++) {
+            int oSize = model->size - offsets[i];
+            if (i + 1 < offsets.size()) {
+                oSize = offsets[i + 1] - offsets[i];
+            }
+            _scene->add(
+                object._name,
+                position, rotation, scale,
+                model->vao, model->shader,
+                model->hasIndices, oSize,
+                object._materialLib != "" ? object._materialLib : model->materialLib,
+                model->data.materialName.size() <= i ? "" : model->data.materialName[i],
+                offsets[i]
+            );
+        }
+    }
+    else {
+        LIA_error(std::vformat("Object {} was not loaded", std::make_format_args(object._name)));
+    }
+}
+
 void LIA::ObjectManager::pass(Scene *scene) {
+    setScene(scene);
     for (Object &object: _objects) {
         if (object._hide) {
             continue;
         }
-        Model* model = _modelManager.get(object._modelInfo.id);
-        if (model->isInGpu) {
-            std::vector<int> offsets = model->data.offsets;
-            for (int i = 0; i < offsets.size(); i++) {
-                int oSize = model->size - offsets[i];
-                if (i + 1 < offsets.size()) {
-                    oSize = offsets[i + 1] - offsets[i];
-                }
-                scene->add(
-                    object._name,
-                    object._position, object._rotation, object._scale,
-                    model->vao, model->shader,
-                    model->hasIndices, oSize,
-                    object._materialLib != "" ? object._materialLib : model->materialLib,
-                    model->data.materialName.size() <= i ? "" : model->data.materialName[i],
-                    offsets[i]
-                );
-            }
-        } else {
-            LIA_error(std::vformat("Object {} was not loaded", std::make_format_args(object._name)));
-        }
-    }   
+        passObjectAt(object, object._position, object._rotation, object._scale);
+    }
 }
 
 void LIA::ObjectManager::print(Object* object) {

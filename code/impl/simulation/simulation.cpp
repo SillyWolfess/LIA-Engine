@@ -110,6 +110,10 @@ void LIA::Simulation::passObjects(Scene* scene) {
     }
     LIA_TRY
         _objManager->pass(scene);
+        LIA_trace("Pass objects event start");
+            LIA::DrawPassEvent drawPassEvent("game");
+            _eventManager->handleEvent(drawPassEvent);
+        LIA_trace("Pass objects event end");
     LIA_CATCH_EMPTY
     LIA_TRY
         for (int indx = 0; indx < _lights.size(); indx++) {
