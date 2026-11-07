@@ -166,6 +166,7 @@ bool LIA::Camera::loadFromSettings(std::string path) {
         _settings.locked = xmlLoader.getBoolean(xmlData, "locked", false);
         _settings.ortho = xmlLoader.getBoolean(xmlData, "ortho", false);
         _settings.position = xmlLoader.getPosition(xmlData, "position");
+        _settings.worldDirection = xmlLoader.getPosition(xmlData, "worldDirection");
         _settings.step = xmlLoader.getFloat(xmlData, "step", 0.1);
         _settings.controls = xmlLoader.getString(xmlData, "controls", "");
 
@@ -174,6 +175,7 @@ bool LIA::Camera::loadFromSettings(std::string path) {
         }
         setLocked(_settings.locked);
         setPosition(_settings.position);
+        setWorldDirection(_settings.worldDirection);
 
         if (_settings.controls != "") {
             _watcher.subscribe(_settings.controls);

@@ -34,6 +34,7 @@ namespace LIA {
                 bool locked;
                 bool ortho;
                 Position position;
+                Position worldDirection;
                 float step;
                 std::string controls;
             } _settings;
@@ -60,6 +61,7 @@ namespace LIA {
            void enableControls() { _cameraControls.enable(); }
            void disableControls() { _cameraControls.disable(); }
            void setPosition(Position& position) { copy(_position, position); };
+           void setWorldDirection(Position& wDirection) { copy(_worldDirection, wDirection); };
            void onPositionChanged(EventManager*);
            ~Camera();
     };

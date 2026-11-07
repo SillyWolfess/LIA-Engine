@@ -22,6 +22,7 @@ namespace LIA {
             static float sinOf(float);
             static float sq(float);
             static float lengthOfSq(LIA::LIAV2);
+            static float lengthOf(LIA::LIAV3);
             static void constrainPositionXY(LIA::Position& position, LIA::Position anker, float radius);
             static float toRadians(float);
     };

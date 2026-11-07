@@ -83,6 +83,10 @@ float LIA::Math::lengthOfSq(LIAV2 vector) {
     return (vector.x * vector.x) + (vector.y * vector.y);
 }
 
+float LIA::Math::lengthOf(LIAV3 vector) {
+    return (vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z);
+}
+
 float LIA::Math::sq(float x) {
     return x * x;
 }

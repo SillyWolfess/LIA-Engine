@@ -161,20 +161,26 @@ bool LIA::Simulation::loadObject(std::string path) {
         LIA_trace("Setting object type");
         _objManager->setType(object, type);
         LIA_trace("Setting posititon");
-        Position position = xmlLoader.getPosition(xmlObject);
+        Position position = xmlLoader.getPositionDefault0(xmlObject);
         _objManager->setPosition(object, position);
         LIA_trace("Setting scale");
-        Scale scale = xmlLoader.getScale(xmlObject);
+        Scale scale = xmlLoader.getScaleDefault1(xmlObject);
         _objManager->setScale(object, scale);
         LIA_trace("Setting rotation");
-        Rotation rotation = xmlLoader.getRotation(xmlObject);
+        Rotation rotation = xmlLoader.getRotationDefault0(xmlObject);
         rotation = convertRotation(rotation);
         _objManager->setRotation(object, rotation);
         
-        LIA_trace("Getting physics node");
-        XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
-        object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
-        object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
+        if (xmlLoader.hasNode(xmlObject, "physics")) {
+            LIA_trace("Getting physics node");
+            XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
+            object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
+            object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
+        } else {
+            LIA_trace("No physics node");
+            object->_collison._grounded = true;
+            object->_physics._mass = 0.0f;
+        }
         return true;
     LIA_CATCH_RETURN_FALSE
 }
