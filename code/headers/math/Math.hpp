@@ -25,6 +25,9 @@ namespace LIA {
             static float lengthOf(LIA::LIAV3);
             static void constrainPositionXY(LIA::Position& position, LIA::Position anker, float radius);
             static float toRadians(float);
+            static float normilizer2D(LIA::LIAV3);
+            static float normilizer(LIA::LIAV3);
+            static void normilize(LIA::LIAV3&);
     };
 }
 #endif // !LIA_MATH

@@ -111,3 +111,24 @@ void LIA::Math::constrainPositionXY(Position& position, Position anker, float ra
     position.x = anker.x + (scale * vec.x);
     position.y = anker.y + (scale * vec.y);
 }
+
+float LIA::Math::normilizer2D(LIA::LIAV3 vec) {
+    LIA::LIAV2 v2 = LIA::LIAV2();
+    v2.x = vec.x;
+    v2.y = vec.y;
+    return std::sqrt(LIA::Math::lengthOfSq(v2));
+}
+
+float LIA::Math::normilizer(LIA::LIAV3 vec) {
+    return std::sqrt(LIA::Math::lengthOf(vec));
+}
+
+void LIA::Math::normilize(LIA::LIAV3& vec) {
+    float norm = normilizer(vec);
+    if (norm == 0.0) {
+        return;
+    }
+    vec.x = vec.x / norm;
+    vec.y = vec.y / norm;
+    vec.z = vec.z / norm;
+}
