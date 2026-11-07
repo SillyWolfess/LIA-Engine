@@ -22,6 +22,7 @@ namespace LIA {
         int x, y;
     };
     void copy(LIAV3& target, const LIAV3& source);
+    void sum(LIAV3& target, const LIAV3& source);
 
     bool isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);
     bool isInRangeCentered2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);

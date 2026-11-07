@@ -37,6 +37,11 @@ void LIA::copy(LIAV3& target, const LIAV3& source) {
     target.y = source.y;
     target.z = source.z;
 }
+void LIA::sum(LIAV3& target, const LIAV3& source) {
+    target.x = target.x + source.x;
+    target.y = target.y + source.y;
+    target.z = target.z + source.z;
+}
 void LIA::setOne(LIAV3& target) {
     setAll(target, 1.0f);
 }
