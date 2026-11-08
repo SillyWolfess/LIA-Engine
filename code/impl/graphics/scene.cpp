@@ -590,8 +590,8 @@ bool LIA::Scene::prefabSquare(ShaderManager& shaderManager) {
         square._useIndices = model.hasIndices;
         square._vao = model.vao;
         square._loaded = true;
+        return true;
     LIA_CATCH_RETURN_FALSE
-    return true;
 }
 
 bool LIA::Scene::prefabSprite(ShaderManager& shaderManager) {

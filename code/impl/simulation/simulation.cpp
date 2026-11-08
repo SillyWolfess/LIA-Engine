@@ -52,7 +52,7 @@ bool LIA::Simulation::load(ShaderManager* shaderManager) {
             XmlLoader::XmlNode xmlTypeNode = xmlLoader.getNode(xmlData, name);
             std::string type = xmlLoader.getString(xmlTypeNode, "type", "");
             if (type == "") {
-                LIA_error_f("'type' attribute is missing for scene object '{}'", name);
+                LIA_error_f("'type' attribute is missing for scene object '{}'. [grid, object, light]", name);
                 return false;
             }
             if (type.compare("grid") == 0) {
@@ -66,7 +66,7 @@ bool LIA::Simulation::load(ShaderManager* shaderManager) {
                     return false;
                 }
             } else if (type.compare("object") == 0) {
-                if (!loadObject(path)) {
+                if (!_objManager->loadObject(path, "")) {
                     LIA_error(std::vformat("Failed to load object from path {}", std::make_format_args(path)));
                     return false;
                 }
@@ -76,6 +76,9 @@ bool LIA::Simulation::load(ShaderManager* shaderManager) {
                     LIA_error_f("Failed to laod light data from path {}", path);
                     return false;
                 }            
+            } else {
+                LIA_trace("Unknown object type '{}'. Supported [grid, object, light]", type);
+                return false;
             }
         }
         if (!_objManager->load(shaderManager)) {
@@ -137,52 +140,6 @@ void LIA::Simulation::passObjects(Scene* scene) {
             }
         }
     LIA_CATCH_EMPTY
-}
-
-bool LIA::Simulation::loadObject(std::string path) {
-    LIA_TRY
-        XmlLoader xmlLoader;
-        XmlLoader::XmlData xmlObject = xmlLoader.load(path);
-        LIA_trace("Reading object name");
-        std::string name = xmlLoader.getValue(xmlObject, "object");
-        LIA_trace("Reading object type");
-        std::string type = xmlLoader.getString(xmlObject, "type");
-        LIA_trace("Creating object");
-        int indx = _objManager->create(name);
-        if (indx == -1) {
-            return false;
-        }
-        Object* object = _objManager->get(indx);
-        Model* model = _objManager->getModelManager()->get(object->_modelInfo.id);
-        if (!model->infoLoaded) {
-            LIA_fatal_f("Failed to get info for the model of object {}", name);
-            return false;
-        }
-        LIA_trace("Setting object type");
-        _objManager->setType(object, type);
-        LIA_trace("Setting posititon");
-        Position position = xmlLoader.getPositionDefault0(xmlObject);
-        _objManager->setPosition(object, position);
-        LIA_trace("Setting scale");
-        Scale scale = xmlLoader.getScaleDefault1(xmlObject);
-        _objManager->setScale(object, scale);
-        LIA_trace("Setting rotation");
-        Rotation rotation = xmlLoader.getRotationDefault0(xmlObject);
-        rotation = convertRotation(rotation);
-        _objManager->setRotation(object, rotation);
-        
-        if (xmlLoader.hasNode(xmlObject, "physics")) {
-            LIA_trace("Getting physics node");
-            XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
-            object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
-            object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
-        } else {
-            LIA_trace("No physics node");
-            object->_collison._grounded = true;
-            object->_physics._mass = 0.0f;
-        }
-        return true;
-    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::Simulation::loadLight(std::string path) {

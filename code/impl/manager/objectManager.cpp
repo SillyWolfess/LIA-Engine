@@ -347,6 +347,10 @@ bool LIA::ObjectManager::createObject(std::string id, std::string name) {
 }
 
 bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
+    return loadObject(path, customName, true);
+}
+
+bool LIA::ObjectManager::loadObject(std::string path, std::string customName, bool doModelLoading) {
     LIA_TRY
         XmlLoader xmlLoader;
         XmlLoader::XmlData xmlObject;
@@ -388,22 +392,25 @@ bool LIA::ObjectManager::loadObject(std::string path, std::string customName) {
         rotation = convertRotation(rotation);
         setRotation(object, rotation);
         
-        LIA_trace("Getting physics node");
+        // defaults
+        object->_collison._grounded = true;
+        object->_physics._mass = 0.0f;
+
         if (xmlLoader.hasNode(xmlObject, "physics")) {
+            LIA_trace("Getting physics node");
             XmlLoader::XmlNode physicsNode = xmlLoader.getNode(xmlObject, "physics");
             object->_collison._grounded = xmlLoader.getBoolean(physicsNode, "grounded", "true");
             object->_physics._mass = xmlLoader.getFloat(physicsNode, "mass", 0.0f);
         }
-        else {
-            object->_collison._grounded = false;
-            object->_physics._mass = 1;
+
+        if (doModelLoading) {
+            if (!loadModel(*object)) {
+                LIA_error("Failed to load model");
+                return false;
+            }
         }
-        if (!loadModel(*object)) {
-            LIA_error("Failed to load model");
-            return false;
-        }
+        return true;
     LIA_CATCH_RETURN_FALSE
-    return true;
 }
 
 bool LIA::ObjectManager::loadModel(Object& object) {

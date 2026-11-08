@@ -48,6 +48,7 @@ namespace LIA {
             int size();
             bool load(ShaderManager*);
             bool loadObject(std::string, std::string);
+            bool loadObject(std::string, std::string, bool);
             bool loadModel(Object&);
 
             void setScene(Scene* scene) { _scene = scene; }

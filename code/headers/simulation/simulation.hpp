@@ -25,7 +25,6 @@ namespace LIA {
 
             std::vector<Light> _lights;
             std::vector<int> _lightIds;
-            bool loadObject(std::string path);
             bool loadLight(std::string path);
             int _playerId = -1;
         public:
