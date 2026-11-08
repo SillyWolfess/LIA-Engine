@@ -23,13 +23,24 @@ namespace LIA {
     };
     void copy(LIAV3& target, const LIAV3& source);
     void sum(LIAV3& target, const LIAV3& source);
+    void sum(LIAV3& target, LIAV3& a, const LIAV3& b);
 
     bool isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);
     bool isInRangeCentered2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale);
+
     void applyForceByAngleXZ(LIAV3& vec, float angle, float force);
+    void applyForceByAngleXY(LIAV3& vec, float angle, float force);
+    LIA::LIAV2 forceByAngle(float angle, float force);
+
     void setZero(LIAV3& target);
+    void setZero(LIAV2& target);
+
     void setOne(LIAV3& target);
+    void setOne(LIAV2& target);
+
     void setAll(LIAV3& target, float);
+    void setAll(LIAV2&, float);
+
     Position emptyPosition();
     Rotation emptyRotation();
     Rotation convertRotation(Rotation&);

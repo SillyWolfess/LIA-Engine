@@ -16,6 +16,21 @@ void LIA::applyForceByAngleXZ(LIAV3& vec, float angle, float force) {
     vec.z = force * fz;
 }
 
+void LIA::applyForceByAngleXY(LIAV3& vec, float angle, float force) {
+    float fx = LIA::Math::sinOf(angle);
+    float fz = LIA::Math::cosOf(angle);
+
+    vec.x = force * fx;
+    vec.y = force * fz;
+}
+
+LIA::LIAV2 LIA::forceByAngle(float angle, float force) {
+    LIAV2 vec;
+    vec.x = force * LIA::Math::sinOf(angle);
+    vec.y = force * LIA::Math::cosOf(angle);
+    return vec;
+}
+
 bool LIA::isInRange2D(const LIAV3& pos, const LIAV3& target, const LIAV3& scale) {
     return  target.x < pos.x && pos.x < target.x + scale.x &&
             target.y < pos.y && pos.y < target.y + scale.y;
@@ -38,20 +53,33 @@ void LIA::copy(LIAV3& target, const LIAV3& source) {
     target.z = source.z;
 }
 void LIA::sum(LIAV3& target, const LIAV3& source) {
-    target.x = target.x + source.x;
-    target.y = target.y + source.y;
-    target.z = target.z + source.z;
+    sum(target, target, source);
+}
+void LIA::sum(LIAV3& target, LIAV3& a, const LIAV3& b) {
+    target.x = a.x + b.x;
+    target.y = a.y + b.y;
+    target.z = a.z + b.z;
 }
 void LIA::setOne(LIAV3& target) {
     setAll(target, 1.0f);
 }
+void LIA::setOne(LIAV2& target) {
+    setAll(target, 1.0f);
+}
 void LIA::setZero(LIAV3& target) {
+    setAll(target, 0.0f);
+}
+void LIA::setZero(LIAV2& target) {
     setAll(target, 0.0f);
 }
 void LIA::setAll(LIAV3& target, float value) {
     target.x = value;
     target.y = value;
     target.z = value;
+}
+void LIA::setAll(LIAV2& target, float value) {
+    target.x = value;
+    target.y = value;
 }
 void LIA::copyColor(Color& target, Color& source) {
     target.r = source.r;

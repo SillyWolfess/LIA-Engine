@@ -87,6 +87,10 @@ float LIA::Math::lengthOf(LIAV3 vector) {
     return (vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z);
 }
 
+float LIA::Math::lengthOf(LIAV2 vector) {
+    return (vector.x * vector.x) + (vector.y * vector.y);
+}
+
 float LIA::Math::sq(float x) {
     return x * x;
 }
@@ -123,6 +127,21 @@ float LIA::Math::normilizer(LIA::LIAV3 vec) {
     return std::sqrt(LIA::Math::lengthOf(vec));
 }
 
+float LIA::Math::normilizer(LIA::LIAV2 vec) {
+    return std::sqrt(LIA::Math::lengthOf(vec));
+}
+
+void LIA::Math::mult(LIA::LIAV3& vec, float a) {
+    vec.x = vec.x * a;
+    vec.y = vec.y * a;
+    vec.z = vec.z * a;
+}
+
+void LIA::Math::mult(LIA::LIAV2& vec, float a) {
+    vec.x = vec.x * a;
+    vec.y = vec.y * a;
+}
+
 void LIA::Math::normilize(LIA::LIAV3& vec) {
     float norm = normilizer(vec);
     if (norm == 0.0) {
@@ -131,4 +150,14 @@ void LIA::Math::normilize(LIA::LIAV3& vec) {
     vec.x = vec.x / norm;
     vec.y = vec.y / norm;
     vec.z = vec.z / norm;
+}
+
+
+void LIA::Math::normilize(LIA::LIAV2& vec) {
+    float norm = normilizer(vec);
+    if (norm == 0.0) {
+        return;
+    }
+    vec.x = vec.x / norm;
+    vec.y = vec.y / norm;
 }
