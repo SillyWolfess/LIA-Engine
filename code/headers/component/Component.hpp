@@ -12,6 +12,8 @@ namespace LIA {
     class KeybindingManager;
     class Gui;
     class AppWindow;
+    class AnimationManager;
+    class Engine;
     enum class ComponentEvent {LOAD, TICK, GET_DATA_GUI, BUTTON_ACTION, INIT_GUI_WINDOW, CHECKBOX_ACTION, OPTION_ACTION, POSITION_CHANGED, TIMER, DRAW_PASS};
     class Component {
         public:
@@ -42,23 +44,20 @@ namespace LIA {
             virtual bool onOptionChanged(LIA::Event&);
             virtual bool onTimer(LIA::Event&);
             virtual bool onDrawPass(LIA::Event&);
-            AppWindow* getAppWindow() { return _appWindow;  }
-            EventManager* getEventManager() { return _eventManager; }
-            ObjectManager* getObjectManager() { return _objectManager; }
-            ComponentManager* getComponentManager() { return _componentManager; }
-            Gui* getGuiManager() { return _guiManager; }
-            TextureManager* getTextureManager() { return _textureManager; }
-            KeybindingManager* getKeybindingManager() { return _keybindingManager; }
+
+            AppWindow& getAppWindow();
+            EventManager& getEventManager();
+            ObjectManager& getObjectManager();
+            ComponentManager& getComponentManager();
+            Gui& getGuiManager();
+            TextureManager& getTextureManager();
+            KeybindingManager& getKeybindingManager();
+            AnimationManager& getAnimationManager();
+
             bool subscribe(std::string);
             bool subscribe(ComponentEvent);
         private:
-            EventManager* _eventManager;
-            ObjectManager* _objectManager;
-            ComponentManager* _componentManager;
-            Gui* _guiManager;
-            TextureManager* _textureManager;
-            KeybindingManager* _keybindingManager;
-            AppWindow* _appWindow;
+            Engine *_engine;
             bool _registerHandlers();
     };
 }

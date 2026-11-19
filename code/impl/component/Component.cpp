@@ -5,13 +5,8 @@
 
 bool LIA::Component::initCore() {
     Engine &engine = LIA::Engine::getInstance();
-    _objectManager = &engine.getObjectManager();
-    _eventManager = &engine.getEventManager();
-    _componentManager = &engine.getComponentManager();
-    _guiManager = &engine.getGuiManager();
-    _textureManager = &engine.getTextureManager();
-    _keybindingManager = &engine.getKeybindingManager();
-    _appWindow = &engine.getAppWindow();
+    _engine = &engine;
+
     _identifier = -1;
     if (!init()) {
         return false;
@@ -23,40 +18,49 @@ bool LIA::Component::initCore() {
     return true;
 };
 
+LIA::AppWindow& LIA::Component::getAppWindow() { return _engine->getAppWindow(); }
+LIA::EventManager& LIA::Component::getEventManager() { return _engine->getEventManager(); }
+LIA::ObjectManager& LIA::Component::getObjectManager() { return _engine->getObjectManager(); }
+LIA::ComponentManager& LIA::Component::getComponentManager() { return _engine->getComponentManager(); }
+LIA::Gui& LIA::Component::getGuiManager() { return _engine->getGuiManager(); }
+LIA::TextureManager& LIA::Component::getTextureManager() { return _engine->getTextureManager(); }
+LIA::KeybindingManager& LIA::Component::getKeybindingManager() { return _engine->getKeybindingManager(); }
+LIA::AnimationManager& LIA::Component::getAnimationManager() { return _engine->getAnimationManager(); }
+
 bool LIA::Component::_registerHandlers() {
     return registerHandlers();
 }
 
 bool LIA::Component::subscribe(LIA::ComponentEvent event) {
     if (event == ComponentEvent::LOAD) {
-        getEventManager()->subscribe("load", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::loadEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("load", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::loadEventHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::TICK) {
-        getEventManager()->subscribe("tick", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::tickEvenHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("tick", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::tickEvenHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::GET_DATA_GUI) {
-        getEventManager()->subscribe("get_data_gui", LIA::EventType::GUI, __FILE__, std::bind(&Component::getDataGuiEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("get_data_gui", LIA::EventType::GUI, __FILE__, std::bind(&Component::getDataGuiEventHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::BUTTON_ACTION) {
-        getEventManager()->subscribe("button_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("button_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::buttonActionEventHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::INIT_GUI_WINDOW) {
-        getEventManager()->subscribe("init_gui_window", LIA::EventType::GUI, __FILE__, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("init_gui_window", LIA::EventType::GUI, __FILE__, std::bind(&Component::guiWindowInitHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::CHECKBOX_ACTION) {
-        getEventManager()->subscribe("checkbox_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::checkboxEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("checkbox_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::checkboxEventHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::POSITION_CHANGED) {
-        getEventManager()->subscribe("position_changed", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::positionChangedEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("position_changed", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::positionChangedEventHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::OPTION_ACTION) {
-        getEventManager()->subscribe("option_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::optionChangedHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("option_action", LIA::EventType::GUI, __FILE__, std::bind(&Component::optionChangedHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::TIMER) {
-        getEventManager()->subscribe("timer", LIA::EventType::GUI, __FILE__, std::bind(&Component::timerHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("timer", LIA::EventType::GUI, __FILE__, std::bind(&Component::timerHandler, this, std::placeholders::_1));
         return true;
     } else if (event == ComponentEvent::DRAW_PASS) {
-        getEventManager()->subscribe("drawPass", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::drawPassEventHandler, this, std::placeholders::_1));
+        getEventManager().subscribe("drawPass", LIA::EventType::SIMULATION, __FILE__, std::bind(&Component::drawPassEventHandler, this, std::placeholders::_1));
         return true;
     } else {
         LIA_error("Subscription event unknown");

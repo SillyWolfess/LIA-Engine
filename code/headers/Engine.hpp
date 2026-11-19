@@ -12,6 +12,7 @@
 #include "manager/textureManager.hpp"
 #include "manager/materialManager.hpp"
 #include "manager/keybindingManager.hpp"
+#include "manager/animationManager.hpp"
 #include "component/BaseGame.hpp"
 
 #include "watcher/Watcher.hpp"
@@ -30,6 +31,7 @@ namespace LIA
             AppWindow _window;
             Simulation _simulation;
             Gui _gui;
+            
             ShaderManager _shaderManager;
             EventManager _eventManager;
             ComponentManager _componentManager;
@@ -37,6 +39,8 @@ namespace LIA
             TextureManager _textureManager;
             MaterialManager _materialManager;
             KeybindingManager _keybindingManager;
+            AnimationManager _animationManager;
+
             Terrain _terrain;
             FpsCounter _fpsCounter;
             BaseGame* _game = nullptr;
@@ -61,12 +65,14 @@ namespace LIA
             bool isExit();
         public:
             Engine();
+
             bool initImplementation(Component*);
             void run();
             void disableSimulationControls();
             void enableSimulationControls();
             void fatal() { _window.close(); }
             int getFps() { return _fpsCounter.getFps(); }
+            
             ShaderManager& getShaderManager() { return _shaderManager; }
             EventManager& getEventManager() { return _eventManager; }
             ComponentManager& getComponentManager() { return _componentManager; }
@@ -74,13 +80,16 @@ namespace LIA
             TextureManager& getTextureManager() { return _textureManager; }
             MaterialManager& getMaterialManager() { return _materialManager; }
             KeybindingManager& getKeybindingManager() { return _keybindingManager; }
+            AnimationManager& getAnimationManager() { return _animationManager; }
+            
             Gui& getGuiManager() { return _gui; }
             AppWindow& getAppWindow() { return _window; }
             Camera& getMainCamera() { return _window.getCamera(); }
             Terrain& getTerrain() { return _terrain; }
             Scene* getTerrainRenderer() { return _window.getTerrain(); }
-            ~Engine();
             void setGame(BaseGame* game);
+
+            ~Engine();
             static Engine& getInstance();
     };
 } // namespace LIA

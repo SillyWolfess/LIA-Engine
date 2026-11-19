@@ -26,11 +26,11 @@ bool LIA::KeyMappingWindow::onGetGuiData(LIA::Event& event) {
 
 void LIA::KeyMappingWindow::updateData(std::string window) {
     LIA_TRY
-        LIA::KeybindingManager *keyBindingManager = getKeybindingManager();
-        std::vector<std::string> keyGroups = keyBindingManager->keySet();
+        LIA::KeybindingManager& keyBindingManager = getKeybindingManager();
+        std::vector<std::string> keyGroups = keyBindingManager.keySet();
         std::vector<std::string> data;
         for (std::string keyGroupName : keyGroups) {
-            LIA::KeybindingControls &controls = keyBindingManager->getControls(keyGroupName);
+            LIA::KeybindingControls &controls = keyBindingManager.getControls(keyGroupName);
             std::vector<std::string> keySet = controls.keySet();
             if (!keySet.empty()) {
                 data.push_back(keyGroupName);
@@ -42,6 +42,6 @@ void LIA::KeyMappingWindow::updateData(std::string window) {
             }
         }
         LIA::UpdateGuiListEvent ev(window, "list", data, -1);
-        getEventManager()->handleEvent(ev);
+        getEventManager().handleEvent(ev);
     LIA_CATCH_EMPTY
 }
