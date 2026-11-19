@@ -6,6 +6,7 @@
 #include <map>
 
 #include "loaders/xmlLoader.hpp"
+#include "frameAnimationManager.hpp"
 
 #include "./../data/AnimationDefinition.hpp"
 
@@ -19,6 +20,8 @@ namespace LIA {
             std::map<std::string, std::string> _templatePaths;
 
             std::vector<AnimationDefinition> _animDefinitions;
+
+            FrameAnimationManager _frameAnimationManager;
 
             std::string getPath(std::string);
             std::string getTemplatePath(std::string);
