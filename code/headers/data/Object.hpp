@@ -23,6 +23,11 @@ namespace LIA {
         ~ModelInfo();
         #endif
     };
+    struct AnimationInfo {
+        std::string name;
+        bool playing;
+        int frame;
+    };
     enum ObjectType {OBJECT, PLAYER};
     struct PhysicData {
         float _mass = 0;
@@ -40,6 +45,8 @@ namespace LIA {
         std::string _name;
         std::string _materialLib;
         ModelInfo _modelInfo;
+        AnimationInfo _animationInfo;
+
         Position _position;
         Rotation _rotation;
 

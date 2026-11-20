@@ -4,6 +4,7 @@
 #include <vector>
 #include "./../data/Object.hpp"
 #include "modelManager.hpp"
+#include "animationManager.hpp"
 
 namespace LIA {
     class ShaderManager;
@@ -11,6 +12,8 @@ namespace LIA {
     class ObjectManager {
         private:
             ModelManager _modelManager;
+            AnimationManager _animationManager;
+
             std::map<std::string, XmlLoader::XmlData> _cache;
             std::map<std::string, XmlLoader::XmlData> _objectCache;
             std::map<std::string, XmlLoader::XmlData> _pathCache;
@@ -75,6 +78,7 @@ namespace LIA {
             int getPlayer(int);
             int getByName(int, std::string);
             ModelManager* getModelManager() { return &_modelManager; };
+            AnimationManager& getAnimationManager() { return _animationManager; }
     };
 }
 #endif

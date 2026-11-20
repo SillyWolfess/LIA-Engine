@@ -2,26 +2,34 @@
 
 #include "logs.hpp"
 #include "precompiled.hpp"
+#include "graphics/scene.hpp"
+#include "data/Object.hpp"
 
 void LIA::AnimationManager::reset() {
     _animDefinitions.clear();
 }
 
-int LIA::AnimationManager::create() {
-    LIA_debug("Creating animation object");
-    _animDefinitions.emplace_back();
-    int indx = _animDefinitions.size();
-    _animDefinitions[indx].loaded = false;
-    LIA_trace_f("Created animaiton object. Current size {}", _animDefinitions.size());
-    return indx;
+bool LIA::AnimationManager::_create(std::string name) {
+    LIA_TRY
+        LIA_debug("Creating animation object");
+        AnimationDefinition tmp;
+        _animDefinitions.emplace(std::pair<std::string, AnimationDefinition>(name, tmp));
+        _animDefinitions[name].loaded = false;
+        _animDefinitions[name].name = name;
+        LIA_trace_f("Created animaiton object {}. Current size {}", _animDefinitions[name].name, _animDefinitions.size());
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
-LIA::AnimationDefinition* LIA::AnimationManager::get(int indx) {
-    return &_animDefinitions.at(indx);
+LIA::AnimationDefinition* LIA::AnimationManager::get(std::string name) {
+    return &_animDefinitions.at(name);
 }
 
-int LIA::AnimationManager::create(std::string animationName) {
-    int id = -1;
+bool LIA::AnimationManager::find(std::string name) {
+    return _animDefinitions.find(name) != _animDefinitions.end();
+}
+
+bool LIA::AnimationManager::create(std::string animationName) {
     LIA_TRY
         LIA_debug_f("Creating animation definition {}", animationName);
         std::string animDefPath = getTemplatePath(animationName);
@@ -54,25 +62,24 @@ int LIA::AnimationManager::create(std::string animationName) {
             _animDefCache.emplace(animDefPath, xmlAnimationData);
         }
 
-        std::string name = xmlLoader.getString(xmlAnimationData, "name");
+        std::string name = xmlLoader.getString(xmlAnimationData, "name", animationName);
         std::string path = xmlLoader.getString(xmlAnimationData, "path");
         std::string type = xmlLoader.getString(xmlAnimationData, "type");
         bool repeat = xmlLoader.getBoolean(xmlAnimationData, "repeat", false);
 
-        id = create();
-        if (id < 0) {
+        if (!create(name)) {
             LIA_error_f("Failed to create animation object for '{}'", animationName);
-            return -1;
+            return false;
         }
 
-        AnimationDefinition* data = get(id);
+        AnimationDefinition* data = get(name);
         data->name = name;
         data->path = path;
         data->type = resolveType(type);
         data->repeat = repeat;
-        LIA_debug_f("Created animation object {} with id {}", animationName, id);
-    LIA_CATCH(return -1;)
-    return id;
+        LIA_debug_f("Created animation object {}", animationName);
+        return true;
+    LIA_CATCH_RETURN_FALSE
 }
 
 bool LIA::AnimationManager::registerPath(std::string name, std::string path) {
@@ -130,3 +137,23 @@ LIA::AnimationType LIA::AnimationManager::resolveType(std::string type) {
     return AnimationType::NONE;
 }
 
+void LIA::AnimationManager::pass(Scene* scene, Object* object, AnimationInfo& animInfo, Position& position, Rotation& rotation, Scale& scale) {
+    if (!animInfo.playing) {
+        LIA_warn_f("Trying to pass not playing animation {}", animInfo.name);
+        return;
+    }
+    if (!find(animInfo.name)) {
+        LIA_warn_f("Trying to pass not existing animation {}", animInfo.name);
+        return;
+    }
+    AnimationDefinition* def = get(animInfo.name);
+    if (!def->loaded) {
+        LIA_warn_f("Animation {} is not loaded", def->name);
+        return;
+    }
+    if (def->type == AnimationType::FRAMES) {
+        _frameAnimationManager.pass(scene, object, animInfo.frame, def->path, position, rotation, scale);
+    } else {
+        LIA_error_f("Unsupported animation type {} for {}", def->type, def->name);
+    }
+}

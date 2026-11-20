@@ -230,27 +230,31 @@ bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
 }
 
 void LIA::ObjectManager::passObjectAt(Object& object, Position& position, Rotation& rotation, Scale& scale) {
-    Model* model = _modelManager.get(object._modelInfo.id);
-    if (model->isInGpu) {
-        std::vector<int> offsets = model->data.offsets;
-        for (int i = 0; i < offsets.size(); i++) {
-            int oSize = model->size - offsets[i];
-            if (i + 1 < offsets.size()) {
-                oSize = offsets[i + 1] - offsets[i];
+    if (object._animationInfo.playing) {
+        _animationManager.pass(_scene, &object, object._animationInfo, position, rotation, scale);
+    } else {
+        Model* model = _modelManager.get(object._modelInfo.id);
+        if (model->isInGpu) {
+            std::vector<int> offsets = model->data.offsets;
+            for (int i = 0; i < offsets.size(); i++) {
+                int oSize = model->size - offsets[i];
+                if (i + 1 < offsets.size()) {
+                    oSize = offsets[i + 1] - offsets[i];
+                }
+                _scene->add(
+                    object._name,
+                    position, rotation, scale,
+                    model->vao, model->shader,
+                    model->hasIndices, oSize,
+                    object._materialLib != "" ? object._materialLib : model->materialLib,
+                    model->data.materialName.size() <= i ? "" : model->data.materialName[i],
+                    offsets[i]
+                );
             }
-            _scene->add(
-                object._name,
-                position, rotation, scale,
-                model->vao, model->shader,
-                model->hasIndices, oSize,
-                object._materialLib != "" ? object._materialLib : model->materialLib,
-                model->data.materialName.size() <= i ? "" : model->data.materialName[i],
-                offsets[i]
-            );
         }
-    }
-    else {
-        LIA_error(std::vformat("Object {} was not loaded", std::make_format_args(object._name)));
+        else {
+            LIA_error(std::vformat("Object {} was not loaded", std::make_format_args(object._name)));
+        }
     }
 }
 

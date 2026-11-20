@@ -9,6 +9,9 @@
 #include "frameAnimationManager.hpp"
 
 #include "./../data/AnimationDefinition.hpp"
+#include "graphics/scene.hpp"
+#include "data/position.hpp"
+#include "data/object.hpp"
 
 namespace LIA {
 	class AnimationManager {
@@ -19,14 +22,15 @@ namespace LIA {
             std::map<std::string, std::string> _paths;
             std::map<std::string, std::string> _templatePaths;
 
-            std::vector<AnimationDefinition> _animDefinitions;
+            std::map<std::string, AnimationDefinition> _animDefinitions;
 
             FrameAnimationManager _frameAnimationManager;
 
             std::string getPath(std::string);
             std::string getTemplatePath(std::string);
 
-            int create();
+            bool _create(std::string);
+            bool find(std::string);
             AnimationType resolveType(std::string);
 		public:
             void reset();
@@ -43,8 +47,10 @@ namespace LIA {
             bool registerPathsFromFile(std::string);
             bool registerTemplatePathsFromFile(std::string);
 
-            int create(std::string);
-            AnimationDefinition* get(int);
+            bool create(std::string);
+            AnimationDefinition* get(std::string);
+
+            void pass(Scene*, Object* object, AnimationInfo&, Position& position, Rotation& rotation, Scale& scale);
 	};
 }
 #endif
