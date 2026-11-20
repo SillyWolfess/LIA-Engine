@@ -253,10 +253,15 @@ bool LIA::Engine::update() {
             enableSimulationControls();
         }
         LIA_trace("Loaded simulation");
-    }
-    else if (!_simulation.update(&_window, deltaTime)) {
-        LIA_fatal("Simulation update failed");
-        return false;
+    } else {
+        if (!_simulation.update(&_window, deltaTime)) {
+            LIA_fatal("Simulation update failed");
+            return false;
+        }
+        if (!_simulation.animationUpdate(deltaTime)) {
+            LIA_fatal("Simulation animation update failed");
+            return false;
+        }
     }
     _gui.update();
     _window.resetState();

@@ -157,3 +157,32 @@ void LIA::AnimationManager::pass(Scene* scene, Object* object, AnimationInfo& an
         LIA_error_f("Unsupported animation type {} for {}", def->type, def->name);
     }
 }
+
+void LIA::AnimationManager::nextFrame(AnimationInfo& animInfo) {
+    if (!animInfo.playing) {
+        LIA_warn_f("Next Frame called while not playing animation {}", animInfo.name);
+        return;
+    }
+    if (!find(animInfo.name)) {
+        LIA_warn_f("Trying to pass not existing animation {}", animInfo.name);
+        return;
+    }
+    AnimationDefinition* def = get(animInfo.name);
+    if (!def->loaded) {
+        LIA_warn_f("Animation {} is not loaded", def->name);
+        return;
+    }
+    if (def->type == AnimationType::FRAMES) {
+        // At the end of the loop
+        if (_frameAnimationManager.nextFrame(def->name, animInfo)) {
+            if (def->repeat) {
+                _frameAnimationManager.reset(def->name, animInfo);
+            } else {
+                animInfo.playing = false;
+            }
+        }
+    }
+    else {
+        LIA_error_f("Unsupported animation type {} for {}", def->type, def->name);
+    }
+}

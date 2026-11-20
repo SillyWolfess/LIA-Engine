@@ -56,6 +56,7 @@ namespace LIA {
 
             void setScene(Scene* scene) { _scene = scene; }
             void pass(Scene*);
+            void animationUpdate(float);
             void passObjectAt(Object& object, Position& position, Rotation& rotation, Scale& scale);
             void setModel(Object* object, std::string);
 

@@ -51,6 +51,7 @@ namespace LIA {
             AnimationDefinition* get(std::string);
 
             void pass(Scene*, Object* object, AnimationInfo&, Position& position, Rotation& rotation, Scale& scale);
+            void nextFrame(AnimationInfo&);
 	};
 }
 #endif

@@ -92,6 +92,14 @@ bool LIA::Simulation::load(ShaderManager* shaderManager) {
     LIA_CATCH_RETURN_FALSE
 }
 
+bool LIA::Simulation::animationUpdate(float deltaTime) {
+    if (_state != LIA_SIM_STATE::RUNNING) {
+        return true;
+    }
+    _objManager->animationUpdate(deltaTime);
+    return true;
+}
+
 bool LIA::Simulation::update(AppWindow* appWindow, float deltaTime) {
     if (_state != LIA_SIM_STATE::RUNNING) {
         return true;

@@ -33,6 +33,7 @@ namespace LIA {
             bool init();
             bool load(ShaderManager*);
             bool update(AppWindow*, float);
+            bool animationUpdate(float);
             int getPlayerId() { return _playerId; };
 
             void passObjects(Scene*);

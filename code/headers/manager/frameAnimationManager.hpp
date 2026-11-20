@@ -18,6 +18,8 @@ namespace LIA {
 		public:
 			FrameAnimationData* get(std::string);
 			void pass(Scene*, Object*, int, std::string, Position&, Rotation&, Scale&);
+			bool nextFrame(std::string, AnimationInfo&);
+			void reset(std::string, AnimationInfo&);
 	};
 }
 

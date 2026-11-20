@@ -42,3 +42,20 @@ void LIA::FrameAnimationManager::pass(Scene* scene, Object* object, int nFrame, 
         LIA_error_f("Animation model {} was not loaded for frame {}", frames->name, nFrame);
     }
 }
+
+bool LIA::FrameAnimationManager::nextFrame(std::string name, AnimationInfo& animInfo) {
+    FrameAnimationData* frames = get(name);
+    if (frames == nullptr) {
+        return true;
+    }
+    animInfo.frame = animInfo.frame + 1;
+    return animInfo.frame > frames->end;
+}
+
+void LIA::FrameAnimationManager::reset(std::string name, AnimationInfo& animInfo) {
+    FrameAnimationData* frames = get(name);
+    if (frames == nullptr) {
+        return;
+    }
+    animInfo.frame = frames->start;
+}

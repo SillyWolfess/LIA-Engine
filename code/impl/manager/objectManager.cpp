@@ -229,6 +229,15 @@ bool LIA::ObjectManager::loadMaterials(Object& object, Model* model) {
     return true;
 }
 
+void LIA::ObjectManager::animationUpdate(float deltaTime) {
+    for (Object& object : _objects) {
+        if (object._hide || !object._animationInfo.playing) {
+            continue;
+        }
+        _animationManager.nextFrame(object._animationInfo);
+    }
+}
+
 void LIA::ObjectManager::passObjectAt(Object& object, Position& position, Rotation& rotation, Scale& scale) {
     if (object._animationInfo.playing) {
         _animationManager.pass(_scene, &object, object._animationInfo, position, rotation, scale);
